@@ -1,5 +1,5 @@
-PageClass = 46, 46, 850, 633, Z
-ProcessClass = 23, 23, 827, 610, 
+PageClass = 46, 46, 850, 633, 
+ProcessClass = 23, 23, 827, 610, Z
 ImportWizardModule = 69, 69, 873, 656, 
 ccCommonModule = 0, 0, 0, 0, C
 kmaCommonModule = 0, 0, 0, 0, C

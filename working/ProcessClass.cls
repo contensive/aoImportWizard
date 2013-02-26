@@ -93,6 +93,7 @@ Public Function Execute(CsvObject As Object, MainObject As Object, OptionString 
     If csv.IsContentFieldSupported("Tasks", "ID") Then
         CS = csv.OpenCSContent("Tasks", "DateCompleted is null")
         Do While csv.IsCSOK(CS)
+            Call csv.SetCS(CS, "DateCompleted", Now)
             PreviousProcessAborted = False
             If (csv.GetDataBuildVersion > "3.4.070") Then
                 '
@@ -102,7 +103,7 @@ Public Function Execute(CsvObject As Object, MainObject As Object, OptionString 
                 PreviousProcessAborted = (csv.GetCSDate(CS, "DateStarted") <> CDate(0))
             End If
             If PreviousProcessAborted Then
-                Call csv.SetCS(CS, "DateCompleted", Now)
+                'Call csv.SetCS(CS, "DateCompleted", Now)
                 Call csv.SetCS(CS, "ResultMessage", "This task failed to complete.")
             Else
                 If csv.IsContentFieldSupported("Tasks", "NotifyEmail") Then
@@ -137,7 +138,7 @@ Public Function Execute(CsvObject As Object, MainObject As Object, OptionString 
                             NotifyBody = "This email is to notify you that your data import is complete for [" & csv.ApplicationNameLocal & "]"
                         End If
                         NotifySubject = "Import Completed"
-                        Call csv.SetCS(CS, "DateCompleted", Now)
+                        'Call csv.SetCS(CS, "DateCompleted", Now)
                         If csv.GetDataBuildVersion > "3.4.070" Then
                             If ResultMessage = "" Then
                                 ResultMessage = "OK"
