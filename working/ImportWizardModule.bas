@@ -326,7 +326,21 @@ Dim startPtr As Long
             hint = hint & ",230"
             Ptr = InStr(Ptr, Source, """")
             endPtr = Ptr - 1
-            If (Mid(Source, Ptr - 1, 2) = vbCrLf) Then
+            ' skip white space to next delimter
+            Do While (Mid(Source, Ptr + 1, 1) = " ") And (Ptr < Len(Source))
+                Ptr = Ptr + 1
+            Loop
+            If (Ptr >= Len(Source)) Then
+                '
+                ' crlf end of line
+                '
+                hint = hint & ",240"
+                return_cell = Mid(Source, startPtr, endPtr - startPtr + 1)
+                return_ptr = Ptr + 3
+                parseFieldReturnEol = True
+            ElseIf (Mid(Source, Ptr + 1, 2) = vbCrLf) Then
+            ' ***** 20140131 - ptr is to the end quote
+            'If (Mid(Source, Ptr - 1, 2) = vbCrLf) Then
                 '
                 ' crlf end of line
                 '
@@ -357,10 +371,17 @@ Dim startPtr As Long
                 hint = hint & ",260"
                 return_cell = Mid(Source, startPtr, endPtr - startPtr + 1)
                 return_ptr = InStr(Ptr, Source, ",")
-                If return_ptr > 0 Then
+                ' ***** 20140131
+                If return_ptr <= 0 Then
+                    '
+                    ' end of line, end of file
+                    '
+                    parseFieldReturnEol = True
+                Else
+                    'If return_ptr > 0 Then
                     return_ptr = return_ptr + 1
+                    parseFieldReturnEol = False
                 End If
-                parseFieldReturnEol = False
             End If
         End If
     End If
@@ -454,6 +475,9 @@ End If
                 colCnt = colPtr + 1
                 ReDim Preserve cells(colCnt - 1, rowCnt - 1)
             End If
+        End If
+        If (rowPtr = 79) And (colPtr = 2) Then
+            rowPtr = rowPtr
         End If
         EOL = parseFieldReturnEol(Source, srcPtr, Cell, srcPtr, eof)
         cells(colPtr, rowPtr) = Cell
