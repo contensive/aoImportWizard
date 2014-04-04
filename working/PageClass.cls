@@ -142,7 +142,7 @@ Private Function GetForm() As String
     Dim ButtonList As String
     Dim EmailScheduleStart As Date
     Dim EmailFinishID As Long
-    Dim Cnt As Long
+    Dim cnt As Long
     Dim Ptr As Long
     Dim ImportSource As Long
     Dim ImportContentID As Long
@@ -162,14 +162,18 @@ Private Function GetForm() As String
     Dim ImportMapData As String
     Dim FieldCnt As Long
     Dim DBFieldCaption As String
-    '
-    'Const ContentName = "People"
+    Dim useNewContentName As Boolean
+    Dim newContentName As String
     Dim PeopleContentID As Long
+    Dim ContentName As String
+    Dim DbField As String
+    Dim inputRadioNewContent As String
+    Dim inputRadioExistingContent As String
     '
     PeopleContentID = Main.GetContentID("people")
     ProcessError = False
     Content = ""
-    Button = Main.GetStreamText(RequestNameButton)
+    Button = Main.getStreamText(RequestNameButton)
     If Button = ButtonCancel Then
         '
         ' Cancel
@@ -207,40 +211,94 @@ Private Function GetForm() As String
                     '
                     'Call SaveWizardValue(RequestNameImportContentName, ContentName)
                     Call SaveWizardStreamInteger(RequestNameImportSource)
+                    Call LoadWizardPath
+                    Select Case Button
+                        Case ButtonBack2
+                            SubformID = PreviousSubFormID(SubformID)
+                        Case ButtonContinue2
+                            SubformID = NextSubFormID(SubformID)
+                    End Select
                 Case SubFormSourceUpload
                     '
                     ' Upload
                     '
                     Filename = Main.ProcessFormInputFile(RequestNameImportUpload)
                     Call SaveWizardValue(RequestNameImportUpload, Filename)
+                    Call LoadWizardPath
+                    Select Case Button
+                        Case ButtonBack2
+                            SubformID = PreviousSubFormID(SubformID)
+                        Case ButtonContinue2
+                            SubformID = NextSubFormID(SubformID)
+                    End Select
                 Case SubFormSourceUploadFolder
                     '
                     '
                     '
-                    Filename = Main.GetStreamText("SelectFile")
+                    Filename = Main.getStreamText("SelectFile")
                     Call SaveWizardValue(RequestNameImportUpload, Filename)
+                    Call LoadWizardPath
+                    Select Case Button
+                        Case ButtonBack2
+                            SubformID = PreviousSubFormID(SubformID)
+                        Case ButtonContinue2
+                            SubformID = NextSubFormID(SubformID)
+                    End Select
                 Case SubFormSourceResourceLibrary
                     '
                     '
                     '
                     ProcessError = True
                     Call Main.AddUserError("Under Construction")
+                    Call LoadWizardPath
+                    Select Case Button
+                        Case ButtonBack2
+                            SubformID = PreviousSubFormID(SubformID)
+                        Case ButtonContinue2
+                            SubformID = NextSubFormID(SubformID)
+                    End Select
                 Case SubFormDestination
                     '
                     ' Source and ContentName
                     '
-Dim ContentName As String
-
-                    ContentID = Main.GetStreamInteger(RequestNameImportContentID)
-                    ContentName = Main.GetContentNamebyid(ContentID)
-                    ImportMap.ContentName = ContentName
+                    useNewContentName = Main.getStreamBoolean("useNewContentName")
+                    If useNewContentName Then
+                        newContentName = Main.getStreamText("newContentName")
+                        ImportMap.ContentName = newContentName
+                        ImportMap.importToNewContent = True
+                        Select Case Button
+                            Case ButtonFinish
+                                SubformID = 1
+                            Case ButtonBack2
+                                SubformID = SubFormSourceUpload
+                            Case ButtonContinue2
+                                SubformID = SubFormFinish
+                            Case Else
+                                SubformID = SubFormDestination
+                        End Select
+                    Else
+                        ContentID = Main.GetStreamInteger(RequestNameImportContentID)
+                        ContentName = Main.GetContentNamebyid(ContentID)
+                        ImportMap.ContentName = ContentName
+                        ImportMap.importToNewContent = False
+                        Select Case Button
+                            Case ButtonFinish
+                                SubformID = 1
+                            Case ButtonBack2
+                                SubformID = 1
+                            Case ButtonContinue2
+                                SubformID = 1
+                            Case Else
+                                SubformID = 1
+                        End Select
+                    End If
                     Call SaveImportMap(ImportMap)
                     Call SaveWizardStreamInteger(RequestNameImportContentID)
                 Case SubFormNewMapping
                     '
                     ' Mapping - Save Values to the file pointed to by RequestNameImportMapFile
                     '
-                    If Main.GetStreamBoolean(RequestNameImportSkipFirstRow) Then
+                    If Main.getStreamBoolean(RequestNameImportSkipFirstRow) Then
                         ImportMap.SkipRowCnt = 1
                     Else
                         ImportMap.SkipRowCnt = 0
@@ -249,36 +307,49 @@ Dim ContentName As String
                     ImportMap.MapPairCnt = FieldCnt
                     If FieldCnt > 0 Then
                     ReDim ImportMap.MapPairs(FieldCnt - 1)
-Dim DbField As String
                     If FieldCnt > 0 Then
                         For Ptr = 0 To FieldCnt - 1
                             SourceFieldPtr = Main.GetStreamInteger("SOURCEFIELD" & Ptr)
                             ImportMap.MapPairs(Ptr).SourceFieldPtr = SourceFieldPtr
-                            DbField = Main.GetStreamText("DBFIELD" & Ptr)
+                            DbField = Main.getStreamText("DBFIELD" & Ptr)
                             ImportMap.MapPairs(Ptr).DbField = DbField
                             ImportMap.MapPairs(Ptr).DbFieldType = kmaEncodeInteger(Main.GetContentFieldProperty(ImportMap.ContentName, DbField, "Fieldtype"))
                         Next
                     End If
                     End If
                     Call SaveImportMap(ImportMap)
+                    Call LoadWizardPath
+                    Select Case Button
+                        Case ButtonBack2
+                            SubformID = PreviousSubFormID(SubformID)
+                        Case ButtonContinue2
+                            SubformID = NextSubFormID(SubformID)
+                    End Select
                 Case SubFormKey
                     '
                     ' Select Key Field
                     '
                     ImportMap.KeyMethodID = Main.GetStreamInteger(RequestNameImportKeyMethodID)
-                    ImportMap.SourceKeyField = Main.GetStreamText(RequestNameImportSourceKeyFieldPtr)
-                    ImportMap.DbKeyField = Main.GetStreamText(RequestNameImportDbKeyField)
+                    ImportMap.SourceKeyField = Main.getStreamText(RequestNameImportSourceKeyFieldPtr)
+                    ImportMap.DbKeyField = Main.getStreamText(RequestNameImportDbKeyField)
                     If ImportMap.DbKeyField <> "" Then
                         ImportMap.DbKeyFieldType = Main.GetContentFieldProperty(ImportMap.ContentName, ImportMap.DbKeyField, "FieldType")
                     End If
                     Call SaveImportMap(ImportMap)
+                    Call LoadWizardPath
+                    Select Case Button
+                        Case ButtonBack2
+                            SubformID = PreviousSubFormID(SubformID)
+                        Case ButtonContinue2
+                            SubformID = NextSubFormID(SubformID)
+                    End Select
                 Case SubFormGroup
                     '
                     ' Add to group
                     '
 Dim newGroupName As String
 Dim newGroupID As Long
-                    newGroupName = Main.GetStreamText(RequestNameImportGroupNew)
+                    newGroupName = Main.getStreamText(RequestNameImportGroupNew)
                     If newGroupName <> "" Then
                         CS = Main.OpenCSContent("groups", "name=" & KmaEncodeSQLText(newGroupName))
                         If Main.IsCSOK(CS) Then
@@ -302,6 +373,13 @@ Dim newGroupID As Long
                     End If
                     ImportMap.GroupOptionID = Main.GetStreamInteger(RequestNameImportGroupOptionID)
                     Call SaveImportMap(ImportMap)
+                    Call LoadWizardPath
+                    Select Case Button
+                        Case ButtonBack2
+                            SubformID = PreviousSubFormID(SubformID)
+                        Case ButtonContinue2
+                            SubformID = NextSubFormID(SubformID)
+                    End Select
                 Case SubFormFinish
                     '
                     ' Get email address for email
@@ -322,30 +400,48 @@ Dim newGroupID As Long
                     ' Call the background process to do the import
                     '
                     Call Main.ExecuteAddonAsProcess(ImportProcessAddonGuid, "", Nothing, False)
+                    If Button = ButtonFinish Then
+                        '
+                        ' Finished - exit here
+                        '
+                        Call ClearWizardValues
+                        Call Main.Redirect(Main.ServerAppRootPath & Main.ServerAppPath)
+                    Else
+                        '
+                        ' Determine next or previous form
+                        '
+                        Call LoadWizardPath
+                        Select Case Button
+                            Case ButtonBack2
+                                SubformID = PreviousSubFormID(SubformID)
+                            Case ButtonContinue2
+                                SubformID = NextSubFormID(SubformID)
+                        End Select
+                    End If
             End Select
-            '
-            ' Handle back and continue
-            '
-            If Not ProcessError Then
-                If Button = ButtonFinish Then
-                    '
-                    ' Finished - exit here
-                    '
-                    Call ClearWizardValues
-                    Call Main.Redirect(Main.ServerAppRootPath & Main.ServerAppPath)
-                Else
-                    '
-                    ' Determine next or previous form
-                    '
-                    Call LoadWizardPath
-                    Select Case Button
-                        Case ButtonBack2
-                            SubformID = PreviousSubFormID(SubformID)
-                        Case ButtonContinue2
-                            SubformID = NextSubFormID(SubformID)
-                    End Select
-                End If
-            End If
+'            '
+'            ' Handle back and continue
+'            '
+'            If Not ProcessError Then
+'                If Button = ButtonFinish Then
+'                    '
+'                    ' Finished - exit here
+'                    '
+'                    Call ClearWizardValues
+'                    Call Main.Redirect(Main.ServerAppRootPath & Main.ServerAppPath)
+'                Else
+'                    '
+'                    ' Determine next or previous form
+'                    '
+'                    Call LoadWizardPath
+'                    Select Case Button
+'                        Case ButtonBack2
+'                            SubformID = PreviousSubFormID(SubformID)
+'                        Case ButtonContinue2
+'                            SubformID = NextSubFormID(SubformID)
+'                    End Select
+'                End If
+'            End If
         End If
         '
         ' Get Next Form
@@ -423,12 +519,22 @@ Dim newGroupID As Long
                 If ImportContentID = 0 Then
                     ImportContentID = Main.GetContentID("People")
                 End If
+                If useNewContentName Then
+                    inputRadioNewContent = "<input type=""radio"" name=""useNewContentName"" value=""1"" checked>"
+                    inputRadioExistingContent = "<input type=""radio"" name=""useNewContentName"" value=""0"">"
+                Else
+                    inputRadioNewContent = "<input type=""radio"" name=""useNewContentName"" value=""1"">"
+                    inputRadioExistingContent = "<input type=""radio"" name=""useNewContentName"" value=""0"" checked>"
+                End If
                 Description = "<B>Select the destination for your data</B>" _
                     & "<BR><BR><p>For example, to import a list in to people, select People.</p>"
                 Content = Content _
                     & "<div>" _
                     & "<TABLE border=0 cellpadding=10 cellspacing=0 width=100%>" _
-                    & "<TR><TD colspan=""2"">" & Main.GetFormInputSelect(RequestNameImportContentID, ImportContentID, "Content") & "</td></tr>" _
+                    & "<TR><TD colspan=""2"">Import into an existing content table</td></tr>" _
+                    & "<TR><TD colspan=""2"">" & inputRadioExistingContent & Main.GetFormInputSelect(RequestNameImportContentID, ImportContentID, "Content") & "</td></tr>" _
+                    & "<TR><TD colspan=""2"">Create a new content table</td></tr>" _
+                    & "<TR><TD colspan=""2"">" & inputRadioNewContent & "<input type=""text"" name=""newContentName"" value=""" & newContentName & """></td></tr>" _
                     & "</table>" _
                     & "</div>" _
                     & ""
@@ -921,7 +1027,7 @@ End Sub
 '
 '
 Private Sub SaveWizardStream(RequestName As String)
-    Call SaveWizardValue(RequestName, Main.GetStreamText(RequestName))
+    Call SaveWizardValue(RequestName, Main.getStreamText(RequestName))
 End Sub
 '
 '
@@ -1285,6 +1391,7 @@ Private Sub SaveImportMap(ImportMap As ImportMapType)
         & vbCrLf & ImportMap.GroupID _
         & vbCrLf & ImportMap.SkipRowCnt _
         & vbCrLf & ImportMap.DbKeyFieldType _
+        & vbCrLf & ImportMap.importToNewContent _
         & vbCrLf
     If ImportMap.MapPairCnt > 0 Then
         For Ptr = 0 To ImportMap.MapPairCnt - 1

@@ -206,22 +206,82 @@ Private Function ProcessCSV(ContentServer As Object, CSVFilename As String, Impo
     Dim ImportTableName As String
     '
     hint = "000"
-    ImportMap = LoadImportMap(csv.ReadVirtualFile(ImportMapFilename))
-    If ImportMap.MapPairCnt > 0 Then
-        hint = "100"
-        Source = csv.ReadVirtualFile(CSVFilename)
-        If Source <> "" Then
+    '
+    If Left(CSVFilename, 1) = "\" Then
+        CSVFilename = Mid(CSVFilename, 2)
+    End If
+    hint = "010"
+    Source = csv.ReadVirtualFile(CSVFilename)
+    If Source <> "" Then
+        hint = "020"
+        ImportMap = LoadImportMap(csv.ReadVirtualFile(ImportMapFilename))
+        hint = "030"
+        ContentName = ImportMap.ContentName
+        hint = "040"
+        cells = parseFile(Source)
+        colCnt = UBound(cells, 1) + 1
+        rowCnt = UBound(cells, 2) + 1
+        If ImportMap.importToNewContent Then
+            hint = "050"
+            '
+            ' create the destination table and import map
+            '
+            ImportMap.MapPairCnt = colCnt
+            ReDim ImportMap.MapPairs(colCnt - 1)
+            ImportTableName = ContentName
+            ImportTableName = Replace(ImportTableName, " ", "_")
+            ImportTableName = Replace(ImportTableName, "-", "_")
+            ImportTableName = Replace(ImportTableName, ",", "_")
+            hint = "060"
+            Call csv.createContent(True, "default", ImportTableName, ContentName)
+            Call csv.loadContentDefinitions
+            hint = "070"
+            For colPtr = 0 To colCnt - 1
+                hint = "080"
+                DBFieldName = cells(colPtr, 0)
+                DBFieldName = Replace(DBFieldName, " ", "_")
+                DBFieldName = Replace(DBFieldName, "-", "_")
+                DBFieldName = Replace(DBFieldName, ",", "_")
+                If (DBFieldName = "") Then
+                    DBFieldName = "field" & colPtr
+                End If
+                ImportMap.MapPairs(colPtr).DbField = DBFieldName
+                ImportMap.MapPairs(colPtr).DbFieldType = 2
+                ImportMap.MapPairs(colPtr).SourceFieldName = DBFieldName
+                ImportMap.MapPairs(colPtr).SourceFieldPtr = colPtr
+                hint = "090"
+                Call csv.createContentField(True, ContentName, DBFieldName, 2)
+            Next
+            Call csv.loadContentDefinitions
+        End If
+        
+        If ImportMap.MapPairCnt > 0 Then
             hint = "200"
-            ContentName = ImportMap.ContentName
-            If ContentName = "" Then
-                ContentName = "People"
-            End If
-            ImportTableName = csv.GetContentTablename(ImportMap.ContentName)
-            cells = parseFile(Source)
-            
-            'Rows = kmaSplit(source, vbCrLf)
+'            ContentName = ImportMap.ContentName
+'            cells = parseFile(Source)
+'            colCnt = UBound(cells, 1) + 1
+'            rowCnt = UBound(cells, 2) + 1
+'            If ImportMap.importToNewContent Then
+'                ImportTableName = ContentName
+'                ImportTableName = Replace(ImportTableName, " ", "_")
+'                ImportTableName = Replace(ImportTableName, "-", "_")
+'                ImportTableName = Replace(ImportTableName, ",", "_")
+'                Call csv.createContent4(True, "default", ImportTableName, ContentName)
+'                For colPtr = 0 To colCnt - 1
+'                    DBFieldName = cells(colPtr, 0)
+'                    DBFieldName = Replace(DBFieldName, " ", "_")
+'                    DBFieldName = Replace(DBFieldName, "-", "_")
+'                    DBFieldName = Replace(DBFieldName, ",", "_")
+'                    If DBFieldName <> "" Then
+'                        Call csv.createContentField2(True, ContentName, DBFieldName, 2)
+'                    End If
+'                Next
+'            Else
+'            End If
+'
+'            'Rows = kmaSplit(source, vbCrLf)
             DbKeyField = ImportMap.DbKeyField
-            SourceKeyPtr = ImportMap.SourceKeyField
+            SourceKeyPtr = kmaEncodeInteger(ImportMap.SourceKeyField)
             KeyMethodID = ImportMap.KeyMethodID
             If (DbKeyField = "") Or (SourceKeyPtr < 0) Then
                 KeyMethodID = KeyMethodInsertAll
@@ -230,8 +290,6 @@ Private Function ProcessCSV(ContentServer As Object, CSVFilename As String, Impo
             '
             '
             KeyCriteria = "(1=0)"
-            colCnt = UBound(cells, 1) + 1
-            rowCnt = UBound(cells, 2) + 1
             For rowPtr = ImportMap.SkipRowCnt To rowCnt - 1
             'For rowPtr = 0 To rowCnt - 1
             'For rowPtr = ImportMap.SkipRowCnt To UBound(Rows)

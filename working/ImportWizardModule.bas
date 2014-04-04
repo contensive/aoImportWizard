@@ -91,6 +91,7 @@ Public Type MapPairType
 End Type
 '
 Public Type ImportMapType
+    importToNewContent As Boolean
     ContentName As String
     KeyMethodID As Long
     SourceKeyField As String
@@ -127,7 +128,7 @@ Public Function LoadImportMap(ImportMapData As String) As ImportMapType
         ' read in what must be saved
         '
         Rows = Split(ImportMapData, vbCrLf)
-        If UBound(Rows) <= 6 Then
+        If UBound(Rows) <= 7 Then
             '
             ' Map file is bad
             '
@@ -141,6 +142,7 @@ Public Function LoadImportMap(ImportMapData As String) As ImportMapType
             LoadImportMap.GroupID = kmaEncodeInteger(Rows(5))
             LoadImportMap.SkipRowCnt = kmaEncodeInteger(Rows(6))
             LoadImportMap.DbKeyFieldType = kmaEncodeInteger(Rows(7))
+            LoadImportMap.importToNewContent = kmaEncodeBoolean(Rows(8))
             LoadImportMap.MapPairCnt = 0
             '
             If UBound(Rows) > 8 Then
