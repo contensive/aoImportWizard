@@ -146,8 +146,8 @@ Public Function LoadImportMap(ImportMapData As String) As ImportMapType
             LoadImportMap.MapPairCnt = 0
             '
             If UBound(Rows) > 8 Then
-                If Trim(Rows(8)) = "" Then
-                    For Ptr = 9 To UBound(Rows)
+                If Trim(Rows(9)) = "" Then
+                    For Ptr = 10 To UBound(Rows)
                         Pair = Split(Rows(Ptr), "=")
                         If UBound(Pair) > 0 Then
                             MapPtr = LoadImportMap.MapPairCnt

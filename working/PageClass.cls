@@ -236,6 +236,9 @@ Private Function GetForm() As String
                     '
                     '
                     Filename = Main.getStreamText("SelectFile")
+                    If Left(Filename, 1) = "\" Then
+                    Filename = Mid(Filename, 2)
+                    End If
                     Call SaveWizardValue(RequestNameImportUpload, Filename)
                     Call LoadWizardPath
                     Select Case Button
@@ -266,6 +269,8 @@ Private Function GetForm() As String
                         newContentName = Main.getStreamText("newContentName")
                         ImportMap.ContentName = newContentName
                         ImportMap.importToNewContent = True
+                        Call SaveImportMap(ImportMap)
+                        Call SaveWizardStreamInteger(RequestNameImportContentID)
                         Select Case Button
                             Case ButtonFinish
                                 SubformID = 1
@@ -281,19 +286,26 @@ Private Function GetForm() As String
                         ContentName = Main.GetContentNamebyid(ContentID)
                         ImportMap.ContentName = ContentName
                         ImportMap.importToNewContent = False
+                        Call SaveImportMap(ImportMap)
+                        Call SaveWizardStreamInteger(RequestNameImportContentID)
+                        Call LoadWizardPath
                         Select Case Button
-                            Case ButtonFinish
-                                SubformID = 1
                             Case ButtonBack2
-                                SubformID = 1
+                                SubformID = PreviousSubFormID(SubformID)
                             Case ButtonContinue2
-                                SubformID = 1
-                            Case Else
-                                SubformID = 1
+                                SubformID = NextSubFormID(SubformID)
                         End Select
+'                        Select Case Button
+'                            Case ButtonFinish
+'                                SubformID = 1
+'                            Case ButtonBack2
+'                                SubformID = 1
+'                            Case ButtonContinue2
+'                                SubformID = 1
+'                            Case Else
+'                                SubformID = 1
+'                        End Select
                     End If
-                    Call SaveImportMap(ImportMap)
-                    Call SaveWizardStreamInteger(RequestNameImportContentID)
                 Case SubFormNewMapping
                     '
                     ' Mapping - Save Values to the file pointed to by RequestNameImportMapFile
@@ -547,6 +559,9 @@ Dim newGroupID As Long
                 Description = "<B>Create a New Mapping</B><BR><BR>This step lets you select which fields in your database you would like each field in your upload to be assigned."
                 Filename = GetWizardValue(RequestNameImportUpload, "")
                 If Filename <> "" Then
+If Left(Filename, 1) = "\" Then
+Filename = Mid(Filename, 2)
+End If
                     FileData = Main.ReadVirtualFile(Filename)
                 End If
                 If FileData = "" Then

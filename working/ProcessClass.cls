@@ -94,6 +94,7 @@ Public Function Execute(CsvObject As Object, MainObject As Object, OptionString 
         CS = csv.OpenCSContent("Tasks", "DateCompleted is null")
         Do While csv.IsCSOK(CS)
             Call csv.SetCS(CS, "DateCompleted", Now)
+            Call csv.savecs(CS)
             PreviousProcessAborted = False
             If (csv.GetDataBuildVersion > "3.4.070") Then
                 '
@@ -253,6 +254,11 @@ Private Function ProcessCSV(ContentServer As Object, CSVFilename As String, Impo
                 Call csv.createContentField(True, ContentName, DBFieldName, 2)
             Next
             Call csv.loadContentDefinitions
+        Else
+            If ContentName = "" Then
+                ContentName = "People"
+            End If
+            ImportTableName = csv.GetContentTablename(ImportMap.ContentName)
         End If
         
         If ImportMap.MapPairCnt > 0 Then
