@@ -398,24 +398,24 @@ Dim newGroupID As Long
                     '
                     Call SaveWizardStream(RequestNameImportEmail)
                     If Button = ButtonFinish Then
-                        CS = Main.InsertCSRecord("Tasks")
+                        CS = Main.InsertCSRecord("Import Wizard Tasks")
                         If Main.IsCSOK(CS) Then
                             Call Main.SetCS(CS, "Name", Now() & " CSV Import")
-                            Call Main.SetCS(CS, "Filename", GetWizardValue(RequestNameImportUpload, ""))
+                            Call Main.SetCS(CS, "uploadFilename", GetWizardValue(RequestNameImportUpload, ""))
                             Call Main.SetCS(CS, "NotifyEmail", GetWizardValue(RequestNameImportEmail, ""))
                             Call Main.SetCS(CS, "ImportMapFilename", GetWizardValue(RequestNameImportMapFile, GetDefaultImportMapFile))
-                            Call Main.SetCS(CS, "COMMAND", "IMPORTCSV")
+                            'Call Main.SetCS(CS, "COMMAND", "IMPORTCSV")
                         End If
                         Call Main.closecs(CS)
                     End If
                     '
                     ' Call the background process to do the import
                     '
-                    Call Main.ExecuteAddonAsProcess(ImportProcessAddonGuid, "", Nothing, False)
                     If Button = ButtonFinish Then
                         '
                         ' Finished - exit here
                         '
+                        Call Main.ExecuteAddonAsProcess(ImportProcessAddonGuid, "", Nothing, False)
                         Call ClearWizardValues
                         Call Main.Redirect(Main.ServerAppRootPath & Main.ServerAppPath)
                     Else

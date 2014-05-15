@@ -90,8 +90,8 @@ Public Function Execute(CsvObject As Object, MainObject As Object, OptionString 
     '
     '   Check this server for anything in the tasks queue
     '
-    If csv.IsContentFieldSupported("Tasks", "ID") Then
-        CS = csv.OpenCSContent("Tasks", "DateCompleted is null")
+    If csv.IsContentFieldSupported("Import Wizard Tasks", "ID") Then
+        CS = csv.OpenCSContent("Import Wizard Tasks", "DateCompleted is null")
         Do While csv.IsCSOK(CS)
             Call csv.SetCS(CS, "DateCompleted", Now)
             Call csv.savecs(CS)
@@ -107,7 +107,7 @@ Public Function Execute(CsvObject As Object, MainObject As Object, OptionString 
                 'Call csv.SetCS(CS, "DateCompleted", Now)
                 Call csv.SetCS(CS, "ResultMessage", "This task failed to complete.")
             Else
-                If csv.IsContentFieldSupported("Tasks", "NotifyEmail") Then
+                If csv.IsContentFieldSupported("Import Wizard Tasks", "NotifyEmail") Then
                     NotifyEMail = csv.GetCS(CS, "NotifyEmail")
                 End If
                 NotifyBody = ""
@@ -116,45 +116,30 @@ Public Function Execute(CsvObject As Object, MainObject As Object, OptionString 
                 Else
                     SQLFieldName = "SQL"
                 End If
-                Select Case UCase(csv.GetCSText(CS, "Command"))
-                    Case "BUILDCSV"
-                        '
-                        ' Build CSV
-                        '
-                    Case "BUILDXML"
-                        '
-                        ' Build XML
-                        '
-                    Case "IMPORTCSV"
-                        '
-                        ' Import a CSV file
-                        '
-                        CSVFilename = Replace(csv.GetCSText(CS, "Filename"), "/", "\")
-                        ImportMapFilename = Replace(csv.GetCSText(CS, "ImportMapFilename"), "/", "\")
-                        '
-                        ResultMessage = ProcessCSV(csv, CSVFilename, ImportMapFilename)
-                        If ResultMessage <> "" Then
-                            NotifyBody = "This email is to notify you that your data import is complete for [" & csv.ApplicationNameLocal & "]" & vbCrLf & "The following errors occurred during import" & vbCrLf & ResultMessage
-                        Else
-                            NotifyBody = "This email is to notify you that your data import is complete for [" & csv.ApplicationNameLocal & "]"
-                        End If
-                        NotifySubject = "Import Completed"
-                        'Call csv.SetCS(CS, "DateCompleted", Now)
-                        If csv.GetDataBuildVersion > "3.4.070" Then
-                            If ResultMessage = "" Then
-                                ResultMessage = "OK"
-                            End If
-                            Call csv.SetCS(CS, "ResultMessage", ResultMessage)
-                        End If
-                        If NotifyEMail <> "" And NotifyBody <> "" Then
-                            notifyFromAddress = csv.GetSiteProperty("EmailFromAddress", "", 0)
-                            Call csv.SendEmail(NotifyEMail, notifyFromAddress, "Task Completion Notification", NotifyBody)
-                        End If
-                    Case Else
-                        '
-                        ' Any other cases
-                        '
-                End Select
+                '
+                ' Import a CSV file
+                '
+                CSVFilename = Replace(csv.GetCSText(CS, "uploadFilename"), "/", "\")
+                ImportMapFilename = Replace(csv.GetCSText(CS, "ImportMapFilename"), "/", "\")
+                '
+                ResultMessage = ProcessCSV(csv, CSVFilename, ImportMapFilename)
+                If ResultMessage <> "" Then
+                    NotifyBody = "This email is to notify you that your data import is complete for [" & csv.ApplicationNameLocal & "]" & vbCrLf & "The following errors occurred during import" & vbCrLf & ResultMessage
+                Else
+                    NotifyBody = "This email is to notify you that your data import is complete for [" & csv.ApplicationNameLocal & "]"
+                End If
+                NotifySubject = "Import Completed"
+                'Call csv.SetCS(CS, "DateCompleted", Now)
+                If csv.GetDataBuildVersion > "3.4.070" Then
+                    If ResultMessage = "" Then
+                        ResultMessage = "OK"
+                    End If
+                    Call csv.SetCS(CS, "ResultMessage", ResultMessage)
+                End If
+                If NotifyEMail <> "" And NotifyBody <> "" Then
+                    notifyFromAddress = csv.GetSiteProperty("EmailFromAddress", "", 0)
+                    Call csv.SendEmail(NotifyEMail, notifyFromAddress, "Task Completion Notification", NotifyBody)
+                End If
             End If
             csv.NextCSRecord (CS)
         Loop
@@ -657,8 +642,8 @@ Private Sub AddGroupMember(MemberID As Long, GroupID As Long)
             Call csv.SetCS(CS, "MemberID", MemberID)
             Call csv.SetCS(CS, "GroupID", GroupID)
         End If
-        Call csv.closecs(CS)
     End If
+    Call csv.closecs(CS)
     '
     Exit Sub
     '
