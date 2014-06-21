@@ -225,9 +225,10 @@ Private Function ProcessCSV(ContentServer As Object, CSVFilename As String, Impo
             For colPtr = 0 To colCnt - 1
                 hint = "080"
                 DBFieldName = cells(colPtr, 0)
-                DBFieldName = Replace(DBFieldName, " ", "_")
-                DBFieldName = Replace(DBFieldName, "-", "_")
-                DBFieldName = Replace(DBFieldName, ",", "_")
+                DBFieldName = encodeFieldName(DBFieldName)
+                'DBFieldName = Replace(DBFieldName, " ", "_")
+                'DBFieldName = Replace(DBFieldName, "-", "_")
+                'DBFieldName = Replace(DBFieldName, ",", "_")
                 If (DBFieldName = "") Then
                     DBFieldName = "field" & colPtr
                 End If
@@ -650,3 +651,34 @@ Private Sub AddGroupMember(MemberID As Long, GroupID As Long)
 ErrorTrap:
     Call HandleLocalError(Err.Number, Err.Source, Err.Description, "AddGroupMember", True, False)
 End Sub
+
+'
+'========================================================================
+' encodeFieldName
+'
+'========================================================================
+'
+Public Function encodeFieldName(Source As String) As String
+    Dim allowed As String
+    Dim chr As String
+    Dim Ptr As Long
+    Dim cnt As Long
+    Dim returnString As String
+    '
+    returnString = ""
+    cnt = Len(Source)
+    If cnt > 254 Then
+        cnt = 254
+    End If
+    allowed = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_"
+    For Ptr = 1 To cnt
+        chr = Mid(Source, Ptr, 1)
+        If InStr(1, allowed, chr, vbBinaryCompare) Then
+            returnString = returnString & chr
+        Else
+            returnString = returnString & "_"
+        End If
+    Next
+    encodeFieldName = returnString
+End Function
+
