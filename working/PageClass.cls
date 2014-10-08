@@ -753,7 +753,8 @@ Dim DbKeyField As String
                 ImportContentName = Main.GetContentNamebyid(ImportContentID)
 Dim note As String
 
-                If (Not Main.IsWithinContent(ImportContentName, "People")) Or Main.IsDeveloper Then
+                If True Then
+                'If (Not Main.IsWithinContent(ImportContentName, "People")) Or Main.IsDeveloper Then
                     '
                     ' Pick any field for key if developer or not the ccMembers table
                     '
