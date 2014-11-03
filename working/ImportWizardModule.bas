@@ -385,6 +385,11 @@ Dim startPtr As Long
                     parseFieldReturnEol = False
                 End If
             End If
+            '
+            ' This is quoted text, so anything inside is converted to double quotes -- convert them back.
+            '
+            return_cell = Replace(return_cell, """""", """")
+            '
         End If
     End If
     '

@@ -481,8 +481,9 @@ Private Function ProcessCSV(ContentServer As Object, CSVFilename As String, Impo
                                     Case FieldTypeFile, FieldTypeImage, FieldTypeTextFile, FieldTypeCSSFile, FieldTypeXMLFile, FieldTypeJavascriptFile, FieldTypeHTMLFile
                                     'Case FieldTypeFile, FieldTypeRedirect
                                         '
-                                        ' can not import these
+                                        ' filenames, can not import these, but at least update the filename
                                         '
+                                        UpdateSQLFieldSet = UpdateSQLFieldSet & "," & DBFieldName & "=" & KmaEncodeSQLText(Left(SourceData, 255))
                                 End Select
                             End If
                         Next
