@@ -1,0 +1,38 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "aoImportWizard", "aoImportWizard.vbproj", "{5A2EAEEE-CDFE-4E0B-BF3C-EE50C0BA76F0}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{5A2EAEEE-CDFE-4E0B-BF3C-EE50C0BA76F0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5A2EAEEE-CDFE-4E0B-BF3C-EE50C0BA76F0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5A2EAEEE-CDFE-4E0B-BF3C-EE50C0BA76F0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5A2EAEEE-CDFE-4E0B-BF3C-EE50C0BA76F0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BD7F68DB-C1C8-4B4B-A1CE-ECE3F4C3689A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BD7F68DB-C1C8-4B4B-A1CE-ECE3F4C3689A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BD7F68DB-C1C8-4B4B-A1CE-ECE3F4C3689A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BD7F68DB-C1C8-4B4B-A1CE-ECE3F4C3689A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{242F27CE-F8DE-49E8-921F-CA95024C2D18}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{242F27CE-F8DE-49E8-921F-CA95024C2D18}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{242F27CE-F8DE-49E8-921F-CA95024C2D18}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{242F27CE-F8DE-49E8-921F-CA95024C2D18}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FBC958C9-DD3A-4E3D-A1E8-F0ADDFE7ABC5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FBC958C9-DD3A-4E3D-A1E8-F0ADDFE7ABC5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FBC958C9-DD3A-4E3D-A1E8-F0ADDFE7ABC5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FBC958C9-DD3A-4E3D-A1E8-F0ADDFE7ABC5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{49DC5814-E991-45DA-9934-C61D8B499D1B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{49DC5814-E991-45DA-9934-C61D8B499D1B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{49DC5814-E991-45DA-9934-C61D8B499D1B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{49DC5814-E991-45DA-9934-C61D8B499D1B}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
