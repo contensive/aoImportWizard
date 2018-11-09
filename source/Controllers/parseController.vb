@@ -1,4 +1,4 @@
-﻿
+﻿Imports Contensive.Addons.ImportWizard.Controllers.genericController
 Namespace Controllers
     Public Class parseController
         '
@@ -42,9 +42,6 @@ Namespace Controllers
                     If colPtr >= colCnt Then
                         If rowCnt <> 1 Then
                             '
-                            ' error - can not adjust columns after first row
-                            '
-                            'Call HandleError("ImportWizardModule", "parseCsvData", KmaErrorInternal, App.EXEName, "Error in file, row [" & rowCnt & "] has [" & colPtr & "] columns, but only [" & colCnt & "] columns were found in the first row. This is not allowed.", False, False)
                         Else
                             colCnt = colPtr + 1
                             ReDim Preserve result(colCnt - 1, rowCnt - 1)
@@ -62,7 +59,6 @@ Namespace Controllers
                         colPtr = colPtr + 1
                     End If
                 Loop
-                parseCsvData = cells
             Catch ex As Exception
                 Throw
             End Try
@@ -320,15 +316,25 @@ ErrorTrap:
         '
         Private Function firstNonZero(a As Integer, b As Integer) As Integer
             Dim v As Integer
-            v = kmaGetFirstNonZeroLong(a, b)
-            If v = 1 Then
-                firstNonZero = a
-            ElseIf v = 2 Then
-                firstNonZero = b
-            Else
-                firstNonZero = 0
-            End If
+            Dim result As String = ""
+            Try
+
+
+                v = kmaGetFirstNonZeroLong(a, b)
+                If v = 1 Then
+                    firstNonZero = a
+                ElseIf v = 2 Then
+                    firstNonZero = b
+                Else
+                    firstNonZero = 0
+                End If
+            Catch ex As Exception
+                Throw
+            End Try
         End Function
+        '
+        '
+
 
 
 

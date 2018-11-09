@@ -436,7 +436,7 @@ Namespace Controllers
                     If (rowPtr = 79) And (colPtr = 2) Then
                         rowPtr = rowPtr
                     End If
-                    EOL = parseFieldReturnEol(Source, srcPtr, result, srcPtr, eof)
+                    EOL = parseFieldReturnEol(Source, srcPtr, result.ToString, srcPtr, eof)
                     result(colPtr, rowPtr) = Cell
                     If EOL Then
                         colPtr = 0
@@ -450,6 +450,10 @@ Namespace Controllers
                 Throw
             End Try
             Return result
+        End Function
+
+        Private Shared Function Cell() As String
+            Throw New NotImplementedException()
         End Function
         '
         '

@@ -531,7 +531,7 @@ public property ShipPhone as String
 public property ShipState as String
 public property ShipZip as String
 public property State as String
-public property StyleFilename as String
+
 public property ThumbnailFilename as String
 public property Title as String
 public property Username as String
@@ -1037,7 +1037,6 @@ Table Name: ccSharedStyles
 
 public property AlwaysInclude as Boolean
 public property Prefix as String
-public property StyleFilename as String
 public property Suffix as String
 
 

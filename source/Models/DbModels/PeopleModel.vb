@@ -72,12 +72,13 @@ Namespace Models     '<------ set namespace
         Public Property ShipState As String
         Public Property ShipZip As String
         Public Property State As String
-        Public Property StyleFilename As String
+
         Public Property ThumbnailFilename As String
         Public Property Title As String
         Public Property Username As String
         Public Property Visits  as Integer
         Public Property Zip As String
+        Public Overloads Property Contentcontrolid As Integer
 
         '
         '====================================================================================================

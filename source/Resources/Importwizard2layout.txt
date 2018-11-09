@@ -1,0 +1,325 @@
+﻿<div id="js-importwizard" class="iWizWrapper">
+					<section id="js-importWizardForm rel=" redactor-form-tag"="">
+
+						<div class="ccWizardHeader">Import Wizard</div>
+						<table border="0" cellpadding="10" cellspacing="0" width="100%"><tbody><tr><td valign="top" class="ccWizardPanel">
+							<div><strong>Select the destination for your data</strong><br><br><p>For example, to import a list in to people, select People.</p>
+							</div>
+							<table border="0" cellpadding="10" cellspacing="0" height="100" width="100%"><tbody><tr><td valign="top">
+								<div>
+									<input type="hidden" name="SubForm" value="9"><div><table border="0" cellpadding="10" cellspacing="0" width="100%"><tbody><tr><td colspan="2">Import into an existing content table</td></tr><tr><td colspan="2"><input type="radio" name="useNewContentName" value="0" checked=""><select size="1" name="ImportWizardDestination"><option value=""></option>
+<option value="232">Account Autopay Options</option>
+<option value="261">Account Categories</option>
+<option value="265">Account Contact Item Category Rules</option>
+<option value="241">Account Contact Types</option>
+<option value="240">Account Contacts</option>
+<option value="235">Account Messages</option>
+<option value="226">Account Notes</option>
+<option value="236">Account Terms</option>
+<option value="252">Account Transaction Documents</option>
+<option value="228">Account Transactions</option>
+<option value="227">Accounts</option>
+<option value="100">Activity Log</option>
+<option value="71">Add-on Collection CDef Rules</option>
+<option value="72">Add-on Collection Module Rules</option>
+<option value="70">Add-on Collection Parent Rules</option>
+<option value="73">Add-on Collections</option>
+<option value="7">Add-on Content Field Type Rules</option>
+<option value="64">Add-on Content Trigger Rules</option>
+<option value="260">Add-on Event Catchers</option>
+<option value="259">Add-on Event Throwers</option>
+<option value="258">Add-on Events</option>
+<option value="63">Add-on Include Rules</option>
+<option value="62">Add-on Scripting Module Rules</option>
+<option value="65">Add-ons</option>
+<option value="225">Admin Framework Report Columns</option>
+<option value="224">Admin Framework Reports</option>
+<option value="15">Admin Menuing</option>
+<option value="21">Admin Site Properties</option>
+<option value="90">Aggregate Access</option>
+<option value="68">Aggregate Function Objects</option>
+<option value="69">Aggregate Function Replacements</option>
+<option value="67">Aggregate Function Scripts</option>
+<option value="66">Aggregate Functions</option>
+<option value="56">Authoring Controls</option>
+<option value="220">Banner Campaign Rules</option>
+<option value="219">Banner Campaigns</option>
+<option value="218">Banner Viewings</option>
+<option value="221">Banners</option>
+<option value="186">Blog Categories</option>
+<option value="192">Blog Category Group Rules</option>
+<option value="187">Blog Comments</option>
+<option value="190">Blog Copy</option>
+<option value="189">Blog Entries</option>
+<option value="223">Blog Entry CTA Rules</option>
+<option value="185">Blog Image Rules</option>
+<option value="184">Blog Images</option>
+<option value="183">Blog Viewing Log</option>
+<option value="191">Blogs</option>
+<option value="107">Calendar Event Rules</option>
+<option value="108">Calendar Events</option>
+<option value="109">Calendars</option>
+<option value="222">Calls To Action</option>
+<option value="281">Certificate CECs</option>
+<option value="286">Certificate Types</option>
+<option value="285">Certificates</option>
+<option value="284">Certification CECs</option>
+<option value="283">Certification Types</option>
+<option value="282">Certifications</option>
+<option value="206">Cleaners Care</option>
+<option value="207">Cleaners Care Charities</option>
+<option value="39">Conditional Email</option>
+<option value="3">Content</option>
+<option value="9">Content Categories</option>
+<option value="5">Content Field Help</option>
+<option value="6">Content Field Types</option>
+<option value="4">Content Fields</option>
+<option value="46">Content Watch</option>
+<option value="48">Content Watch List Rules</option>
+<option value="47">Content Watch Lists</option>
+<option value="91">Copy Content</option>
+<option value="53">Countries</option>
+<option value="96">Custom Reports</option>
+<option value="1">Data Sources</option>
+<option value="266">DLI Garment Submission</option>
+<option value="269">DLI Garment Submission Detail</option>
+<option value="255">DLI Keys</option>
+<option value="248">DLI Membership Application Contacts</option>
+<option value="251">DLI Membership Application Locations</option>
+<option value="247">DLI Membership Applications</option>
+<option value="246">DLI Membership Categories</option>
+<option value="268">DLI Order Status</option>
+<option value="193">DLI Seal Rules</option>
+<option value="194">DLI Seals</option>
+<option value="267">DLI Submission Type</option>
+<option value="81">Domains</option>
+<option value="95">Dynamic Menu Section Rules</option>
+<option value="94">Dynamic Menus</option>
+<option value="273">Ecommerce Catalog Style Rules</option>
+<option value="274">Ecommerce Catalogs</option>
+<option value="234">Ecommerce Exports</option>
+<option value="35">Email</option>
+<option value="290">Email Bounce List</option>
+<option value="42">Email Drops</option>
+<option value="40">Email Groups</option>
+<option value="43">Email Log</option>
+<option value="36">Email Style Rules</option>
+<option value="44">Email Templates</option>
+<option value="41">Email Topics</option>
+<option value="45">Email Wizards</option>
+<option value="295">Encyclopedia Article Category Rules</option>
+<option value="294">Encyclopedia Articles</option>
+<option value="293">Encyclopedia Categories</option>
+<option value="176">Encyclopedia Documents</option>
+<option value="177">Encyclopedia Lists</option>
+<option value="296">Encyclopedia Tags</option>
+<option value="291">ESM FORM DATA</option>
+<option value="216">Exam Registration Rules</option>
+<option value="149">Fabric Types</option>
+<option value="174">FAQ</option>
+<option value="173">FAQ Lists</option>
+<option value="106">Form Fields</option>
+<option value="97">Form Pages</option>
+<option value="105">Form Sets</option>
+<option value="104">Forms</option>
+<option value="249">Free Service Rules</option>
+<option value="250">Free Services</option>
+<option value="211">Galleriffic Image Galleries</option>
+<option value="212">Galleriffic Images</option>
+<option value="146">Garment Type Brochures</option>
+<option value="144">Garment Types</option>
+<option value="239">General Ledger Accounts</option>
+<option value="270">General Ledger Transactions</option>
+<option value="37">Group Email</option>
+<option value="30">Group Rules</option>
+<option value="289">Group Types</option>
+<option value="29">Groups</option>
+<option value="275">Hanger Recycling Participants</option>
+<option value="202">Header Images</option>
+<option value="143">Heads Up Alerts</option>
+<option value="153">Image Slider Images</option>
+<option value="54">Images</option>
+<option value="256">Import Wizard Tasks</option>
+<option value="287">ImportCertifications</option>
+<option value="238">Invoice Layouts</option>
+<option value="257">Item Bundling Rules</option>
+<option value="111">Item Categories</option>
+<option value="280">Item Images</option>
+<option value="117">Item Material Categories</option>
+<option value="116">Item Materials</option>
+<option value="110">Items</option>
+<option value="245">JSAs</option>
+<option value="26">Languages</option>
+<option value="101">Layouts</option>
+<option value="78">Library File Log</option>
+<option value="77">Library File Types</option>
+<option value="76">Library Files</option>
+<option value="75">Library Folder Rules</option>
+<option value="74">Library Folders</option>
+<option value="80">Link Aliases</option>
+<option value="79">Link Forwards</option>
+<option value="271">Manager Features</option>
+<option value="272">Managers</option>
+<option value="145">Manufacturers</option>
+<option value="130">Meeting Attendee Field Rules</option>
+<option value="131">Meeting Attendee Fields</option>
+<option value="132">Meeting Attendee Session Selections</option>
+<option value="126">Meeting Attendee Sessions</option>
+<option value="122">Meeting Attendee Types</option>
+<option value="124">Meeting Attendees</option>
+<option value="118">Meeting AttendeeType Rules</option>
+<option value="128">Meeting Discount Codes</option>
+<option value="133">Meeting Guest Attendee Types</option>
+<option value="134">Meeting Guest Session Fees</option>
+<option value="135">Meeting Guest Session Selections</option>
+<option value="136">Meeting Guest Sessions</option>
+<option value="137">Meeting Guests</option>
+<option value="138">Meeting Links</option>
+<option value="125">Meeting Pay Methods</option>
+<option value="127">Meeting Payment Transactions</option>
+<option value="123">Meeting Session Fees</option>
+<option value="139">Meeting Session Selections</option>
+<option value="129">Meeting Session Sort Methods</option>
+<option value="121">Meeting Sessions</option>
+<option value="120">Meetings</option>
+<option value="31">Member Rules</option>
+<option value="24">Member Topic Rules</option>
+<option value="28">Members</option>
+<option value="142">Membership Application Contact Types</option>
+<option value="152">Membership Application Organizations</option>
+<option value="141">Membership Application People</option>
+<option value="140">Membership Applications</option>
+<option value="262">Membership Kit Fulfillments</option>
+<option value="243">Membership Organization Rules</option>
+<option value="242">Membership People Rules</option>
+<option value="279">Membership Reasons For Leaving</option>
+<option value="151">Membership Types</option>
+<option value="16">Menu Entries</option>
+<option value="87">Meta Content</option>
+<option value="89">Meta Keyword Rules</option>
+<option value="88">Meta Keywords</option>
+<option value="17">Navigator Entries</option>
+<option value="210">Newsletter Categories</option>
+<option value="160">Newsletter Issue Categories</option>
+<option value="157">Newsletter Issue Category Rules</option>
+<option value="159">Newsletter Issue Pages</option>
+<option value="161">Newsletter Issues</option>
+<option value="164">Newsletter Page Group Rules</option>
+<option value="208">Newsletter Stories</option>
+<option value="209">Newsletter Story Group Rules</option>
+<option value="163">Newsletter Templates</option>
+<option value="162">Newsletters</option>
+<option value="213">Online Exam Registrations</option>
+<option value="214">Online Exams</option>
+<option value="172">Operating Plants</option>
+<option value="113">Order Details</option>
+<option value="237">Order Pay Options</option>
+<option value="112">Order Ship Methods</option>
+<option value="114">Orders</option>
+<option value="115">Orders Completed</option>
+<option value="288">Organization Activity Log</option>
+<option value="32">Organizations</option>
+<option value="33">Page Content</option>
+<option value="34">Page Content Block Rules</option>
+<option value="23">Page Content Topic Rules</option>
+<option value="82">Page Templates</option>
+<option value="11">Page View Summary</option>
+<option value="51">Path Rules</option>
+<option value="50">Paths</option>
+<option value="119">Pay Methods</option>
+<option value="178">PDF Text</option>
+<option value="27" selected="">People</option>
+<option value="277">Portal Features</option>
+<option value="278">Portal Links</option>
+<option value="276">Portals</option>
+<option value="231">Print Queue</option>
+<option value="263">Promotional Discount Item Rules</option>
+<option value="264">Promotional Discounts</option>
+<option value="55">Properties</option>
+<option value="198">Quiz Answers</option>
+<option value="199">Quiz Questions</option>
+<option value="201">Quiz Response Details</option>
+<option value="196">Quiz Response Scores</option>
+<option value="197">Quiz Responses</option>
+<option value="195">Quiz Subjects</option>
+<option value="200">Quizzes</option>
+<option value="229">Recurring Purchases</option>
+<option value="230">Referrals</option>
+<option value="98">Remote Queries</option>
+<option value="18">Report Rules</option>
+<option value="180">RSS Aggregator Source Rules</option>
+<option value="179">RSS Aggregator Source Stories</option>
+<option value="181">RSS Aggregator Sources</option>
+<option value="182">RSS Aggregators</option>
+<option value="188">RSS Feed Blog Rules</option>
+<option value="156">RSS Feed Newsletter Issue Page Rules</option>
+<option value="155">RSS Feed Rules</option>
+<option value="154">RSS Feeds</option>
+<option value="61">Scripting Languages</option>
+<option value="60">Scripting Modules</option>
+<option value="166">Search Keywords</option>
+<option value="86">Section Block Rules</option>
+<option value="49">See Also</option>
+<option value="58">Shared Styles</option>
+<option value="59">Shared Styles Add-on Rules</option>
+<option value="57">Shared Styles Include Rules</option>
+<option value="102">Shared Styles Layout Rules</option>
+<option value="84">Shared Styles Template Rules</option>
+<option value="20">Site Properties</option>
+<option value="85">Site Sections</option>
+<option value="103">Site Warnings</option>
+<option value="217">Solvent Exam Registration Rules</option>
+<option value="215">Solvent Types</option>
+<option value="8">Sort Methods</option>
+<option value="171">Spider Cookies</option>
+<option value="167">Spider Doc Body</option>
+<option value="170">Spider Docs</option>
+<option value="169">Spider Errors</option>
+<option value="168">Spider Links</option>
+<option value="150">Stain Fighting Solutions</option>
+<option value="147">Stain Types</option>
+<option value="233">Statement Layouts</option>
+<option value="52">States</option>
+<option value="205">Survey Questions</option>
+<option value="203">Survey Results</option>
+<option value="204">Surveys</option>
+<option value="38">System Email</option>
+<option value="2">Tables</option>
+<option value="93">Tasks</option>
+<option value="175">Technical Bulletin Categories</option>
+<option value="83">Template Domain Rules</option>
+<option value="165">Text Search Section Rules</option>
+<option value="254">tmpDliAccountData20140423</option>
+<option value="244">tmpMemberConversion</option>
+<option value="253">tmpNonMembers</option>
+<option value="25">Topic Habits</option>
+<option value="22">Topics</option>
+<option value="19">Trap Log</option>
+<option value="92">User Form Response</option>
+<option value="292">Video Form Data</option>
+<option value="14">Viewings</option>
+<option value="10">Visit Summary</option>
+<option value="12">Visitors</option>
+<option value="13">Visits</option>
+<option value="99">Wrappers</option></select></td></tr><tr><td colspan="2">Create a new content table</td></tr><tr><td colspan="2"><input type="radio" name="useNewContentName" value="1"><input type="text" name="newContentName" value=""></td></tr></tbody></table></div>
+								</div>
+							</td></tr></tbody></table>
+							<div>
+								<table border="0" cellpadding="0" cellspacing="0" width="100%">
+									<tbody><tr>
+										<td align="left" class="ccButtonCon">
+											<table border="0" cellpadding="0" cellspacing="0" width="100%">
+												<tbody><tr>
+													<td width="50%" align="left"><input type="SUBMIT" name="Button" value=" Cancel " onclick="" id=""><input type="SUBMIT" name="Button" value=" Back " onclick="" id=""></td>
+													<td width="50%" align="right"><input type="SUBMIT" name="Button" value=" Continue " onclick="" id=""></td>
+												</tr>
+											</tbody></table>
+										</td>
+									</tr>
+								</tbody></table>
+							</div>
+						</td></tr></tbody></table>
+						<input type="hidden" name="ccFormRefreshBlockSN" value="1409227214"><br><img alt="space" src="/ccLib/images/spacer.gif" width="400" height="1">
+					
+					</section>
+					</div>

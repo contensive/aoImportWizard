@@ -1,6 +1,6 @@
 ﻿
 Option Explicit On
-Option Strict On
+'Option Strict On
 
 Imports Contensive.Addons.ImportWizard.Controllers
 Imports Contensive.BaseClasses

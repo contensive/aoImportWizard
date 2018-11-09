@@ -64,6 +64,7 @@
     </Reference>
     <Reference Include="CPBase, Version=4.1.2.0, Culture=neutral, PublicKeyToken=10b3c53389b845fb, processorArchitecture=MSIL">
       <HintPath>packages\contensive.clib.4.1.2\lib\net35\CPBase.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Enyim.Caching, Version=2.16.0.0, Culture=neutral, PublicKeyToken=cec98615db04012e, processorArchitecture=MSIL">
       <HintPath>packages\EnyimMemcached.2.16.0\lib\net35\Enyim.Caching.dll</HintPath>
@@ -222,6 +223,9 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Models\DbModels\modelData.txt" />
+    <Content Include="Resources\Importwizard2layout.txt" />
+    <Content Include="Resources\ImportwizardLayout.txt" />
+    <Content Include="Resources\importWizardSelectLayout.txt" />
     <Content Include="Resources\sampleSql.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.VisualBasic.targets" />

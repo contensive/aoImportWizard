@@ -23,7 +23,6 @@ Namespace Models     '<------ set namespace
 
         Public Property AlwaysInclude As Boolean
         Public Property Prefix As String
-        Public Property StyleFilename As String
         Public Property Suffix As String
 
 

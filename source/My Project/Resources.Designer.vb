@@ -61,6 +61,55 @@ Namespace My.Resources
         End Property
         
         '''<summary>
+        '''  Looks up a localized string similar to &lt;div id=&quot;js-importwizard&quot; class=&quot;iWizWrapper&quot;&gt;
+        '''					&lt;section id=&quot;js-importWizardForm rel=&quot; redactor-form-tag&quot;=&quot;&quot;&gt;
+        '''
+        '''						&lt;div class=&quot;ccWizardHeader&quot;&gt;Import Wizard&lt;/div&gt;
+        '''						&lt;table border=&quot;0&quot; cellpadding=&quot;10&quot; cellspacing=&quot;0&quot; width=&quot;100%&quot;&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td valign=&quot;top&quot; class=&quot;ccWizardPanel&quot;&gt;
+        '''							&lt;div&gt;&lt;strong&gt;Select the destination for your data&lt;/strong&gt;&lt;br&gt;&lt;br&gt;&lt;p&gt;For example, to import a list in to people, select People.&lt;/p&gt;
+        '''							&lt;/div&gt;
+        '''							&lt;table border=&quot;0&quot; cellpadding=&quot;10&quot; cellspacing=&quot;0&quot; heig [rest of string was truncated]&quot;;.
+        '''</summary>
+        Friend ReadOnly Property Importwizard2layout() As String
+            Get
+                Return ResourceManager.GetString("Importwizard2layout", resourceCulture)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  Looks up a localized string similar to                     &lt;div id=&quot;js-importwizard&quot; class=&quot;iWizWrapper&quot; &gt;
+        '''					&lt;form id=&quot;js-importWizardForm&gt;
+        '''					&lt;td valign=&quot;top&quot;&gt;
+        '''						&lt;div class=&quot;ccWizardHeader&quot;&gt;Import Wizard&lt;/div&gt;
+        '''						&lt;table border=&quot;0&quot; cellpadding=&quot;10&quot; cellspacing=&quot;0&quot; width=&quot;100%&quot;&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td valign=&quot;top&quot; class=&quot;ccWizardPanel&quot;&gt;
+        '''							&lt;div&gt;&lt;b&gt;Upload your File&lt;/b&gt;&lt;br&gt;&lt;br&gt;Hit browse to locate the file you want to upload...
+        '''							&lt;/div&gt;
+        '''							&lt;table border=&quot;0&quot; cellpadding=&quot;10&quot; cellspacing=&quot;0&quot; height=&quot;100&quot; width=&quot;100%&quot;&gt;&lt;tbody&gt;&lt;tr [rest of string was truncated]&quot;;.
+        '''</summary>
+        Friend ReadOnly Property ImportwizardLayout() As String
+            Get
+                Return ResourceManager.GetString("ImportwizardLayout", resourceCulture)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  Looks up a localized string similar to                 &lt;div id=&quot;js-importwizard&quot; class=&quot;iWizWrapper&quot;&gt;		
+        '''					   &lt;form id=&quot;js-importWizardForm&quot;&gt;				  
+        '''					   &lt;td valign=&quot;top&quot;&gt;
+        '''							&lt;div class=&quot;ccWizardHeader&quot;&gt;Import Wizard&lt;/div&gt;
+        '''							&lt;table border=&quot;0&quot; cellpadding=&quot;10&quot; cellspacing=&quot;0&quot; width=&quot;100%&quot;&gt;
+        '''							&lt;tbody&gt;&lt;tr&gt;&lt;td valign=&quot;top&quot; class=&quot;ccWizardPanel&quot;&gt;
+        '''								&lt;div&gt;&lt;b&gt;Select the import source&lt;/b&gt;&lt;br&gt;&lt;br&gt;There are several sources you can use for your data...
+        '''								&lt;/div&gt;
+        '''								&lt;table border=&quot;0&quot; cellpadding=&quot;10&quot; cellspacing=&quot;0&quot; h [rest of string was truncated]&quot;;.
+        '''</summary>
+        Friend ReadOnly Property importWizardSelectLayout() As String
+            Get
+                Return ResourceManager.GetString("importWizardSelectLayout", resourceCulture)
+            End Get
+        End Property
+        
+        '''<summary>
         '''  Looks up a localized string similar to select top 1 m.name as personName, o.organizationName 
         '''from ccmembers m left join organizations o on o.id=m.organizationId
         '''where o.id={0}.
