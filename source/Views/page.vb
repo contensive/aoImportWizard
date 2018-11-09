@@ -840,13 +840,23 @@ Namespace Views
 
         Private ReadOnly Property GetWizardContent(cp As CPBaseClass, headerCaption As String, buttonCancel As String, buttonback2 As String, buttonContinue2 As String, description As String, WizardContent As String) As String
             Get
-                Dim body As String = "<div class=""iWizWrapper"" style=""border:2px solid black;"">" _
-                    & cp.Html.div(headerCaption,, "ccWizardHeader") _
-                    & cp.Html.div(description) _
-                    & cp.Html.div(WizardContent) _
-                    & cp.Html.Button("button", buttonCancel) _
-                    & cp.Html.Button("button", buttonback2) _
-                    & cp.Html.Button("button", buttonContinue2)
+                Dim body As String = ""
+                If buttonback2 = "" Then
+                    body = "<div class=""iWizWrapper"" style=""border:2px solid black;"">" _
+                            & cp.Html.div(headerCaption,, "ccWizardHeader") _
+                            & cp.Html.div(description) _
+                            & cp.Html.div(WizardContent) _
+                            & cp.Html.Button("button", buttonCancel) _
+                            & cp.Html.Button("button", buttonContinue2)
+                Else
+                    body = "<div class=""iWizWrapper"" style=""border:2px solid black;"">" _
+                            & cp.Html.div(headerCaption,, "ccWizardHeader") _
+                            & cp.Html.div(description) _
+                            & cp.Html.div(WizardContent) _
+                            & cp.Html.Button("button", buttonCancel) _
+                            & cp.Html.Button("button", buttonback2) _
+                            & cp.Html.Button("button", buttonContinue2)
+                End If
                 Return body
             End Get
         End Property
