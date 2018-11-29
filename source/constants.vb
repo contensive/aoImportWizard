@@ -250,9 +250,9 @@ Public Module constants
         Public MapPairCnt As Integer
         Public MapPairs() As MapPairType
 
-        Public Shared Widening Operator CType(v As String) As ImportMapType
-            Throw New NotImplementedException()
-        End Operator
+        'Public Shared Widening Operator CType(v As String) As ImportMapType
+        '    Throw New NotImplementedException()
+        'End Operator
     End Class
 
     '
@@ -345,6 +345,7 @@ Public Module constants
                                     MapPtr = result.MapPairCnt
                                     result.MapPairCnt = CInt(MapPtr + 1)
                                     ReDim Preserve result.MapPairs(MapPtr)
+                                    result.MapPairs(MapPtr) = New MapPairType()
                                     result.MapPairs(CInt(MapPtr)).DbField = Pair(0)
                                     SourceSplit = Split(Pair(1), ",")
                                     If UBound(SourceSplit) > 0 Then
@@ -359,7 +360,7 @@ Public Module constants
 
             End If
             '
-            result = ImportMapData
+            ' result = ImportMapData
         Catch ex As Exception
             cp.Site.ErrorReport(ex)
         End Try

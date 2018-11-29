@@ -169,7 +169,7 @@ Namespace Controllers
                     'dataString = Newtonsoft.Json.JsonConvert.SerializeObject(data)
                 End If
                 If cacheIsLocal Then
-                    cp.Cache.Save(encodeCacheKey(Key), dataString, , invalidationDate)
+                    cp.Cache.Save(encodeCacheKey(Key), dataString, "", invalidationDate)
                 Else
                     Call mc.Store(Enyim.Caching.Memcached.StoreMode.Set, encodeCacheKey(Key), dataString, invalidationDate)
                 End If

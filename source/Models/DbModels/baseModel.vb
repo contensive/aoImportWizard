@@ -60,6 +60,7 @@ Namespace Models
             Else
                 Return fieldInfo.GetRawConstantValue().ToString()
             End If
+            Dim bob As String
         End Function
         '
         '====================================================================================================

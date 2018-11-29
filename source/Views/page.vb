@@ -7,6 +7,7 @@ Imports Contensive.BaseClasses
 Imports Contensive.Addons.ImportWizard.Models
 Imports System.Linq
 Imports System.Text
+Imports Contensive.Addons.ImportWizard.Controllers.genericController
 
 Namespace Views
     '
@@ -129,7 +130,6 @@ Namespace Views
                     Dim inputRadioNewContent As String
                     Dim inputRadioExistingContent As String
                     '
-                    Dim PeopleModelList As List(Of PeopleModel) = PeopleModel.createList(CP, "")
                     PeopleContentID = CP.Content.GetRecordID("content", "people")
                     ProcessError = False
                     Content = ""
@@ -141,7 +141,6 @@ Namespace Views
                         Call ClearWizardValues(CP)
                         Call CP.Response.Redirect(CP.Site.AppRootPath & CP.Site.AppPath)
                     Else
-                        ' SubformID = Main.GetStreamInteger(RequestNameSubForm)
                         '
                         SubformID = CP.Doc.GetInteger(RequestNameSubForm)
 
@@ -171,7 +170,6 @@ Namespace Views
                                     '
                                     ' Source and ContentName
                                     '
-                                    'Call SaveWizardValue(RequestNameImportContentName, ContentName)
                                     Call SaveWizardStreamInteger(CP, RequestNameImportSource)
                                     Call LoadWizardPath(CP)
 
@@ -187,7 +185,7 @@ Namespace Views
                                     '
                                     CP.Html.ProcessInputFile(RequestNameImportUpload, "upload")
                                     Filename = CP.Doc.GetText(RequestNameImportUpload)
-                                    Call SaveWizardValue(CP, RequestNameImportUpload, Filename)
+                                    Call SaveWizardValue(CP, RequestNameImportUpload, "upload/" & Filename)
                                     Call LoadWizardPath(CP)
 
                                     Select Case Button
@@ -236,6 +234,7 @@ Namespace Views
                                         newContentName = CP.Doc.GetText("newContentName")
                                         ImportMap.ContentName = newContentName
                                         ImportMap.importToNewContent = True
+                                        ImportMap.SkipRowCnt = 1
                                         Call SaveImportMap(CP, ImportMap)
                                         Call SaveWizardStreamInteger(CP, RequestNameImportContentID)
                                         Select Case Button
@@ -263,16 +262,6 @@ Namespace Views
                                             Case ButtonContinue2
                                                 SubformID = NextSubFormID(SubformID)
                                         End Select
-                                        '                        Select Case Button
-                                        '                            Case ButtonFinish
-                                        '                                SubformID = 1
-                                        '                            Case ButtonBack2
-                                        '                                SubformID = 1
-                                        '                            Case ButtonContinue2
-                                        '                                SubformID = 1
-                                        '                            Case Else
-                                        '                                SubformID = 1
-                                        '                        End Select
                                     End If
                                 Case SubFormNewMapping
                                     '
@@ -290,6 +279,7 @@ Namespace Views
                                         If FieldCnt > 0 Then
                                             For Ptr = 0 To FieldCnt - 1
                                                 SourceFieldPtr = CP.Doc.GetInteger("SOURCEFIELD" & Ptr)
+                                                ImportMap.MapPairs(Ptr) = New MapPairType()
                                                 ImportMap.MapPairs(Ptr).SourceFieldPtr = SourceFieldPtr
                                                 DbField = CP.Doc.GetText("DBFIELD" & Ptr)
                                                 ImportMap.MapPairs(Ptr).DbField = DbField
@@ -334,7 +324,7 @@ Namespace Views
                                     newGroupName = CP.Doc.GetText(RequestNameImportGroupNew)
                                     If newGroupName <> "" Then
                                         Dim groupmodellist As List(Of GroupModel) = GroupModel.createList(CP, "name=" & CP.Db.EncodeSQLText(newGroupName))
-                                        If (groupmodellist IsNot Nothing) Then
+                                        If (groupmodellist.Count <> 0) Then
                                             Dim newGroup As GroupModel = groupmodellist.First
                                             newGroupID = newGroup.id
                                         End If
@@ -343,6 +333,7 @@ Namespace Views
                                             newGroup.name = newGroupName
                                             newGroup.Caption = newGroupName
                                             newGroupID = newGroup.id
+                                            newGroup.save(CP)
                                         End If
 
                                     End If
@@ -368,7 +359,6 @@ Namespace Views
                                     Call SaveWizardStream(CP, RequestNameImportEmail)
                                     If Button = ButtonFinish Then
                                         Dim ImportWizardTasks = ImportWizardTaskModel.add(CP)
-                                        ' CS = Main.InsertCSRecord("Import Wizard Tasks")
                                         If (ImportWizardTasks IsNot Nothing) Then
                                             ImportWizardTasks.name = Now() & " CSV Import" 'Call Main.SetCS(CS, "Name", Now() & " CSV Import")
                                             ImportWizardTasks.uploadFilename = GetWizardValue(CP, RequestNameImportUpload, "")
@@ -385,9 +375,7 @@ Namespace Views
                                         '
                                         Dim addon As New processClass()
                                         addon.Execute(CP)
-                                        'Call CP.Utils.ExecuteAddonAsProcess(ImportProcessAddonGuid)
                                         Call ClearWizardValues(CP)
-                                        ' Call CP.Response.Redirect(CP.Site.AppRootPath & CP.Site.AppPath)
                                     Else
                                         '
                                         ' Determine next or previous form
@@ -405,35 +393,12 @@ Namespace Views
                             '            '
                             '            ' Handle back and continue
                             '            '
-                            '            If Not ProcessError Then
-                            '                If Button = ButtonFinish Then
-                            '                    '
-                            '                    ' Finished - exit here
-                            '                    '
-                            '                    Call ClearWizardValues
-                            '                    Call Main.Redirect(Main.ServerAppRootPath & Main.ServerAppPath)
-                            '                Else
-                            '                    '
-                            '                    ' Determine next or previous form
-                            '                    '
-                            '                    Call LoadWizardPath
-                            '                    Select Case Button
-                            '                        Case ButtonBack2
-                            '                            SubformID = PreviousSubFormID(SubformID)
-                            '                        Case ButtonContinue2
-                            '                            SubformID = NextSubFormID(SubformID)
-                            '                    End Select
-                            '                End If
-                            '            End If
                         End If
                         '
                         ' Get Next Form
                         '
                         HeaderCaption = "Import Wizard"
                         Content = Content & CP.Html.Hidden(RequestNameSubForm, SubformID.ToString)
-                        'If CP.UserError Then
-                        '    Content = Content & Main.GetUserError()
-                        'End If
                         Select Case SubformID
                             Case SubFormSource, 0
                                 '
@@ -459,28 +424,24 @@ Namespace Views
 
                                 Description = "<B>Upload your File</B><BR><BR>Hit browse to locate the file you want to upload..."
                                 Content = Content _
-                            & "<div>" _
-                            & "<TABLE border=0 cellpadding=10 cellspacing=0 width=100%>" _
-                            & "<TR><TD width=1>&nbsp;</td><td width=99% align=left>" & CP.Html.InputFile(RequestNameImportUpload) & "</td></tr>" _
-                            & "</table>" _
-                            & "</div>" _
-                            & ""
+                                    & "<div>" _
+                                    & "<TABLE border=0 cellpadding=10 cellspacing=0 width=100%>" _
+                                    & "<TR><TD width=1>&nbsp;</td><td width=99% align=left>" & CP.Html.InputFile(RequestNameImportUpload) & "</td></tr>" _
+                                    & "</table>" _
+                                    & "</div>" _
+                                    & ""
                                 'WizardContent = "hello world"
                                 WizardContent = GetWizardContent(CP, HeaderCaption, ButtonCancel, ButtonBack2, ButtonContinue2, Description, Content)
-                                'GetForm = "Hello World"
-                                'Exit Function
                             Case SubFormSourceUploadFolder
                                 '
                                 ' Select a file from the upload folder
                                 '
                                 Description = "<B>Select a file from your Upload folder</B><BR><BR>Select the upload file you wish to import..."
-                                Dim AdminFormImportWizard As String = Nothing
-                                Call CP.Doc.AddRefreshQueryString("af", AdminFormImportWizard)
                                 Call CP.Doc.AddRefreshQueryString(RequestNameSubForm, SubFormSourceUploadFolder.ToString)
 
                                 Dim fileList2 As New StringBuilder()
                                 For Each file In System.IO.Directory.GetFiles(CP.Site.PhysicalFilePath & "upload")
-                                    fileList2.Append(CP.Html.div(CP.Html.CheckBox(file.Replace(" ", "")) & "&nbsp;" & file))
+                                    fileList2.Append(CP.Html.div(CP.Html.RadioBox("selectfile", file, "") & "&nbsp;" & file))
                                 Next
                                 Content = fileList2.ToString() & CP.Html.Hidden(RequestNameSubForm, SubformID.ToString)
 
@@ -510,7 +471,7 @@ Namespace Views
                                     & "<TR><TD colspan=""2"">Import into an existing content table</td></tr>" _
                                     & "<TR><TD colspan=""2"">" & inputRadioExistingContent & CP.Html.SelectContent(RequestNameImportContentID, ImportContentID.ToString, "Content") & "</td></tr>" _
                                     & "<TR><TD colspan=""2"">Create a new content table</td></tr>" _
-                                    & "<TR><TD colspan=""2"">" & inputRadioNewContent & "<input type=""text"" name=""newContentName"" value=""" & newContentName & """></td></tr>" _
+                                    & "<TR><TD colspan=""2"">" & inputRadioNewContent & "<input type=""text"" name=""newContentName"" value=""" &  newContentName & """></td></tr>" _
                                     & "</table>" _
                                     & "</div>" _
                                     & ""
@@ -549,19 +510,19 @@ Namespace Views
                                     '
                                     ImportContentID = CInt(GetWizardValue(CP, RequestNameImportContentID, PeopleContentID.ToString))
                                     ImportContentName = CP.Content.GetRecordName("content", ImportContentID)
-                                    DBFields = Split(GetDbFieldList(ImportContentName, False), ",")
+                                    DBFields = Split(GetDbFieldList(CP, ImportContentName, False), ",")
                                     '
                                     ' Output the table
                                     '
                                     Content = Content & vbCrLf & "<TABLE border=0 cellpadding=2 cellspacing=0 width=100%>"
                                     Content = Content _
-                                & vbCrLf _
-                                & "<TR>" _
-                                & "<TD width=99% align=left>Imported&nbsp;Field<BR><img src=/cclib/images/spacer.gif width=1 height=1></TD>" _
-                                & "<TD width=10 align=center><img src=/cclib/images/spacer.gif width=10 height=1></TD>" _
-                                & "<TD width=100 align=left>Database&nbsp;Field<BR><img src=/cclib/images/spacer.gif width=100 height=1></TD>" _
-                                & "<TD width=100 align=left>Type<BR><img src=/cclib/images/spacer.gif width=100 height=1></TD>" _
-                                & "</TR>"
+                                        & vbCrLf _
+                                        & "<TR>" _
+                                        & "<TD width=99% align=left>Imported&nbsp;Field<BR><img src=/cclib/images/spacer.gif width=1 height=1></TD>" _
+                                        & "<TD width=10 align=center><img src=/cclib/images/spacer.gif width=10 height=1></TD>" _
+                                        & "<TD width=100 align=left>Database&nbsp;Field<BR><img src=/cclib/images/spacer.gif width=100 height=1></TD>" _
+                                        & "<TD width=100 align=left>Type<BR><img src=/cclib/images/spacer.gif width=100 height=1></TD>" _
+                                        & "</TR>"
                                     ImportMapFile = GetWizardValue(CP, RequestNameImportMapFile, GetDefaultImportMapFile)
                                     ImportMapData = CP.File.ReadVirtual(ImportMapFile)
                                     ImportMap = LoadImportMap(CP, ImportMapData)
@@ -724,7 +685,8 @@ Namespace Views
                                     '
                                     DbKeyField = ImportMap.DbKeyField
                                     Dim LookupContentName As String
-                                    LookupContentName = CP.Content.GetRecordName(CType(CP.Utils.EncodeInteger(GetWizardValue(CP, CStr(RequestNameImportContentID), CStr(PeopleContentID))), String), 0)
+                                    LookupContentName = CP.Content.GetRecordName("content", CP.Utils.EncodeInteger(GetWizardValue(CP, RequestNameImportContentID, PeopleContentID.ToString)))
+                                    ' LookupContentName = Main.GetContentNamebyid(kmaEncodeInteger(GetWizardValue(RequestNameImportContentID, CStr(PeopleContentID))))
                                     DBFieldSelect = Replace(GetDbFieldSelect(CP, LookupContentName, "Select One", True), "xxxx", RequestNameImportDbKeyField)
                                     DBFieldSelect = Replace(DBFieldSelect, ">" & DbKeyField & "<", " selected>" & DbKeyField & "<", , , vbTextCompare)
                                     note = ""
@@ -733,35 +695,35 @@ Namespace Views
                                     ' non-developer in ccMembers table - limit key fields
                                     '
                                     DBFieldSelect = "" _
-                                & "<select name=" & RequestNameImportDbKeyField & ">" _
-                                & "<Option value="""">Select One</Option>" _
-                                & "<Option value=ID>Contensive ID</Option>" _
-                                & "<Option value=email>Email</Option>" _
-                                & "<Option value=username>Username</Option>" _
-                                & "" _
-                                & "</select>"
+                                    & "<select name=" & RequestNameImportDbKeyField & ">" _
+                                    & "<Option value="""">Select One</Option>" _
+                                    & "<Option value=ID>Contensive ID</Option>" _
+                                    & "<Option value=email>Email</Option>" _
+                                    & "<Option value=username>Username</Option>" _
+                                    & "" _
+                                    & "</select>"
                                     DBFieldSelect = Replace(DBFieldSelect, "value=" & DbKeyField & ">", "value=" & DbKeyField & " selected>", , , vbTextCompare)
                                     note = "<p>note: As a non-developer, your Database key options are limited to id, email and username.</p>"
                                 End If
                                 '
                                 Description = "<p><B>Update Control</B><BR><BR>When your data is imported, it can either update your current database, or insert new records into your database. Use this form to control which records will be updated, and which will be inserted.</p>" & note
                                 Content = Content _
-                            & "<div>" _
-                            & "<TABLE border=0 cellpadding=4 cellspacing=0 width=100%>" _
-                            & "<TR><TD colspan=2>Key Fields</td></tr>" _
-                            & "<TR><TD width=10>&nbsp;</td><td width=99% align=left>" _
-                                & "<TABLE border=0 cellpadding=2 cellspacing=0 width=100%>" _
-                                & "<tr><td>Imported&nbsp;Key&nbsp;</td><td>" & SourceFieldSelect & "</td></tr>" _
-                                & "<tr><td>Database&nbsp;Key&nbsp;</td><td>" & DBFieldSelect & "</td></tr>" _
-                                & "</table>" _
-                                & "</td></tr>" _
-                            & "<TR><TD colspan=2>Update Options</td></tr>" _
-                            & "<TR><TD width=10>" & CP.Html.RadioBox(RequestNameImportKeyMethodID, KeyMethodInsertAll.ToString, KeyMethodID & "</td><td width=99% align=left>" & "Insert all imported data, regardless of key field.</td></tr>") _
-                            & "<TR><TD width=10>" & CP.Html.RadioBox(RequestNameImportKeyMethodID, KeyMethodUpdateOnMatchInsertOthers.ToString, KeyMethodID & "</td><td width=99% align=left>" & "Update database records when the data in the key fields match. Insert all other imported data.</td></tr>") _
-                            & "<TR><TD width=10>" & CP.Html.RadioBox(RequestNameImportKeyMethodID, KeyMethodUpdateOnMatch.ToString, KeyMethodID & "</td><td width=99% align=left>" & "Update database records when the data in the key fields match. Ignore all other imported data.</td></tr>") _
-                            & "</table>" _
-                            & "</div>" _
-                            & ""
+                                    & "<div>" _
+                                    & "<TABLE border=0 cellpadding=4 cellspacing=0 width=100%>" _
+                                    & "<TR><TD colspan=2>Key Fields</td></tr>" _
+                                    & "<TR><TD width=10>&nbsp;</td><td width=99% align=left>" _
+                                        & "<TABLE border=0 cellpadding=2 cellspacing=0 width=100%>" _
+                                        & "<tr><td>Imported&nbsp;Key&nbsp;</td><td>" & SourceFieldSelect & "</td></tr>" _
+                                        & "<tr><td>Database&nbsp;Key&nbsp;</td><td>" & DBFieldSelect & "</td></tr>" _
+                                        & "</table>" _
+                                        & "</td></tr>" _
+                                    & "<TR><TD colspan=2>Update Options</td></tr>" _
+                                    & "<TR><TD width=10>" & CP.Html.RadioBox(RequestNameImportKeyMethodID, KeyMethodInsertAll.ToString, KeyMethodID.ToString) & "</td><td width=99% align=left>Insert all imported data, regardless of key field.</td></tr>" _
+                                    & "<TR><TD width=10>" & CP.Html.RadioBox(RequestNameImportKeyMethodID, KeyMethodUpdateOnMatchInsertOthers.ToString, KeyMethodID.ToString) & "</td><td width=99% align=left>Update database records when the data in the key fields match. Insert all other imported data.</td></tr>" _
+                                    & "<TR><TD width=10>" & CP.Html.RadioBox(RequestNameImportKeyMethodID, KeyMethodUpdateOnMatch.ToString, KeyMethodID.ToString) & "</td><td width=99% align=left>Update database records when the data in the key fields match. Ignore all other imported data.</td></tr>" _
+                                    & "</table>" _
+                                    & "</div>" _
+                                    & ""
                                 WizardContent = GetWizardContent(CP, HeaderCaption, ButtonCancel, ButtonBack2, ButtonContinue2, Description, Content)
                                 Dim GroupID As Integer
                                 Dim GroupOptionID As Integer
@@ -776,20 +738,20 @@ Namespace Views
                                 End If
                                 Description = "<B>Group Membership</B><BR><BR>When your data is imported, people can be added to a group automatically. Select the option below, and a group."
                                 Content = Content _
-                            & "<div>" _
-                            & "<TABLE border=0 cellpadding=4 cellspacing=0 width=100%>" _
-                            & "<TR><TD colspan=2>Add to Existing Group</td></tr>" _
-                            & "<TR><TD width=10>&nbsp;</td><td width=99% align=left>" & CP.Html.SelectContent(RequestNameImportGroupID, ImportMap.GroupID.ToString, "Groups") & "</td></tr>" _
-                            & "<TR><TD colspan=2>Create New Group</td></tr>" _
-                            & "<TR><TD width=10>&nbsp;</td><td width=99% align=left>" & CP.Doc.GetText(RequestNameImportGroupNew, "") & "</td></tr>" _
-                            & "<TR><TD colspan=2>Group Options</td></tr>" _
-                            & "<TR><TD width=10>" & CP.Html.RadioBox(RequestNameImportGroupOptionID, GroupOptionNone.ToString, GroupOptionID.ToString) & "</td><td width=99% align=left>Do not add to a group.</td></tr>" _
-                            & "<TR><TD width=10>" & CP.Html.RadioBox(RequestNameImportGroupOptionID, GroupOptionAll.ToString, GroupOptionID.ToString) & "</td><td width=99% align=left>Add everyone to the the group.</td></tr>" _
-                            & "<TR><TD width=10>" & CP.Html.RadioBox(RequestNameImportGroupOptionID, GroupOptionOnMatch.ToString, GroupOptionID.ToString) & "</td><td width=99% align=left>Add to the group if keys match.</td></tr>" _
-                            & "<TR><TD width=10>" & CP.Html.RadioBox(RequestNameImportGroupOptionID, GroupOptionOnNoMatch.ToString, GroupOptionID.ToString) & "</td><td width=99% align=left>Add to the group if keys do NOT match.</td></tr>" _
-                            & "</table>" _
-                            & "</div>" _
-                            & ""
+                                    & "<div>" _
+                                    & "<TABLE border=0 cellpadding=4 cellspacing=0 width=100%>" _
+                                    & "<TR><TD colspan=2>Add to Existing Group</td></tr>" _
+                                    & "<TR><TD width=10>&nbsp;</td><td width=99% align=left>" & CP.Html.SelectContent(RequestNameImportGroupID, ImportMap.GroupID.ToString, "Groups") & "</td></tr>" _
+                                    & "<TR><TD colspan=2>Create New Group</td></tr>" _
+                                    & "<TR><TD width=10>&nbsp;</td><td width=99% align=left>" & CP.Html.InputText(RequestNameImportGroupNew, "") & "</td></tr>" _
+                                    & "<TR><TD colspan=2>Group Options</td></tr>" _
+                                    & "<TR><TD width=10>" & CP.Html.RadioBox(RequestNameImportGroupOptionID, GroupOptionNone.ToString, GroupOptionID.ToString) & "</td><td width=99% align=left>Do not add to a group.</td></tr>" _
+                                    & "<TR><TD width=10>" & CP.Html.RadioBox(RequestNameImportGroupOptionID, GroupOptionAll.ToString, GroupOptionID.ToString) & "</td><td width=99% align=left>Add everyone to the the group.</td></tr>" _
+                                    & "<TR><TD width=10>" & CP.Html.RadioBox(RequestNameImportGroupOptionID, GroupOptionOnMatch.ToString, GroupOptionID.ToString) & "</td><td width=99% align=left>Add to the group if keys match.</td></tr>" _
+                                    & "<TR><TD width=10>" & CP.Html.RadioBox(RequestNameImportGroupOptionID, GroupOptionOnNoMatch.ToString, GroupOptionID.ToString) & "</td><td width=99% align=left>Add to the group if keys do NOT match.</td></tr>" _
+                                    & "</table>" _
+                                    & "</div>" _
+                                    & ""
                                 WizardContent = GetWizardContent(CP, HeaderCaption, ButtonCancel, ButtonBack2, ButtonContinue2, Description, Content)
                             Case SubFormFinish
                                 '
@@ -797,20 +759,18 @@ Namespace Views
                                 '
                                 Description = "<B>Finish</B><BR><BR>Your list will be submitted for import when you hit the finish button. Processing may take several minutes, depending on the size and complexity of your import. If you supply an email address, you will be notified with the import is complete."
                                 Content = Content _
-                            & "<div>" _
-                            & "<TABLE border=0 cellpadding=4 cellspacing=0 width=100%>" _
-                            & "<TR><TD width=10>&nbsp;</td><td width=99% align=left>" & CP.Doc.GetText(RequestNameImportEmail, GetWizardValue(CP, RequestNameImportEmail, CP.User.Email)) & "</td></tr>" _
-                            & "</table>" _
-                            & "</div>" _
-                            & ""
+                                    & "<div>" _
+                                    & "<TABLE border=0 cellpadding=4 cellspacing=0 width=100%>" _
+                                    & "<TR><TD width=10>&nbsp;</td><td width=99% align=left>" & CP.Doc.GetText(RequestNameImportEmail, GetWizardValue(CP, RequestNameImportEmail, CP.User.Email)) & "</td></tr>" _
+                                    & "</table>" _
+                                    & "</div>" _
+                                    & ""
                                 WizardContent = GetWizardContent(CP, HeaderCaption, ButtonCancel, ButtonBack2, ButtonFinish, Description, Content)
                             Case Else
                         End Select
                         '
                         'GetForm = WizardContent
                         GetForm = GetAdminFormBody(CP, "", "", "", True, True, "", "", 20, WizardContent)
-                        'GetForm = Replace(GetForm, "<form ", "<xform ", , , vbTextCompare)
-                        'GetForm = Replace(GetForm, "</form", "</xform", , , vbTextCompare)
                     End If
                     result = GetForm.ToString
                 End Using
@@ -933,9 +893,6 @@ Namespace Views
                     Wizard.SourceFormInstructions = "Select the source"
                     Wizard.UploadFormInstructions = "Upload the file"
                     '        '
-                    '        Wizard.AllowSpamFooterDefault = True
-                    '        '
-                    '        Wizard.IncludeAllowSpamFooter = True
                 Else
                     Call LoadWizard(ImportWizardID)
                 End If
@@ -1054,7 +1011,6 @@ Namespace Views
                 Filename = "Temp/ImportWizard_Visit" & cp.Visit.Id & ".txt"
                 Call SaveWizardValue(cp, RequestName, Filename)
             End If
-            'Call Main.SaveVirtualFile(Filename, Main.GetStreamActiveContent(RequestName))
             Call cp.File.SaveVirtual(Filename, cp.Html.InputWysiwyg(RequestName))
         End Sub
         '
@@ -1076,130 +1032,13 @@ Namespace Views
         '
         '
         Private Sub LoadAllImportWizardValues(EmailID As Integer)
-            '    On Error GoTo ErrorTrap
-            '    '
-            '    Dim ImportWizardID as Integer
-            '    Dim CS as Integer
-            '    Dim IDList As String
-            '    Dim ConditionID as Integer
-            '    Dim CSList as Integer
-            '    Dim ContentID as Integer
-            '    Dim ContentName As String
-            '    Dim SendMethodID as Integer
-            '    '
-            '    ImportWizardID = 0
-            '    CS = Main.OpenCSContentRecord("email", EmailID)
-            '    If Main.IsCSOK(CS) Then
-            '        ConditionID = Main.GetCSInteger(CS, "ConditionID")
-            '        Call SaveWizardValue(RequestNameEmailName, Main.GetCSText(CS, "Name"))
-            '        Call SaveWizardValue(RequestNameEmailSubject, Main.GetCSText(CS, "Subject"))
-            '        Call SaveWizardValue(RequestNameEmailFromAddress, Main.GetCSText(CS, "FromAddress"))
-            '        Call SaveWizardValue(RequestNameEmailTestMemberID, Main.GetCSText(CS, "TestMemberID"))
-            '        Call SaveWizardFileValue(RequestNameEmailContent, Main.GetCS(CS, "CopyFilename"))
-            '        Call SaveWizardValue(RequestNameEmailConditionID, CStr(ConditionID))
-            '        Call SaveWizardValue(RequestNameEmailConditionPeriod, Main.GetCSText(CS, "ConditionPeriod"))
-            '        Call SaveWizardValue(RequestNameEmailScheduleStart, Main.GetCSText(CS, "ScheduleDate"))
-            '        Call SaveWizardValue(RequestNameEmailScheduleStop, Main.GetCSText(CS, "ConditionExpireDate"))
-            '        Call SaveWizardValue(RequestNameEmailLinkAuthentication, Main.GetCSText(CS, "AddLinkEID"))
-            '        Call SaveWizardValue(RequestNameEmailSpamFooter, Main.GetCSText(CS, "AllowSpamFooter"))
-            '        If Main.SiteProperty_BuildVersion > "3.3.530" Then
-            '            Call SaveWizardValue(RequestNameEmailTemplateID, Main.GetCSText(CS, "EmailTemplateID"))
-            '        End If
-            '        If Main.SiteProperty_BuildVersion > "3.3.531" Then
-            '            Call SaveWizardValue(RequestNameImportWizardID, Main.GetCSText(CS, "ImportWizardID"))
-            '        End If
-            '        '
-            '        IDList = ""
-            '        CSList = Main.OpenCSContent("Email Groups", "emailid=" & EmailID)
-            '        Do While Main.IsCSOK(CSList)
-            '            IDList = IDList & "," & Main.GetCSText(CSList, "GroupID")
-            '            Main.NextCSRecord (CSList)
-            '        Loop
-            '        Call Main.CloseCS(CSList)
-            '        If IDList <> "" Then
-            '            IDList = Mid(IDList, 2)
-            '        End If
-            '        Call SaveWizardValue(RequestNameEmailGroupIDList, IDList)
-            '        '
-            '        IDList = ""
-            '        CSList = Main.OpenCSContent("Email Topics", "emailid=" & EmailID)
-            '        Do While Main.IsCSOK(CSList)
-            '            IDList = IDList & "," & Main.GetCSText(CSList, "Topicid")
-            '            Main.NextCSRecord (CSList)
-            '        Loop
-            '        Call Main.CloseCS(CSList)
-            '        If IDList <> "" Then
-            '            IDList = Mid(IDList, 2)
-            '        End If
-            '        Call SaveWizardValue(RequestNameEmailTopicIDList, IDList)
-            '        '
-            '        'Call SaveWizardValue(RequestNameEmailTopicIDList, "")
-            '        ContentID = Main.GetCSInteger(CS, "ContentControlID")
-            '        If ContentID <> 0 Then
-            '            ContentName = CP.Content.GetRecordName(ContentID)
-            '            Select Case UCase(ContentName)
-            '                Case "GROUP EMAIL"
-            '                    SendMethodID = SendMethodIDGroup
-            '                Case "SYSTEM EMAIL"
-            '                    SendMethodID = SendMethodIDSystem
-            '                Case "CONDITIONAL EMAIL"
-            '                    Select Case ConditionID
-            '                        Case EmailConditionAfterJoin
-            '                            SendMethodID = SendMethodIDConditionalAfterJoin
-            '                        Case EmailConditionBeforeExpire
-            '                            SendMethodID = SendMethodIDConditionalBeforeExpire
-            '                        Case EmailConditionBirthday
-            '                            SendMethodID = SendMethodIDConditionalBirthday
-            '                    End Select
-            '            End Select
-            '        End If
-            '        Call SaveWizardValue(RequestNameEmailSendMethodID, CStr(SendMethodID))
-            '    End If
-            '    Call Main.CloseCS(CS)
-            '
-            '    '
-            '    Exit Sub
-            'ErrorTrap:
-            '    Call HandleClassTrapError("LoadAllImportWizardValues")
+
         End Sub
         '
         '
         '
         Private Sub LoadWizard(ImportWizardID As Integer)
             '    On Error GoTo ErrorTrap
-            '    '
-            '    Dim CS as Integer
-            '    '
-            '    CS = Main.OpenCSContentRecord("Import Wizards", ImportWizardID)
-            '    If Main.IsCSOK(CS) Then
-            '        Wizard.ContentformInstructions = Main.GetCSText(CS, "ContentformInstructions")
-            '        Wizard.TemplateFormInstructions = Main.GetCSText(CS, "TemplateFormInstructions")
-            '        '
-            '        Wizard.GroupFormConditionalAfterJoinInstructions = Main.GetCSText(CS, "GroupFormInstructions")
-            '        Wizard.GroupFormConditionalBeforeExpireInstructions = Main.GetCSText(CS, "GroupFormInstructions")
-            '        Wizard.GroupFormConditionalBirthdayInstructions = Main.GetCSText(CS, "GroupFormInstructions")
-            '        Wizard.GroupFormGroupInstructions = Main.GetCSText(CS, "GroupFormInstructions")
-            '        Wizard.GroupFormSystemInstructions = Main.GetCSText(CS, "GroupFormInstructions")
-            '        '
-            '        Wizard.IncludeAllowSpamFooter = Main.GetCSBoolean(CS, "IncludeAllowSpamFooter")
-            '        Wizard.IncludeContentForm = Main.GetCSBoolean(CS, "IncludeContentForm")
-            '        Wizard.IncludeSchedule = Main.GetCSBoolean(CS, "IncludeSchedule")
-            '        Wizard.IncludeGroupForm = Main.GetCSBoolean(CS, "IncludeGroupForm")
-            '        Wizard.IncludeLinkAuthentication = Main.GetCSBoolean(CS, "IncludeLinkAuthentication")
-            '        Wizard.IncludeTemplateForm = Main.GetCSBoolean(CS, "IncludeTemplateForm")
-            '        '
-            '        Wizard.LinkAuthenticationDefault = Main.GetCSBoolean(CS, "LinkAuthenticationDefault")
-            '        Wizard.AllowSpamFooterDefault = Main.GetCSBoolean(CS, "AllowSpamFooterDefault")
-            '        Wizard.DefaultConditionPeriod = Main.GetCSInteger(CS, "DefaultConditionPeriod")
-            '        Wizard.DefaultContent = Main.GetCSText(CS, "DefaultContent")
-            '        Wizard.DefaultTemplateID = Main.GetCSInteger(CS, "DefaultTemplateID")
-            '        Wizard.SendMethodID = Main.GetCSInteger(CS, "SendMethodID")
-            '    End If
-            '    Call Main.CloseCS(CS)
-            '    '
-            '    Exit Sub
-            'ErrorTrap:
-            '    Call HandleClassTrapError("LoadWizard")
         End Sub
         '
         '
@@ -1273,6 +1112,7 @@ Namespace Views
                 GetDbFieldList = Replace(GetDbFieldList, ",DEVELOPER,", ",", , , vbTextCompare)
                 GetDbFieldList = Mid(GetDbFieldList, 2, Len(GetDbFieldList) - 2)
                 '
+                result = GetDbFieldList
             Catch ex As Exception
                 cp.Site.ErrorReport(ex)
             End Try
@@ -1287,18 +1127,16 @@ Namespace Views
                 '
                 GetDbFieldSelect = "" _
                 & "<select name=xxxx><option value="""" style=""Background-color:#E0E0E0;"">" & NoneCaption & "</option>" _
-                & "<option>" & Replace(GetDbFieldList(ContentName, AllowID), ",", "</option><option>") & "</option>" _
+                & "<option>" & Replace(GetDbFieldList(cp, ContentName, AllowID), ",", "</option><option>") & "</option>" _
                 & "</select>"
                 '
+                result = GetDbFieldSelect
             Catch ex As Exception
                 cp.Site.ErrorReport(ex)
             End Try
             Return result
         End Function
 
-        Private Function GetDbFieldList(contentName As String, allowID As Boolean) As String
-            Throw New NotImplementedException()
-        End Function
         '
         '
         '
@@ -1307,10 +1145,6 @@ Namespace Views
             Try
                 '
                 Dim FileData As String
-                Dim FileRows() As String
-                Dim Ptr As Integer
-                Dim FileColumns() As String
-                Dim ColumnName As String
                 Dim ignoreLong As Integer
                 Dim ignoreBoolean As Boolean
                 '
@@ -1323,29 +1157,6 @@ Namespace Views
                             '
                             Call parseLine(FileData, 1, SourceFields, ignoreLong, ignoreBoolean)
                             SourceFieldCnt = UBound(SourceFields) + 1
-                            '                If InStr(1, FileData, vbCrLf) <> 0 Then
-                            '                    FileRows = Split(FileData, vbCrLf)
-                            '                Else
-                            '                    FileRows = Split(FileData, vbLf)
-                            '                End If
-                            '                If UBound(FileRows) > 0 Then
-                            '                    If InStr(1, FileRows(0), ",") = 0 Then
-                            '                        SourceFieldCnt = 1
-                            '                        ReDim Preserve SourceFields(0)
-                            '                        SourceFields(0) = Trim(FileRows(0))
-                            '                    Else
-                            '                        FileColumns = Split(FileRows(0), ",")
-                            '                        SourceFieldCnt = UBound(FileColumns) + 1
-                            '                        ReDim Preserve SourceFields(SourceFieldCnt - 1)
-                            '                        For ptr = 0 To SourceFieldCnt - 1
-                            '                            ColumnName = Trim(FileColumns(ptr))
-                            '                            If Len(ColumnName) > 2 And Left(ColumnName, 1) = """" And Right(ColumnName, 1) = """" Then
-                            '                                ColumnName = Trim(Mid(ColumnName, 2, Len(ColumnName) - 2))
-                            '                            End If
-                            '                            SourceFields(ptr) = ColumnName
-                            '                        Next
-                            '                    End If
-                            '                End If
                         End If
                     End If
                 End If
@@ -1357,9 +1168,7 @@ Namespace Views
             Return
         End Sub
 
-        Private Sub parseLine(fileData As String, v As Integer, sourceFields() As String, ignoreLong As Integer, ignoreBoolean As Boolean)
-            Throw New NotImplementedException()
-        End Sub
+
         '
         '
         '
@@ -1378,7 +1187,6 @@ Namespace Views
                     '
                     ' Build FileColumns
                     '
-                    'GetSourceFieldSelect = vbCrLf & "<select name=xxxx>" & vbCrLf & "<option value=""-1"">" & NoneCaption & "</option>"
                     GetSourceFieldSelect = vbCrLf & "<select name=xxxx><option style=""Background-color:#E0E0E0;"" value=-1>" & NoneCaption & "</option>"
                     For Ptr = 0 To SourceFieldCnt - 1
                         ColumnName = SourceFields(Ptr)

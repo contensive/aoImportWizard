@@ -116,6 +116,7 @@ Namespace Controllers
                                         MapPtr = result.MapPairCnt
                                         result.MapPairCnt = MapPtr + 1
                                         ReDim Preserve result.MapPairs(MapPtr)
+                                        result.MapPairs(MapPtr) = New MapPairType
                                         result.MapPairs(MapPtr).DbField = Pair(0)
                                         SourceSplit = Split(Pair(1), ",")
                                         If UBound(SourceSplit) > 0 Then
@@ -142,7 +143,7 @@ Namespace Controllers
         '   if at end of line, the parseFieldReturnEol is true
         '   if end of file, return_eof is true
         '
-        Public Shared Function parseFieldReturnEol(Source As String, sourcePtr As Integer, return_cell As String, return_ptr As Integer, return_eof As Boolean) As Boolean
+        Public Shared Function parseFieldReturnEol(Source As String, sourcePtr As Integer, ByRef return_cell As String, ByRef return_ptr As Integer, ByRef return_eof As Boolean) As Boolean
             Dim result As Boolean
             Try
                 '
@@ -412,6 +413,7 @@ Namespace Controllers
                 rowPtr = 0
                 srcPtr = 1
                 ReDim result(colCnt - 1, 0)
+
                 Do While Not eof
                     If rowPtr = 105 Then
                         rowPtr = rowPtr
@@ -436,13 +438,20 @@ Namespace Controllers
                     If (rowPtr = 79) And (colPtr = 2) Then
                         rowPtr = rowPtr
                     End If
-                    EOL = parseFieldReturnEol(Source, srcPtr, result.ToString, srcPtr, eof)
-                    result(colPtr, rowPtr) = Cell
+                    Dim cell As String = ""
+                    EOL = parseFieldReturnEol(Source, srcPtr, cell, srcPtr, eof)
+                    result(colPtr, rowPtr) = cell
+
                     If EOL Then
                         colPtr = 0
                         rowPtr = rowPtr + 1
                     Else
-                        colPtr = colPtr + 1
+                        If colPtr + 1 < colCnt Then
+                            colPtr = colPtr + 1
+                        Else
+                            colPtr = 0
+                            rowPtr = rowPtr + 1
+                        End If
                     End If
                 Loop
                 parseFile = result
@@ -452,9 +461,6 @@ Namespace Controllers
             Return result
         End Function
 
-        Private Shared Function Cell() As String
-            Throw New NotImplementedException()
-        End Function
         '
         '
         '
@@ -474,11 +480,11 @@ Namespace Controllers
             If (a = 0) And (b = 0) Then
                 Return 0
             ElseIf (a = 0) Then
-                Return b
+                Return 2
             ElseIf (b = 0) Or (a < b) Then
-                Return a
+                Return 1
             Else
-                Return b
+                Return 2
             End If
         End Function
 

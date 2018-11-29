@@ -105,6 +105,32 @@ Namespace Models     '<------ set namespace
         Public Function Clone() As Object Implements ICloneable.Clone
             Return Me.MemberwiseClone()
         End Function
+        '
+        '===========================================================================
+        ''' <summary>
+        ''' Add the user to the group. If already in the group, leave user in. If not, add a new rule with no expiration date
+        ''' </summary>
+        ''' <param name="cp"></param>
+        ''' <param name="MemberID"></param>
+        ''' <param name="GroupID"></param>
+        Public Shared Sub AddGroupMember(cp As CPBaseClass, MemberID As Integer, GroupID As Integer)
+            Dim result As String = ""
+            Try
+                '
+                '
+                Dim sqlNow As String = cp.Db.EncodeSQLDate(Now)
+                Dim memberRulelist As List(Of Models.MemberRuleModel) = Models.MemberRuleModel.createList(cp, "(MemberID=" & MemberID & ")and(GroupID=" & GroupID & ")and((dateexpires is null)or(dateexpires<" & sqlNow & "))")
+                If (memberRulelist.Count = 0) Then
+                    Dim memberRule = Models.MemberRuleModel.add(cp)
+                    memberRule.MemberID = MemberID
+                    memberRule.GroupID = GroupID
+                    memberRule.save(cp)
+                End If
+            Catch ex As Exception
+                Throw
+            End Try
+
+        End Sub
 
     End Class
 End Namespace
