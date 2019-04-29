@@ -283,7 +283,11 @@ Namespace Views
                                                 ImportMap.MapPairs(Ptr).SourceFieldPtr = SourceFieldPtr
                                                 DbField = CP.Doc.GetText("DBFIELD" & Ptr)
                                                 ImportMap.MapPairs(Ptr).DbField = DbField
-                                                ImportMap.MapPairs(Ptr).DbFieldType = CP.Utils.EncodeInteger(CP.Content.GetFieldProperty(ImportMap.ContentName, DbField, "Fieldtype"))
+                                                Dim field = ContentFieldModel.getContentField(CP, ImportMap.ContentName, DbField)
+                                                If (field IsNot Nothing) Then
+                                                    ImportMap.MapPairs(Ptr).DbFieldType = field.Type
+                                                End If
+                                                'CP.Utils.EncodeInteger(CP.Content.GetFieldProperty(ImportMap.ContentName, DbField, "Fieldtype"))
                                             Next
                                         End If
                                     End If
@@ -304,7 +308,11 @@ Namespace Views
                                     ImportMap.SourceKeyField = CP.Doc.GetText(RequestNameImportSourceKeyFieldPtr)
                                     ImportMap.DbKeyField = CP.Doc.GetText(RequestNameImportDbKeyField)
                                     If ImportMap.DbKeyField <> "" Then
-                                        ImportMap.DbKeyFieldType = CInt(CP.Content.GetFieldProperty(ImportMap.ContentName, ImportMap.DbKeyField, "FieldType"))
+                                        Dim field = ContentFieldModel.getContentField(CP, ImportMap.ContentName, ImportMap.DbKeyField)
+                                        If (field IsNot Nothing) Then
+                                            ImportMap.DbKeyFieldType = field.Type
+                                        End If
+                                        'ImportMap.DbKeyFieldType = CInt(CP.Content.GetFieldProperty(ImportMap.ContentName, ImportMap.DbKeyField, "FieldType"))
                                     End If
                                     Call SaveImportMap(CP, ImportMap)
                                     Call LoadWizardPath(CP)
@@ -471,7 +479,7 @@ Namespace Views
                                     & "<TR><TD colspan=""2"">Import into an existing content table</td></tr>" _
                                     & "<TR><TD colspan=""2"">" & inputRadioExistingContent & CP.Html.SelectContent(RequestNameImportContentID, ImportContentID.ToString, "Content") & "</td></tr>" _
                                     & "<TR><TD colspan=""2"">Create a new content table</td></tr>" _
-                                    & "<TR><TD colspan=""2"">" & inputRadioNewContent & "<input type=""text"" name=""newContentName"" value=""" &  newContentName & """></td></tr>" _
+                                    & "<TR><TD colspan=""2"">" & inputRadioNewContent & "<input type=""text"" name=""newContentName"" value=""" & newContentName & """></td></tr>" _
                                     & "</table>" _
                                     & "</div>" _
                                     & ""
@@ -528,7 +536,13 @@ Namespace Views
                                     ImportMap = LoadImportMap(CP, ImportMapData)
                                     For Ptr = 0 To UBound(DBFields)
                                         DBFieldName = DBFields(Ptr)
-                                        Select Case CP.Utils.EncodeInteger(CP.Content.GetFieldProperty(ImportContentName, DBFieldName, "FieldType"))
+                                        Dim switchFieldType As Integer = 0
+                                        Dim field = ContentFieldModel.getContentField(CP, ImportContentName, DBFieldName)
+                                        If (field IsNot Nothing) Then
+                                            switchFieldType = field.Type
+                                        End If
+                                        'Select Case CP.Utils.EncodeInteger(CP.Content.GetFieldProperty(ImportContentName, DBFieldName, "FieldType"))
+                                        Select Case switchFieldType
                                             Case FieldTypeBoolean
                                                 DbFieldType = "true/false"
                                             Case FieldTypeCurrency, FieldTypeFloat
@@ -1046,16 +1060,16 @@ Namespace Views
         Private Function GetMemberSelect(cp As CPBaseClass, RequestName As String, MemberID As Integer) As String
             Dim result As String = ""
             Try
-                '
-                Dim CS As Integer
                 Dim cs1 As CPCSBaseClass = cp.CSNew()
                 Dim recordId As Integer
                 Dim Email As String
-                Dim ContentID As Integer
-                Dim ContentName As String
                 '
-                ContentID = CInt(cp.Content.GetFieldProperty("Email", "TestMemberID", "LookupContentID"))
-                ContentName = cp.Content.GetRecordName("content", ContentID)
+                Dim ContentID As Integer = 0
+                Dim emailContentTestMemberField = ContentFieldModel.getContentField(cp, "email", "testmemberid")
+                If (emailContentTestMemberField IsNot Nothing) Then
+                    ContentID = emailContentTestMemberField.LookupContentID
+                End If
+                Dim ContentName As String = cp.Content.GetRecordName("content", ContentID)
                 If ContentName = "" Then
                     ContentName = "Members"
                 End If

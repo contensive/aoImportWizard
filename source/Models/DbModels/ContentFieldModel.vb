@@ -139,6 +139,24 @@ Namespace Models     '<------ set namespace
         Public Function Clone() As Object Implements ICloneable.Clone
             Return Me.MemberwiseClone()
         End Function
-
+        '
+        '====================================================================================================
+        ''' <summary>
+        ''' return a field for the content name and field name
+        ''' </summary>
+        ''' <param name="cp"></param>
+        ''' <param name="contentName"></param>
+        ''' <param name="fieldName"></param>
+        ''' <returns></returns>
+        Public Shared Function getContentField(cp As CPBaseClass, contentName As String, fieldName As String) As Models.ContentFieldModel
+            Dim emailContent As Models.ContentModel = ContentModel.create(cp, "email")
+            If (emailContent IsNot Nothing) Then
+                Dim fieldList As List(Of ContentFieldModel) = ContentFieldModel.createList(cp, "(contentid=" & emailContent.id & ")and(name=" & cp.Db.EncodeSQLText("testmemberid") & ")")
+                If (fieldList.Count > 0) Then
+                    Return fieldList(0)
+                End If
+            End If
+            Return Nothing
+        End Function
     End Class
 End Namespace
