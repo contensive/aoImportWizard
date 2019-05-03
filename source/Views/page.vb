@@ -413,14 +413,14 @@ Namespace Views
                                 ' Source
                                 '
                                 ImportSource = CP.Utils.EncodeInteger(GetWizardValue(CP, RequestNameImportSource, CP.Utils.EncodeText(ImportSourceUpload)))
-                                Description = "<B>Select the import source</B><BR><BR>There are several sources you can use for your data..."
+                                Description = CP.Html.h4("Select the import source") & CP.Html.p("There are several sources you can use for your data")
                                 Content = Content _
                                     & "<div>" _
                                     & "<TABLE border=0 cellpadding=10 cellspacing=0 width=100%>" _
                                     & "<TR><TD width=1>" & CP.Html.RadioBox(RequestNameImportSource, ImportSourceUpload.ToString, ImportSource.ToString) & "</td>" _
-                                    & "<td width=99% align=left>""Upload a comma delimited text file (up to 5 MBytes).</td></tr>" _
+                                    & "<td width=99% align=left>Upload a comma delimited text file (up to 5 MBytes).</td></tr>" _
                                     & "<TR><TD width=1>" & CP.Html.RadioBox(RequestNameImportSource, ImportSourceUploadFolder.ToString, ImportSource.ToString) & "</td>" _
-                                    & "<td width=99% align=left>""Use a file already uploaded into your Upload Folder.</td></tr>" _
+                                    & "<td width=99% align=left>Use a file already uploaded into your Upload Folder.</td></tr>" _
                                     & "</table>" _
                                     & "</div>" _
                                     & ""
@@ -430,7 +430,7 @@ Namespace Views
                                 ' Upload file to Upload folder
                                 '
 
-                                Description = "<B>Upload your File</B><BR><BR>Hit browse to locate the file you want to upload..."
+                                Description = CP.Html.h4("Upload your File") & CP.Html.p("Hit browse to locate the file you want to upload")
                                 Content = Content _
                                     & "<div>" _
                                     & "<TABLE border=0 cellpadding=10 cellspacing=0 width=100%>" _
@@ -444,7 +444,7 @@ Namespace Views
                                 '
                                 ' Select a file from the upload folder
                                 '
-                                Description = "<B>Select a file from your Upload folder</B><BR><BR>Select the upload file you wish to import..."
+                                Description = CP.Html.h4("Select a file from your Upload folder") & CP.Html.p("Select the upload file you wish to import")
                                 Call CP.Doc.AddRefreshQueryString(RequestNameSubForm, SubFormSourceUploadFolder.ToString)
 
                                 Dim fileList2 As New StringBuilder()
@@ -471,8 +471,7 @@ Namespace Views
                                     inputRadioNewContent = "<input type=""radio"" name=""useNewContentName"" value=""1"">"
                                     inputRadioExistingContent = "<input type=""radio"" name=""useNewContentName"" value=""0"" checked>"
                                 End If
-                                Description = "<B>Select the destination for your data</B>" _
-                                    & "<BR><BR><p>For example, to import a list in to people, select People.</p>"
+                                Description = CP.Html.h4("Select the destination for your data") & CP.Html.p("For example, to import a list in to people, select People.")
                                 Content = Content _
                                     & "<div>" _
                                     & "<TABLE border=0 cellpadding=10 cellspacing=0 width=100%>" _
@@ -489,7 +488,7 @@ Namespace Views
                                 ' Get Mapping fields
                                 '
                                 FileData = ""
-                                Description = "<B>Create a New Mapping</B><BR><BR>This step lets you select which fields in your database you would like each field in your upload to be assigned."
+                                Description = CP.Html.h4("Create a New Mapping") & CP.Html.p("This step lets you select which fields in your database you would like each field in your upload to be assigned.")
                                 Filename = GetWizardValue(CP, RequestNameImportUpload, "")
                                 If Filename <> "" Then
                                     If Left(Filename, 1) = "\" Then
@@ -526,46 +525,45 @@ Namespace Views
                                     Content = Content _
                                         & vbCrLf _
                                         & "<TR>" _
-                                        & "<TD width=99% align=left>Imported&nbsp;Field<BR><img src=/cclib/images/spacer.gif width=1 height=1></TD>" _
-                                        & "<TD width=10 align=center><img src=/cclib/images/spacer.gif width=10 height=1></TD>" _
-                                        & "<TD width=100 align=left>Database&nbsp;Field<BR><img src=/cclib/images/spacer.gif width=100 height=1></TD>" _
-                                        & "<TD width=100 align=left>Type<BR><img src=/cclib/images/spacer.gif width=100 height=1></TD>" _
+                                        & "<TD align=left>Imported&nbsp;Field</TD>" _
+                                        & "<TD align=center width=10></TD>" _
+                                        & "<TD align=left width=200>Database&nbsp;Field</TD>" _
+                                        & "<TD align=left width=200>Type</TD>" _
                                         & "</TR>"
                                     ImportMapFile = GetWizardValue(CP, RequestNameImportMapFile, GetDefaultImportMapFile)
                                     ImportMapData = CP.File.ReadVirtual(ImportMapFile)
                                     ImportMap = LoadImportMap(CP, ImportMapData)
                                     For Ptr = 0 To UBound(DBFields)
                                         DBFieldName = DBFields(Ptr)
-                                        Dim switchFieldType As Integer = 0
                                         Dim field = ContentFieldModel.getContentField(CP, ImportContentName, DBFieldName)
-                                        If (field IsNot Nothing) Then
-                                            switchFieldType = field.Type
+                                        If (field Is Nothing) Then
+                                            DbFieldType = "Text (255 chr)"
+                                        Else
+                                            Select Case field.Type
+                                                Case FieldTypeBoolean
+                                                    DbFieldType = "true/false"
+                                                Case FieldTypeCurrency, FieldTypeFloat
+                                                    DbFieldType = "Number"
+                                                Case FieldTypeDate
+                                                    DbFieldType = "Date"
+                                                Case FieldTypeFile, FieldTypeImage, FieldTypeTextFile, FieldTypeCSSFile, FieldTypeXMLFile, FieldTypeJavascriptFile, FieldTypeHTMLFile
+                                                    DbFieldType = "Filename"
+                                                Case FieldTypeInteger
+                                                    DbFieldType = "Integer"
+                                                Case FieldTypeLongText, FieldTypeHTML
+                                                    DbFieldType = "Text (8000 chr)"
+                                                Case FieldTypeLookup
+                                                    DbFieldType = "Integer ID"
+                                                Case FieldTypeManyToMany
+                                                    DbFieldType = "Integer ID"
+                                                Case FieldTypeMemberSelect
+                                                    DbFieldType = "Integer ID"
+                                                Case FieldTypeText, FieldTypeLink, FieldTypeResourceLink
+                                                    DbFieldType = "Text (255 chr)"
+                                                Case Else
+                                                    DbFieldType = "Invalid [" & field.Type & "]"
+                                            End Select
                                         End If
-                                        'Select Case CP.Utils.EncodeInteger(CP.Content.GetFieldProperty(ImportContentName, DBFieldName, "FieldType"))
-                                        Select Case switchFieldType
-                                            Case FieldTypeBoolean
-                                                DbFieldType = "true/false"
-                                            Case FieldTypeCurrency, FieldTypeFloat
-                                                DbFieldType = "Number"
-                                            Case FieldTypeDate
-                                                DbFieldType = "Date"
-                                            Case FieldTypeFile, FieldTypeImage, FieldTypeTextFile, FieldTypeCSSFile, FieldTypeXMLFile, FieldTypeJavascriptFile, FieldTypeHTMLFile
-                                                DbFieldType = "Filename"
-                                            Case FieldTypeInteger
-                                                DbFieldType = "Integer"
-                                            Case FieldTypeLongText, FieldTypeHTML
-                                                DbFieldType = "Text (8000 chr)"
-                                            Case FieldTypeLookup
-                                                DbFieldType = "Integer ID"
-                                            Case FieldTypeManyToMany
-                                                DbFieldType = "Integer ID"
-                                            Case FieldTypeMemberSelect
-                                                DbFieldType = "Integer ID"
-                                            Case FieldTypeText, FieldTypeLink, FieldTypeResourceLink
-                                                DbFieldType = "Text (255 chr)"
-                                            Case Else
-                                                DbFieldType = "Invalid"
-                                        End Select
                                         SourceFieldSelect = DefaultSourceFieldSelect
                                         SourceFieldSelect = Replace(SourceFieldSelect, "xxxx", "SourceField" & Ptr)
                                         SourceFieldPtr = -1
@@ -658,10 +656,10 @@ Namespace Views
                                         Content = Content _
                                     & vbCrLf _
                                     & "<TR>" _
-                                    & "<TD style=" & RowStyle & " width=99% align=left>" & SourceFieldSelect & "</td>" _
-                                    & "<TD style=" & RowStyle & " width=10 align=center>&gt;&gt;</TD>" _
-                                    & "<TD style=" & RowStyle & " width=100 align=left>&nbsp;" & DBFieldCaption & "<input type=hidden name=DbField" & Ptr & " value=""" & DBFieldName & """></td>" _
-                                    & "<TD style=" & RowStyle & " width=100 align=left>&nbsp;" & DbFieldType & "</td>" _
+                                    & "<TD style=" & RowStyle & " align=left>" & SourceFieldSelect & "</td>" _
+                                    & "<TD style=" & RowStyle & " align=center>&gt;&gt;</TD>" _
+                                    & "<TD style=" & RowStyle & " align=left>&nbsp;" & DBFieldCaption & "<input type=hidden name=DbField" & Ptr & " value=""" & DBFieldName & """></td>" _
+                                    & "<TD style=" & RowStyle & " align=left>&nbsp;" & DbFieldType & "</td>" _
                                     & "</TR>"
                                     Next
                                     Content = Content & "<input type=hidden name=Ccnt value=" & Ptr & ">"
@@ -720,7 +718,7 @@ Namespace Views
                                     note = "<p>note: As a non-developer, your Database key options are limited to id, email and username.</p>"
                                 End If
                                 '
-                                Description = "<p><B>Update Control</B><BR><BR>When your data is imported, it can either update your current database, or insert new records into your database. Use this form to control which records will be updated, and which will be inserted.</p>" & note
+                                Description = CP.Html.h4("Update Control") & CP.Html.p("When your data is imported, it can either update your current database, or insert new records into your database. Use this form to control which records will be updated, and which will be inserted.")
                                 Content = Content _
                                     & "<div>" _
                                     & "<TABLE border=0 cellpadding=4 cellspacing=0 width=100%>" _
@@ -750,7 +748,7 @@ Namespace Views
                                 If GroupOptionID = 0 Then
                                     GroupOptionID = GroupOptionNone
                                 End If
-                                Description = "<B>Group Membership</B><BR><BR>When your data is imported, people can be added to a group automatically. Select the option below, and a group."
+                                Description = CP.Html.h4("Group Membership") & CP.Html.p("When your data is imported, people can be added to a group automatically. Select the option below, and a group.")
                                 Content = Content _
                                     & "<div>" _
                                     & "<TABLE border=0 cellpadding=4 cellspacing=0 width=100%>" _
@@ -771,7 +769,7 @@ Namespace Views
                                 '
                                 ' Ask for an email address to notify when the list is complete
                                 '
-                                Description = "<B>Finish</B><BR><BR>Your list will be submitted for import when you hit the finish button. Processing may take several minutes, depending on the size and complexity of your import. If you supply an email address, you will be notified with the import is complete."
+                                Description = CP.Html.h4("Finish") & CP.Html.p("Your list will be submitted for import when you hit the finish button. Processing may take several minutes, depending on the size and complexity of your import. If you supply an email address, you will be notified with the import is complete.")
                                 Content = Content _
                                     & "<div>" _
                                     & "<TABLE border=0 cellpadding=4 cellspacing=0 width=100%>" _
@@ -816,20 +814,18 @@ Namespace Views
             Get
                 Dim body As String = ""
                 If buttonback2 = "" Then
-                    body = "<div class=""iWizWrapper"" style=""border:2px solid black;"">" _
-                            & cp.Html.div(headerCaption,, "ccWizardHeader") _
+                    body = "<div class=""bg-white p-4"">" _
+                            & cp.Html.h2(headerCaption) _
                             & cp.Html.div(description) _
                             & cp.Html.div(WizardContent) _
-                            & cp.Html.Button("button", buttonCancel) _
-                            & cp.Html.Button("button", buttonContinue2)
+                            & cp.Html.div(cp.Html.Button("button", buttonCancel) & cp.Html.Button("button", buttonContinue2), "", "p-2 bg-secondary")
+
                 Else
-                    body = "<div class=""iWizWrapper"" style=""border:2px solid black;"">" _
-                            & cp.Html.div(headerCaption,, "ccWizardHeader") _
+                    body = "<div class=""bg-white p-4"">" _
+                            & cp.Html.h2(headerCaption) _
                             & cp.Html.div(description) _
                             & cp.Html.div(WizardContent) _
-                            & cp.Html.Button("button", buttonCancel) _
-                            & cp.Html.Button("button", buttonback2) _
-                            & cp.Html.Button("button", buttonContinue2)
+                            & cp.Html.div(cp.Html.Button("button", buttonCancel) & cp.Html.Button("button", buttonback2) & cp.Html.Button("button", buttonContinue2), "", "p-2 bg-secondary")
                 End If
                 Return body
             End Get

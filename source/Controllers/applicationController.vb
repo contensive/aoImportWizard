@@ -41,23 +41,6 @@ Namespace Controllers
         '
         '====================================================================================================
         ''' <summary>
-        ''' instance of performanceCloud cache
-        ''' </summary>
-        ''' <value></value>
-        ''' <returns></returns>
-        ''' <remarks></remarks>
-        Public ReadOnly Property pCache As cacheController
-            Get
-                If (_pcache Is Nothing) Then
-                    _pcache = New cacheController(cp)
-                End If
-                Return _pcache
-            End Get
-        End Property
-        Private _pcache As cacheController
-        '
-        '====================================================================================================
-        ''' <summary>
         ''' get the serialized results
         ''' </summary>
         ''' <returns></returns>
@@ -160,9 +143,6 @@ Namespace Controllers
                     '
                     ' ----- call .dispose for managed objects
                     '
-                    If Not _pcache Is Nothing Then
-                        _pcache.Dispose()
-                    End If
                 End If
                 '
                 ' Add code here to release the unmanaged resource.

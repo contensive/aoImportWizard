@@ -21,44 +21,42 @@ Namespace Models     '<------ set namespace
         '====================================================================================================
         ' -- instance properties
 
-        Public Property AdminOnly As Boolean
-        Public Property Authorable As Boolean
-        Public Property Caption As String
-        Public Property ContentID  as Integer
-        Public Property createResourceFilesOnRoot As Boolean
-        Public Property DefaultValue As String
-        Public Property DeveloperOnly As Boolean
-        Public Property editorAddonID  as Integer
-        Public Property EditSortPriority  as Integer
-        Public Property EditTab As String
-        Public Property HTMLContent As Boolean
-        Public Property IndexColumn  as Integer
-        Public Property IndexSortDirection  as Integer
-        Public Property IndexSortPriority  as Integer
-        Public Property IndexWidth As String
-        Public Property InstalledByCollectionID  as Integer
-        Public Property IsBaseField As Boolean
-        Public Property LookupContentID  as Integer
-        Public Property LookupList As String
-        Public Property ManyToManyContentID  as Integer
-        Public Property ManyToManyRuleContentID  as Integer
-        Public Property ManyToManyRulePrimaryField As String
-        Public Property ManyToManyRuleSecondaryField As String
-        Public Property MemberSelectGroupID  as Integer
-        Public Property NotEditable As Boolean
-        Public Property Password As Boolean
-        Public Property prefixForRootResourceFiles As String
-        'Public Property ReadOnly As Boolean
-        Public Property RedirectContentID  as Integer
-        Public Property RedirectID As String
-        Public Property RedirectPath As String
-        Public Property Required As Boolean
-        Public Property RSSDescriptionField As Boolean
-        Public Property RSSTitleField As Boolean
-        Public Property Scramble As Boolean
-        Public Property TextBuffered As Boolean
+        'Public Property AdminOnly As Boolean
+        'Public Property Authorable As Boolean
+        'Public Property Caption As String
+        'Public Property ContentID  as Integer
+        'Public Property DefaultValue As String
+        'Public Property DeveloperOnly As Boolean
+        'Public Property editorAddonID  as Integer
+        'Public Property EditSortPriority  as Integer
+        'Public Property EditTab As String
+        'Public Property HTMLContent As Boolean
+        'Public Property IndexColumn  as Integer
+        'Public Property IndexSortDirection  as Integer
+        'Public Property IndexSortPriority  as Integer
+        'Public Property IndexWidth As String
+        'Public Property InstalledByCollectionID As Integer
+        Public Property LookupContentID As Integer
+        'Public Property LookupList As String
+        'Public Property ManyToManyContentID  as Integer
+        'Public Property ManyToManyRuleContentID  as Integer
+        'Public Property ManyToManyRulePrimaryField As String
+        'Public Property ManyToManyRuleSecondaryField As String
+        'Public Property MemberSelectGroupID  as Integer
+        'Public Property NotEditable As Boolean
+        'Public Property Password As Boolean
+        'Public Property prefixForRootResourceFiles As String
+        ''Public Property ReadOnly As Boolean
+        'Public Property RedirectContentID  as Integer
+        'Public Property RedirectID As String
+        'Public Property RedirectPath As String
+        'Public Property Required As Boolean
+        'Public Property RSSDescriptionField As Boolean
+        'Public Property RSSTitleField As Boolean
+        'Public Property Scramble As Boolean
+        'Public Property TextBuffered As Boolean
         Public Property Type  as Integer
-        Public Property UniqueName As Boolean        '
+        'Public Property UniqueName As Boolean        '
         '====================================================================================================
         Public Overloads Shared Function add(cp As CPBaseClass) As ContentFieldModel
             Return add(Of ContentFieldModel)(cp)
@@ -149,9 +147,9 @@ Namespace Models     '<------ set namespace
         ''' <param name="fieldName"></param>
         ''' <returns></returns>
         Public Shared Function getContentField(cp As CPBaseClass, contentName As String, fieldName As String) As Models.ContentFieldModel
-            Dim emailContent As Models.ContentModel = ContentModel.create(cp, "email")
-            If (emailContent IsNot Nothing) Then
-                Dim fieldList As List(Of ContentFieldModel) = ContentFieldModel.createList(cp, "(contentid=" & emailContent.id & ")and(name=" & cp.Db.EncodeSQLText("testmemberid") & ")")
+            Dim content As Models.ContentModel = ContentModel.createByName(cp, contentName)
+            If (content IsNot Nothing) Then
+                Dim fieldList As List(Of ContentFieldModel) = ContentFieldModel.createList(cp, "(contentid=" & content.id & ")and(name=" & cp.Db.EncodeSQLText(fieldName) & ")")
                 If (fieldList.Count > 0) Then
                     Return fieldList(0)
                 End If

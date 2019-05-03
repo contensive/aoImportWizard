@@ -132,7 +132,6 @@ public property AdminOnly as Boolean
 public property Authorable as Boolean
 public property Caption as String
 public property ContentID  as Integer
-public property createResourceFilesOnRoot as Boolean
 public property DefaultValue as String
 public property DeveloperOnly as Boolean
 public property editorAddonID  as Integer
@@ -144,7 +143,6 @@ public property IndexSortDirection  as Integer
 public property IndexSortPriority  as Integer
 public property IndexWidth as String
 public property InstalledByCollectionID  as Integer
-public property IsBaseField as Boolean
 public property LookupContentID  as Integer
 public property LookupList as String
 public property ManyToManyContentID  as Integer
