@@ -1,1 +1,0 @@
-See http://contensive.io for details.
