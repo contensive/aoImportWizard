@@ -7,13 +7,11 @@ Namespace Controllers
             Try
                 '
                 Dim Cell As String = ""
-                Dim Ptr As Integer
                 Dim EOL As Boolean
                 Dim srcPtr As Integer
                 Dim rowPtr As Integer
                 Dim colPtr As Integer
                 Dim eof As Boolean
-                Dim cells() As String
                 Dim colCnt As Integer
                 Dim rowCnt As Integer
                 Dim dummyCells As String() = {}
@@ -70,7 +68,6 @@ Namespace Controllers
         Private Sub parseCsvData_Line(Source As String, source_ptr As Integer, return_cells() As String, return_ptr As Integer, return_eof As Boolean)
             On Error GoTo ErrorTrap
             '
-            Dim Cell As String
             Dim Ptr As Integer
             Dim EOL As Boolean
             Dim fieldPtr As Integer
@@ -80,6 +77,7 @@ Namespace Controllers
             Do While Not EOL
                 Dim last As Integer
                 last = return_ptr
+                Dim Cell As String = ""
                 EOL = parseCsvData_FieldReturnEOL(Source, return_ptr, Cell, return_ptr, return_eof)
                 ReDim Preserve return_cells(fieldPtr)
                 return_cells(fieldPtr) = Cell

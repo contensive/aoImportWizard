@@ -65,12 +65,12 @@ Namespace Views
                         ' Cancel
                         '
                         Call ClearWizardValues(CP)
-                        Call CP.Response.Redirect(CP.Site.AppRootPath & CP.Site.AppPath)
+                        Call CP.Response.Redirect("\")
                     Else
                         '
                         Dim SubformID As Integer = CP.Doc.GetInteger(RequestNameSubForm)
 
-                        Dim ImportMap As ImportMapType
+                        Dim ImportMap As New ImportMapType
                         Dim Ptr As Integer
                         Dim ImportContentID As Integer
                         Dim Filename As String
@@ -78,7 +78,7 @@ Namespace Views
                         Dim ImportMapFile As String
                         Dim ImportMapData As String
                         Dim useNewContentName As Boolean
-                        Dim newContentName As String
+                        Dim newContentName As String = ""
                         If SubformID = 0 Then
                             '
                             ' Set defaults and go to first form
@@ -95,7 +95,7 @@ Namespace Views
                             ' Load the importmap with what we have so far
                             '
                             ImportMapFile = GetWizardValue(CP, RequestNameImportMapFile, GetDefaultImportMapFile)
-                            ImportMapData = CP.File.ReadVirtual(ImportMapFile)
+                            ImportMapData = CP.CdnFiles.Read(ImportMapFile)
                             ImportMap = LoadImportMap(CP, ImportMapData)
                             '
                             ' Process incoming form
@@ -331,7 +331,7 @@ Namespace Views
                         Content = Content & CP.Html.Hidden(RequestNameSubForm, SubformID.ToString)
                         Dim SourceFieldSelect As String
                         Dim Description As String
-                        Dim WizardContent As String
+                        Dim WizardContent As String = ""
                         Dim ImportContentName As String
                         Select Case SubformID
                             Case SubFormSource, 0
@@ -372,10 +372,13 @@ Namespace Views
                                 '
                                 Description = CP.Html.h4("Select a file from your Upload folder") & CP.Html.p("Select the upload file you wish to import")
                                 Call CP.Doc.AddRefreshQueryString(RequestNameSubForm, SubFormSourceUploadFolder.ToString)
-
                                 Dim fileList2 As New StringBuilder()
-                                For Each file In System.IO.Directory.GetFiles(CP.Site.PhysicalFilePath & "upload")
-                                    fileList2.Append(CP.Html.div(CP.Html.RadioBox("selectfile", file, "") & "&nbsp;" & file))
+                                Dim uploadPtr As Integer = 0
+                                For Each file In CP.CdnFiles.FileList("upload")
+                                    Dim uploadId As String = "upload" & uploadPtr
+                                    Dim input As String = "<label for=""" & uploadId & """>" & CP.Html.RadioBox("selectfile", "upload\" & file.Name, "", "", uploadId) & "&nbsp;" & file.Name & "</label>"
+                                    fileList2.Append(CP.Html.div(input, "", "pb-2"))
+                                    uploadPtr += 1
                                 Next
                                 Content = fileList2.ToString() & CP.Html.Hidden(RequestNameSubForm, SubformID.ToString)
 
@@ -393,11 +396,11 @@ Namespace Views
                                 Dim inputRadioNewContent As String
                                 Dim inputRadioExistingContent As String
                                 If useNewContentName Then
-                                    inputRadioNewContent = "<input type=""radio"" name=""useNewContentName"" value=""1"" checked>"
-                                    inputRadioExistingContent = "<input type=""radio"" name=""useNewContentName"" value=""0"">"
+                                    inputRadioNewContent = "<input type=""radio"" name=""useNewContentName"" class=""mr-2"" value=""1"" checked>"
+                                    inputRadioExistingContent = "<input type=""radio"" name=""useNewContentName"" class=""mr-2"" value=""0"">"
                                 Else
-                                    inputRadioNewContent = "<input type=""radio"" name=""useNewContentName"" value=""1"">"
-                                    inputRadioExistingContent = "<input type=""radio"" name=""useNewContentName"" value=""0"" checked>"
+                                    inputRadioNewContent = "<input type=""radio"" name=""useNewContentName"" class=""mr-2"" value=""1"">"
+                                    inputRadioExistingContent = "<input type=""radio"" name=""useNewContentName"" class=""mr-2"" value=""0"" checked>"
                                 End If
                                 Description = CP.Html.h4("Select the destination for your data") & CP.Html.p("For example, to import a list in to people, select People.")
                                 Content = Content _
@@ -422,7 +425,7 @@ Namespace Views
                                     If Left(Filename, 1) = "\" Then
                                         Filename = Mid(Filename, 2)
                                     End If
-                                    FileData = CP.File.ReadVirtual(Filename)
+                                    FileData = CP.CdnFiles.Read(Filename)
                                 End If
                                 If FileData = "" Then
                                     '
@@ -459,7 +462,7 @@ Namespace Views
                                         & "<TD align=left width=200>Type</TD>" _
                                         & "</TR>"
                                     ImportMapFile = GetWizardValue(CP, RequestNameImportMapFile, GetDefaultImportMapFile)
-                                    ImportMapData = CP.File.ReadVirtual(ImportMapFile)
+                                    ImportMapData = CP.CdnFiles.Read(ImportMapFile)
                                     ImportMap = LoadImportMap(CP, ImportMapData)
                                     For Ptr = 0 To UBound(DBFields)
                                         Dim DBFieldName As String = DBFields(Ptr)
@@ -673,9 +676,6 @@ Namespace Views
                                     & "</div>" _
                                     & ""
                                 WizardContent = GetWizardContent(CP, HeaderCaption, ButtonCancel, ButtonBack2, ButtonContinue2, Description, Content)
-                                Dim GroupID As Integer
-                                Dim GroupOptionID As Integer
-
                             Case SubFormGroup
                                 '
                                 ' Select a group to add
@@ -770,7 +770,7 @@ Namespace Views
         Public Property GetForm As Object
 
         Private Sub ClearWizardValues(cp As CPBaseClass)
-            Call cp.Db.ExecuteSQL("delete from ccProperties where name Like 'ImportWizard.%' and typeid=1 and keyid=" & cp.Visit.Id)
+            Call cp.Db.ExecuteNonQuery("delete from ccProperties where name Like 'ImportWizard.%' and typeid=1 and keyid=" & cp.Visit.Id)
         End Sub
         '
         '
@@ -816,22 +816,15 @@ Namespace Views
             Dim result As String = ""
             Try
                 '
-                Dim CS As Integer
-                Dim EmailID As Integer
-                Dim CSEmail As Integer
-                Dim CSWizard As Integer
                 Dim ImportWizardID As Integer
-                Dim ValueString As String
                 Dim EmailCID As Integer
                 '
                 ' Get the saved ImportWizardID
-                '
                 ImportWizardID = cp.Utils.EncodeInteger(GetWizardValue(cp, RequestNameImportWizardID, ""))
                 '
                 If ImportWizardID = 0 Then
                     '
                     ' Default Wizard, for any type of email, nothing disabled
-                    '
                     EmailCID = cp.Content.GetRecordID("content", "Email Templates")
                     Wizard.GroupFormInstructions = "Select Group"
                     Wizard.KeyFormInstructions = "Select the key field"
@@ -924,7 +917,7 @@ Namespace Views
         '
         '
         Private Function GetWizardValue(cp As CPBaseClass, Name As String, DefaultValue As String) As String
-            GetWizardValue = cp.Visit.GetProperty("ImportWizard." & Name, DefaultValue)
+            GetWizardValue = cp.Visit.GetText("ImportWizard." & Name, DefaultValue)
         End Function
         '
         '
@@ -1084,7 +1077,7 @@ Namespace Views
                 '
                 If Filename <> "" Then
                     If SourceFieldCnt = 0 Then
-                        FileData = cp.File.ReadVirtual(Filename)
+                        FileData = cp.CdnFiles.Read(Filename)
                         If FileData <> "" Then
                             '
                             ' Build FileColumns
@@ -1109,35 +1102,28 @@ Namespace Views
         Private Function GetSourceFieldSelect(cp As CPBaseClass, Filename As String, NoneCaption As String) As String
             Dim result As String = ""
             Try
-                '
-                Dim FileData As String
-                Dim FileRows() As String
                 Dim Ptr As Integer
-                Dim FileColumns() As String
                 Dim ColumnName As String
-                '
                 If Filename <> "" Then
                     Call LoadSourceFields(cp, Filename)
                     '
                     ' Build FileColumns
                     '
-                    GetSourceFieldSelect = vbCrLf & "<select name=xxxx><option style=""Background-color:#E0E0E0;"" value=-1>" & NoneCaption & "</option>"
+                    result = vbCrLf & "<select name=xxxx><option style=""Background-color:#E0E0E0;"" value=-1>" & NoneCaption & "</option>"
                     For Ptr = 0 To SourceFieldCnt - 1
                         ColumnName = SourceFields(Ptr)
                         If ColumnName = "" Then
                             ColumnName = "[blank]"
                         End If
-                        GetSourceFieldSelect = GetSourceFieldSelect & vbCrLf & "<option value=""" & Ptr & """>" & (Ptr + 1) & " (" & ColumnName & ")</option>"
+                        result = result & vbCrLf & "<option value=""" & Ptr & """>" & (Ptr + 1) & " (" & ColumnName & ")</option>"
                     Next
-                    GetSourceFieldSelect = GetSourceFieldSelect & vbCrLf & "</select>"
+                    result = result & vbCrLf & "</select>"
                 End If
-
-                '
-                '
+                Return result
             Catch ex As Exception
                 cp.Site.ErrorReport(ex)
+                Return ""
             End Try
-
         End Function
         '
         '
@@ -1145,11 +1131,8 @@ Namespace Views
         Private Sub SaveImportMap(cp As CPBaseClass, ImportMap As ImportMapType)
             Dim result As String = ""
             Try
-                '
                 Dim ImportMapFile As String
                 Dim ImportMapData As String
-                Dim Rows() As String
-                Dim Pair() As String
                 Dim Ptr As Integer
                 '
                 ImportMapFile = GetWizardValue(cp, RequestNameImportMapFile, GetDefaultImportMapFile)
@@ -1169,7 +1152,7 @@ Namespace Views
                         ImportMapData = ImportMapData & vbCrLf & ImportMap.MapPairs(Ptr).DbField & "=" & ImportMap.MapPairs(Ptr).SourceFieldPtr & "," & ImportMap.MapPairs(Ptr).DbFieldType
                     Next
                 End If
-                Call cp.File.SaveVirtual(ImportMapFile, ImportMapData)
+                Call cp.CdnFiles.Save(ImportMapFile, ImportMapData)
             Catch ex As Exception
                 cp.Site.ErrorReport(ex)
             End Try

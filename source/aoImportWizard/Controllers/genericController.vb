@@ -149,15 +149,12 @@ Namespace Controllers
                 '
                 Dim crPtr As Integer
                 Dim endPtr As Integer
-                Dim quotePtr As Integer
-                Dim dblQuotePtr As Integer
                 Dim Ptr As Integer
                 Dim workingPtr As Integer
                 Dim IsQuoted As Boolean
                 Dim commaptr As Integer
                 Dim lfPtr As Integer
                 Dim crlfPtr As Integer
-                Dim cellLen As Integer
                 Dim hint As String
                 '
                 Ptr = sourcePtr
@@ -393,7 +390,6 @@ Namespace Controllers
             Dim result As String(,)
             Try
                 '
-                Dim Ptr As Integer
                 Dim EOL As Boolean
                 Dim srcPtr As Integer
                 Dim rowPtr As Integer

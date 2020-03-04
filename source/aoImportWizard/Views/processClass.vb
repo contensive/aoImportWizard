@@ -125,198 +125,137 @@ Namespace Views
         Private Function ProcessCSV(cp As CPBaseClass, CSVFilename As String, ImportMapFilename As String) As String
             Dim result As String = ""
             Try
-                Dim matchFound As Boolean
-                Dim colCnt As Integer
-                Dim rowCnt As Integer
-                Dim ImportMap As ImportMapType
-                Dim sourcePtr As Integer
-                Dim Source As String
-                Dim Rows() As String
-                Dim rowPtr As Integer
-                Dim colPtr As Integer
-                Dim row As String
-                Dim cells As String(,)
-                ' Dim CS As Integer
-                Dim DBFieldName As String
-                Dim SourceData As String
-                Dim fieldPtr As Integer
-                Dim ContentName As String
-                Dim DbKeyField As String
-                Dim SourceKeyPtr As Integer
-                Dim SourceKeyData As String
-                Dim KeyMethodID As Integer
-                Dim KeyCriteria As String
-                Dim UpdateRecord As Boolean
-                Dim InsertRecord As Boolean
-                Dim recordId As Integer
-                Dim UpdateSQLFieldSet As String
-                Dim UpdateSQL As String
-                Dim LoopCnt As Integer
-                Dim RowWidth As Integer
-                Dim hint As String
-                Dim ImportTableName As String = ""
-                '
-                hint = "000"
-                '
                 If Left(CSVFilename, 1) = "\" Then
                     CSVFilename = Mid(CSVFilename, 2)
                 End If
-                hint = "010"
-                Source = cp.File.ReadVirtual(CSVFilename)
-                If Source <> "" Then
+                Dim hint As String = "010"
+                Dim source As String = cp.CdnFiles.Read(CSVFilename)
+                If (Not String.IsNullOrEmpty(source)) Then
                     hint = "020"
-                    ImportMap = genericController.LoadImportMap(cp, cp.File.ReadVirtual(ImportMapFilename))
-                    hint = "030"
-                    ContentName = ImportMap.ContentName
+                    Dim importMap As ImportMapType = genericController.LoadImportMap(cp, cp.CdnFiles.Read(ImportMapFilename))
                     hint = "040"
-                    cells = genericController.parseFile(Source)
-                    colCnt = UBound(cells, 1) + 1
-                    rowCnt = UBound(cells, 2) + 1
-                    If ImportMap.importToNewContent Then
-                        '
-                        ' -- edge case, not supporting for now
-                        'hint = "050"
+                    Dim cells As String(,) = genericController.parseFile(source)
+                    Dim colCnt As Integer = UBound(cells, 1) + 1
+                    Dim rowCnt As Integer = UBound(cells, 2) + 1
+                    Dim dBFieldName As String
+                    Dim ImportTableName As String = ""
+                    If importMap.importToNewContent Then
                         '
                         ' create the destination table and import map
-                        '
-                        ImportMap.SkipRowCnt = 1
-                        ImportMap.MapPairCnt = colCnt
-                        ReDim ImportMap.MapPairs(colCnt - 1)
-                        ImportMap.MapPairs(colCnt - 1) = New MapPairType
-                        ImportTableName = ContentName
+                        importMap.SkipRowCnt = 1
+                        importMap.MapPairCnt = colCnt
+                        ReDim importMap.MapPairs(colCnt - 1)
+                        importMap.MapPairs(colCnt - 1) = New MapPairType
+                        ImportTableName = importMap.ContentName
                         ImportTableName = Replace(ImportTableName, " ", "_")
                         ImportTableName = Replace(ImportTableName, "-", "_")
                         ImportTableName = Replace(ImportTableName, ",", "_")
                         hint = "060"
-
-                        cp.Content.AddContent(ContentName, ImportTableName)
-
-                        'Dim table As Models.TableModel = Models.TableModel.add(cp)
-                        'table.name = ImportTableName
-                        'table.save(cp)
-                        '
-                        'Dim content As Models.ContentModel = Models.ContentModel.add(cp)
-                        'content.name = ContentName
-                        'content.Active = True
-                        'content.AuthoringTableID = table.id
-                        'content.save(cp)
-
+                        cp.Content.AddContent(importMap.ContentName, ImportTableName)
                         hint = "070"
+                        Dim colPtr As Integer
                         For colPtr = 0 To colCnt - 1
-                            ImportMap.MapPairs(colPtr) = New MapPairType
+                            importMap.MapPairs(colPtr) = New MapPairType
                             hint = "080"
-                            DBFieldName = cells(colPtr, 0)
-                            DBFieldName = encodeFieldName(cp, DBFieldName)
-                            If (DBFieldName = "") Then
-                                DBFieldName = "field" & colPtr
+                            dBFieldName = cells(colPtr, 0)
+                            dBFieldName = encodeFieldName(cp, dBFieldName)
+                            If (String.IsNullOrEmpty(dBFieldName)) Then
+                                dBFieldName = "field" & colPtr
                             End If
-                            ImportMap.MapPairs(colPtr).DbField = DBFieldName
-                            ImportMap.MapPairs(colPtr).DbFieldType = 2
-                            ImportMap.MapPairs(colPtr).SourceFieldName = DBFieldName
-                            ImportMap.MapPairs(colPtr).SourceFieldPtr = colPtr
+                            importMap.MapPairs(colPtr).DbField = dBFieldName
+                            importMap.MapPairs(colPtr).DbFieldType = 2
+                            importMap.MapPairs(colPtr).SourceFieldName = dBFieldName
+                            importMap.MapPairs(colPtr).SourceFieldPtr = colPtr
                             hint = "090"
-                            cp.Content.AddContentField(ContentName, DBFieldName, 2)
-                            'Dim field As Models.ContentFieldModel = Models.ContentFieldModel.add(cp)
-                            'field.Active = True
-                            'field.Type = 2
-                            'field.ContentID = content.id
-                            'field.save(cp)
+                            cp.Content.AddContentField(importMap.ContentName, dBFieldName, 2)
                         Next
                     Else
-                        If ContentName = "" Then
-                            ContentName = "People"
+                        If (String.IsNullOrEmpty(importMap.ContentName)) Then
+                            importMap.ContentName = "People"
                         End If
-                        ImportTableName = cp.Content.GetTable(ImportMap.ContentName)
+                        ImportTableName = cp.Content.GetTable(importMap.ContentName)
                     End If
 
-                    If ImportMap.MapPairCnt > 0 Then
+                    If importMap.MapPairCnt > 0 Then
                         hint = "200"
-                        DbKeyField = ImportMap.DbKeyField
-                        SourceKeyPtr = cp.Utils.EncodeInteger(ImportMap.SourceKeyField)
-                        KeyMethodID = ImportMap.KeyMethodID
-                        If (DbKeyField = "") Or (SourceKeyPtr < 0) Then
-                            KeyMethodID = KeyMethodInsertAll
+                        Dim SourceKeyPtr As Integer = cp.Utils.EncodeInteger(importMap.SourceKeyField)
+                        If (importMap.DbKeyField = "") Or (SourceKeyPtr < 0) Then
+                            importMap.KeyMethodID = KeyMethodInsertAll
                         End If
                         '
-                        '
-                        '
-                        KeyCriteria = "(1=0)"
-                        For rowPtr = ImportMap.SkipRowCnt To rowCnt - 1
+                        Dim KeyCriteria As String = "(1=0)"
+                        Dim rowPtr As Integer
+                        For rowPtr = importMap.SkipRowCnt To rowCnt - 1
                             hint = "300"
-                            UpdateRecord = False
-                            InsertRecord = False
-                            'row = Rows(rowPtr)
-                            RowWidth = 0
+                            Dim updateRecord As Boolean = False
+                            Dim insertRecord As Boolean = False
+                            Dim rowWidth As Integer = 0
                             If (rowPtr = 76) Or (rowPtr = 105) Then
                                 rowPtr = rowPtr
                             End If
                             If True Then
-                                'If row <> "" Then
                                 hint = "310"
-                                'cells = kmaSplit(row, ",")
-                                If KeyMethodID = KeyMethodInsertAll Then
+                                If importMap.KeyMethodID = KeyMethodInsertAll Then
                                     hint = "320"
-                                    '
-                                    InsertRecord = True
+                                    insertRecord = True
                                 Else
                                     hint = "330"
                                     '
                                     ' Update or Update-And-Insert, Build Key Criteria
-                                    '
-                                    SourceKeyData = cells(SourceKeyPtr, rowPtr)
-                                    If Len(SourceKeyData) > 2 And Left(SourceKeyData, 1) = """" And Right(SourceKeyData, 1) = """" Then
-                                        SourceKeyData = Trim(Mid(SourceKeyData, 2, Len(SourceKeyData) - 2))
+                                    Dim sourceKeyData As String = cells(SourceKeyPtr, rowPtr)
+                                    If Len(sourceKeyData) > 2 And Left(sourceKeyData, 1) = """" And Right(sourceKeyData, 1) = """" Then
+                                        sourceKeyData = Trim(Mid(sourceKeyData, 2, Len(sourceKeyData) - 2))
                                     End If
-                                    If Trim(SourceKeyData) = "" Then
+                                    If Trim(sourceKeyData) = "" Then
                                         '
                                         ' Source had no data in key field, insert if allowed
                                         '
-                                        If KeyMethodID = KeyMethodUpdateOnMatchInsertOthers Then
-                                            InsertRecord = True
+                                        If importMap.KeyMethodID = KeyMethodUpdateOnMatchInsertOthers Then
+                                            insertRecord = True
                                         End If
                                     Else
                                         hint = "340"
                                         '
                                         ' Source has good key field data
                                         '
-                                        Select Case ImportMap.DbKeyFieldType
+                                        Select Case importMap.DbKeyFieldType
                                             Case FieldTypeAutoIncrement, FieldTypeCurrency, FieldTypeFloat, FieldTypeInteger, FieldTypeLookup, FieldTypeManyToMany, FieldTypeMemberSelect
                                                 '
                                                 ' number
                                                 '
-                                                UpdateRecord = True
-                                                KeyCriteria = "(" & DbKeyField & "=" & cp.Db.EncodeSQLNumber(CDbl(SourceKeyData)) & ")"
+                                                updateRecord = True
+                                                KeyCriteria = "(" & importMap.DbKeyField & "=" & cp.Db.EncodeSQLNumber(CDbl(sourceKeyData)) & ")"
                                             Case FieldTypeBoolean
                                                 '
                                                 ' Boolean
                                                 '
-                                                UpdateRecord = True
-                                                KeyCriteria = "(" & DbKeyField & "=" & cp.Db.EncodeSQLBoolean(CBool(SourceKeyData)) & ")"
+                                                updateRecord = True
+                                                KeyCriteria = "(" & importMap.DbKeyField & "=" & cp.Db.EncodeSQLBoolean(CBool(sourceKeyData)) & ")"
                                             Case FieldTypeDate
                                                 '
                                                 ' date
                                                 '
-                                                UpdateRecord = True
-                                                KeyCriteria = "(" & DbKeyField & "=" & cp.Db.EncodeSQLDate(CDate(SourceKeyData)) & ")"
+                                                updateRecord = True
+                                                KeyCriteria = "(" & importMap.DbKeyField & "=" & cp.Db.EncodeSQLDate(CDate(sourceKeyData)) & ")"
                                             Case FieldTypeText, FieldTypeResourceLink, FieldTypeLink
                                                 '
                                                 ' text
                                                 '
-                                                UpdateRecord = True
-                                                KeyCriteria = "(" & DbKeyField & "=" & cp.Db.EncodeSQLText(Left(SourceKeyData, 255)) & ")"
+                                                updateRecord = True
+                                                KeyCriteria = "(" & importMap.DbKeyField & "=" & cp.Db.EncodeSQLText(Left(sourceKeyData, 255)) & ")"
                                             Case FieldTypeLongText, FieldTypeHTML
                                                 '
                                                 ' long text
                                                 '
-                                                UpdateRecord = True
-                                                KeyCriteria = "(" & DbKeyField & "=" & cp.Db.EncodeSQLText(SourceKeyData) & ")"
+                                                updateRecord = True
+                                                KeyCriteria = "(" & importMap.DbKeyField & "=" & cp.Db.EncodeSQLText(sourceKeyData) & ")"
                                             Case Else
                                                 '
                                                 ' unknown field type
                                                 '
-                                                UpdateRecord = True
-                                                If KeyMethodID = KeyMethodUpdateOnMatchInsertOthers Then
-                                                    InsertRecord = True
+                                                updateRecord = True
+                                                If importMap.KeyMethodID = KeyMethodUpdateOnMatchInsertOthers Then
+                                                    insertRecord = True
                                                 End If
                                         End Select
                                         ' move to after the row work so we can skip the insert if the row width=0
@@ -324,19 +263,15 @@ Namespace Views
                                 End If
                                 '
                                 ' If Insert, Build KeyCriteria and setup CS
-                                ' x If Update, CS is good -- else there is no open record
-                                '
-                                '                  
-                                If (InsertRecord Or UpdateRecord) Then
+                                Dim updateSQLFieldSet As String = ""
+                                If (insertRecord Or updateRecord) Then
                                     hint = "400"
+                                    Dim fieldPtr As Integer
                                     '
                                     ' Build Update SQL
-                                    '
-                                    UpdateSQLFieldSet = ""
-                                    'For fieldPtr = 0 To colCnt - 1
-                                    For fieldPtr = 0 To ImportMap.MapPairCnt - 1
+                                    For fieldPtr = 0 To importMap.MapPairCnt - 1
                                         hint = "500"
-                                        sourcePtr = ImportMap.MapPairs(fieldPtr).SourceFieldPtr
+                                        Dim sourcePtr As Integer = importMap.MapPairs(fieldPtr).SourceFieldPtr
                                         If sourcePtr < 0 Then
                                             '
                                             ' Bad pointer
@@ -349,180 +284,145 @@ Namespace Views
                                             sourcePtr = sourcePtr
                                         Else
                                             hint = "600"
-                                            DBFieldName = ImportMap.MapPairs(fieldPtr).DbField
-                                            SourceData = cells(sourcePtr, rowPtr)
-                                            RowWidth = RowWidth + Len(Trim(SourceData))
+                                            dBFieldName = importMap.MapPairs(fieldPtr).DbField
+                                            Dim sourceData As String = cells(sourcePtr, rowPtr)
+                                            rowWidth += Len(Trim(sourceData))
                                             ' there are no fieldtypes defined as 0, and I do not want the CS open now, so we can avoid the insert if rowwidth=0
 
-                                            Select Case ImportMap.MapPairs(fieldPtr).DbFieldType
+                                            Select Case importMap.MapPairs(fieldPtr).DbFieldType
                                                 Case FieldTypeAutoIncrement, FieldTypeCurrency, FieldTypeFloat, FieldTypeInteger, FieldTypeLookup, FieldTypeManyToMany, FieldTypeMemberSelect
                                                     '
-                                                    ' number
-                                                    '
-                                                    UpdateSQLFieldSet = UpdateSQLFieldSet & "," & DBFieldName & "=" & cp.Db.EncodeSQLNumber(CDbl(SourceData))
+                                                    ' number, nullable
+                                                    If (String.IsNullOrEmpty(sourceData)) Then
+                                                        updateSQLFieldSet &= "," & dBFieldName & "=null"
+                                                    Else
+                                                        Dim sourceConverted As Double = cp.Utils.EncodeNumber(sourceData)
+                                                        updateSQLFieldSet &= "," & dBFieldName & "=" & cp.Db.EncodeSQLNumber(sourceConverted)
+                                                    End If
                                                 Case FieldTypeBoolean
                                                     '
-                                                    ' Boolean
-                                                    '
-                                                    UpdateSQLFieldSet = UpdateSQLFieldSet & "," & DBFieldName & "=" & cp.Db.EncodeSQLBoolean(CBool(SourceData))
+                                                    ' Boolean, null is false
+                                                    Dim sourceConverted As Boolean = cp.Utils.EncodeBoolean(sourceData)
+                                                    updateSQLFieldSet &= "," & dBFieldName & "=" & cp.Db.EncodeSQLBoolean(sourceConverted)
                                                 Case FieldTypeDate
                                                     '
-                                                    ' date
-                                                    '
-                                                    UpdateSQLFieldSet = UpdateSQLFieldSet & "," & DBFieldName & "=" & cp.Db.EncodeSQLDate(CDate(SourceData))
+                                                    ' date, nullable
+                                                    If (String.IsNullOrEmpty(sourceData)) Then
+                                                        updateSQLFieldSet &= "," & dBFieldName & "=null"
+                                                    Else
+                                                        Dim sourceConverted As Date = cp.Utils.EncodeDate(sourceData)
+                                                        updateSQLFieldSet &= "," & dBFieldName & "=" & cp.Db.EncodeSQLDate(sourceConverted)
+                                                    End If
                                                 Case FieldTypeText, FieldTypeLink, FieldTypeResourceLink
-                                                    'Case FieldTypeText
                                                     '
-                                                    ' text
-                                                    '
-                                                    UpdateSQLFieldSet = UpdateSQLFieldSet & "," & DBFieldName & "=" & cp.Db.EncodeSQLText(Left(SourceData, 255))
+                                                    ' text, null is empty
+                                                    Dim sourceConverted As String = If(String.IsNullOrEmpty(sourceData), "", If(sourceData.Length < 256, sourceData, Left(sourceData, 255)))
+                                                    updateSQLFieldSet &= "," & dBFieldName & "=" & cp.Db.EncodeSQLText(sourceConverted)
                                                 Case FieldTypeLongText, FieldTypeHTML
-                                                    'Case FieldTypeLongText
                                                     '
-                                                    ' long text
-                                                    '
-                                                    UpdateSQLFieldSet = UpdateSQLFieldSet & "," & DBFieldName & "=" & cp.Db.EncodeSQLText(SourceData)
-                                        'Case FieldTypeTextFile
-                                        '
-                                        ' can not map to any file type because these are sql updates and each record must have a unique filename
-                                        ' the import needs to be rewritten to update one record at a time.
-                                        '   1) pick up the key criteria and run it on live Db to select the record(s) to update
-                                        '   2) update the records in the ContentSet and SaveCS
-                                        '
-                                        '    '
-                                        '    ' text file
-                                        '    '
+                                                    ' long text, null is empty
+                                                    updateSQLFieldSet &= "," & dBFieldName & "=" & cp.Db.EncodeSQLText(sourceData)
                                                 Case FieldTypeFile, FieldTypeImage, FieldTypeTextFile, FieldTypeCSSFile, FieldTypeXMLFile, FieldTypeJavascriptFile, FieldTypeHTMLFile
-
                                                     '
                                                     ' filenames, can not import these, but at least update the filename
-                                                    '
-                                                    UpdateSQLFieldSet = UpdateSQLFieldSet & "," & DBFieldName & "=" & cp.Db.EncodeSQLText(Left(SourceData, 255))
+                                                    Dim sourceConverted As String = If(String.IsNullOrEmpty(sourceData), "", If(sourceData.Length < 256, sourceData, Left(sourceData, 255)))
+                                                    updateSQLFieldSet &= "," & dBFieldName & "=" & cp.Db.EncodeSQLText(sourceConverted)
                                             End Select
                                         End If
                                     Next
                                 End If
                                 hint = "700"
-                                ''on error Resume Next
-                                'Call CSv.CloseCS(CS)
                                 If Err.Number <> 0 Then
-                                    ProcessCSV = ProcessCSV & vbCrLf & "Row " & (rowPtr + 1) & " could not be imported. [" & Err.Description & "]"
-                                ElseIf RowWidth = 0 Then
-                                    ProcessCSV = ProcessCSV & vbCrLf & "Row " & (rowPtr + 1) & " was not imported because it was empty."
-                                ElseIf (UpdateSQLFieldSet <> "") Then
+                                    result &= vbCrLf & "Row " & (rowPtr + 1) & " could not be imported. [" & Err.Description & "]"
+                                ElseIf rowWidth = 0 Then
+                                    result &= vbCrLf & "Row " & (rowPtr + 1) & " was not imported because it was empty."
+                                ElseIf (updateSQLFieldSet <> "") Then
                                     '
                                     ' insert or update the table
                                     '
                                     Dim cs As CPCSBaseClass = cp.CSNew()
-                                    If UpdateRecord Then
+                                    Dim matchFound As Boolean
+                                    If updateRecord Then
                                         '
                                         ' Update requested
-                                        '
-                                        'On Error Resume Next
                                         matchFound = False
-                                        InsertRecord = False
-
-                                        matchFound = cs.Open(ContentName, KeyCriteria, "ID", False)
-
+                                        insertRecord = False
+                                        matchFound = cs.Open(importMap.ContentName, KeyCriteria, "ID", False)
                                         Call cs.Close()
-                                        '
                                         If matchFound Then
                                             '
                                             ' match was found, update all records found
-                                            '
-                                            UpdateRecord = True
-                                        ElseIf (KeyMethodID = KeyMethodUpdateOnMatchInsertOthers) Then
+                                            updateRecord = True
+                                        ElseIf (importMap.KeyMethodID = KeyMethodUpdateOnMatchInsertOthers) Then
                                             '
                                             ' no match, convert to insert if that was requested
-                                            '
-                                            InsertRecord = True
+                                            insertRecord = True
                                         End If
                                     End If
-                                    If InsertRecord Then
+                                    If insertRecord Then
                                         '
                                         ' Insert a new record and convert to an update
-                                        '
-                                        'on error Resume Next
-                                        UpdateRecord = False
-                                        If cs.Insert(ContentName) Then
+                                        updateRecord = False
+                                        If cs.Insert(importMap.ContentName) Then
                                             If Err.Number <> 0 Then
                                                 Err.Clear()
-                                                ProcessCSV = ProcessCSV & vbCrLf & "Row " & (rowPtr + 1) & " could not be imported. [" & Err.Description & "]"
+                                                result &= vbCrLf & "Row " & (rowPtr + 1) & " could not be imported. [" & Err.Description & "]"
                                             Else
                                                 If Not cs.OK() Then
-                                                    ProcessCSV = ProcessCSV & vbCrLf & "Row " & (rowPtr + 1) & " could not be imported because a record count not be inserted."
+                                                    result &= vbCrLf & "Row " & (rowPtr + 1) & " could not be imported because a record count not be inserted."
                                                 Else
-                                                    recordId = cs.GetInteger("ID")
+                                                    Dim recordId As Integer = cs.GetInteger("ID")
                                                     KeyCriteria = "(ID=" & cp.Utils.EncodeNumber(recordId) & ")"
-                                                    UpdateRecord = True
+                                                    updateRecord = True
                                                 End If
                                             End If
                                         End If
-
-                                        'on error GoTo ErrorTrap
                                         Call cs.Close()
                                     End If
                                     '
                                     ' Update the record if needed
-                                    '
-                                    If UpdateRecord Then
+                                    If updateRecord Then
                                         hint = "900"
                                         '
                                         ' Update all records in the current recordset
-                                        '
-                                        'on error Resume Next
-                                        UpdateSQL = "update " & ImportTableName & " set " & Mid(UpdateSQLFieldSet, 2) & " where " & KeyCriteria
-                                        Call cs.OpenSQL(UpdateSQL, cp.Content.GetDataSource(ImportMap.ContentName))
+                                        Dim UpdateSQL As String = "update " & ImportTableName & " set " & Mid(updateSQLFieldSet, 2) & " where " & KeyCriteria
+                                        Call cs.OpenSQL(UpdateSQL, cp.Content.GetDataSource(importMap.ContentName))
                                         If Err.Number <> 0 Then
                                             Err.Clear()
-                                            ProcessCSV = ProcessCSV & vbCrLf & "Row " & (rowPtr + 1) & " could not be imported. [" & Err.Description & "]"
+                                            result &= vbCrLf & "Row " & (rowPtr + 1) & " could not be imported. [" & Err.Description & "]"
                                         End If
-                                        'on error GoTo ErrorTrap
                                     End If
-                                    If ImportMap.GroupOptionID <> GroupOptionNone Then
+                                    If importMap.GroupOptionID <> GroupOptionNone Then
                                         '
                                         ' update/insert OK and records are People
-                                        '
-                                        If cs.Open(ContentName, KeyCriteria, "ID", False) Then
-                                            Do While cs.OK()
-                                                '
-                                                ' Add Groups
-                                                '
-                                                recordId = cs.GetInteger("ID")
-                                                Select Case ImportMap.GroupOptionID
-                                                    Case GroupOptionAll
-                                                        '
-                                                        '
-                                                        '
-                                                        cp.Group.AddUser(ImportMap.GroupID, recordId)
-                                                        'Call MemberRuleModel.AddGroupMember(cp, recordId, ImportMap.GroupID)
-                                                    Case GroupOptionOnMatch
-                                                        '
-                                                        '
-                                                        '
-                                                        If matchFound Then
-                                                            cp.Group.AddUser(ImportMap.GroupID, recordId)
-                                                            'Call MemberRuleModel.AddGroupMember(cp, recordId, ImportMap.GroupID)
-                                                        End If
-                                                    Case GroupOptionOnNoMatch
-                                                        '
-                                                        '
-                                                        '
-                                                        If Not matchFound Then
-                                                            cp.Group.AddUser(ImportMap.GroupID, recordId)
-                                                            'Call MemberRuleModel.AddGroupMember(cp, recordId, ImportMap.GroupID)
-                                                        End If
-                                                End Select
-                                                cs.GoNext()
-                                            Loop
+                                        Dim group As GroupModel = DbBaseModel.create(Of GroupModel)(cp, importMap.GroupID)
+                                        If (group IsNot Nothing) Then
+                                            For Each user In DbBaseModel.createList(Of PersonModel)(cp, KeyCriteria)
+                                                If (user IsNot Nothing) Then
+                                                    '
+                                                    ' Add Groups
+                                                    Select Case importMap.GroupOptionID
+                                                        Case GroupOptionAll
+                                                            '
+                                                            cp.Group.AddUser(group.id, user.id)
+                                                        Case GroupOptionOnMatch
+                                                            '
+                                                            If matchFound Then
+                                                                cp.Group.AddUser(group.id, user.id)
+                                                            End If
+                                                        Case GroupOptionOnNoMatch
+                                                            '
+                                                            If Not matchFound Then
+                                                                cp.Group.AddUser(group.id, user.id)
+                                                            End If
+                                                    End Select
+                                                End If
+                                            Next
                                         End If
-
-                                        Call cs.Close()
                                     End If
                                 End If
-                                'on error GoTo ErrorTrap
                             End If
-                            LoopCnt = LoopCnt + 1
+                            Dim LoopCnt As Integer = LoopCnt + 1
                             If LoopCnt > 10 Then
                                 LoopCnt = 0
                             End If
@@ -533,7 +433,6 @@ Namespace Views
                 Throw
             End Try
             Return result
-
         End Function
 
         '
