@@ -46,7 +46,7 @@ Namespace Views
     '
     '========================================================================
     '
-    Public Class processClass
+    Public Class ProcessClass
         Inherits AddonBaseClass
         '
         ' - if nuget references are not there, open nuget command line and click the 'reload' message at the top, or run "Update-Package -reinstall" - close/open
@@ -62,61 +62,44 @@ Namespace Views
         ''' <param name="CP"></param>
         ''' <returns></returns>
         Public Overrides Function Execute(ByVal CP As CPBaseClass) As Object
-            Dim result As String = ""
             Try
                 '
-                ' -- initialize application. If authentication needed and not login page, pass true
-                Using ae As New applicationController(CP, False)
-                    '
-                    '
-                    Dim ResultMessage As String
-                    Dim CSVFilename As String
-                    Dim ImportMapFilename As String
-                    Dim NotifyBody As String
-                    Dim NotifySubject As String
-                    Dim PreviousProcessAborted As Boolean
-                    Dim notifyFromAddress As String
-                    '
-                    '   Check this server for anything in the tasks queue
-                    If CP.Content.IsField("Import Wizard Tasks", "ID") Then
-                        Dim taskList As List(Of ImportWizardTaskModel) = ImportWizardTaskModel.createList(Of ImportWizardTaskModel)(CP, "DateCompleted is null")
-                        For Each task As ImportWizardTaskModel In taskList
-                            task.dateCompleted = Now
-                            PreviousProcessAborted = (task.dateStarted <> Date.MinValue)
-                            If PreviousProcessAborted Then
-                                task.resultMessage = "This task failed to complete."
-                            Else
-                                NotifyBody = ""
-                                '
-                                ' Import a CSV file
-                                '
-                                CSVFilename = Replace(task.uploadFilename, "/", "\")
-                                ImportMapFilename = Replace(task.importMapFilename, "/", "\")
-                                '
-                                ResultMessage = ProcessCSV(CP, CSVFilename, ImportMapFilename)
-                                If ResultMessage <> "" Then
-                                    NotifyBody = "This email is to notify you that your data import is complete for [" & CP.Site.Name & "]" & vbCrLf & "The following errors occurred during import" & vbCrLf & ResultMessage
-                                Else
-                                    NotifyBody = "This email is to notify you that your data import is complete for [" & CP.Site.Name & "]"
-                                End If
-                                NotifySubject = "Import Completed"
-                                If ResultMessage = "" Then
-                                    ResultMessage = "OK"
-                                End If
-                                task.resultMessage = ResultMessage
-                                If task.notifyEmail <> "" And NotifyBody <> "" Then
-                                    notifyFromAddress = CP.Site.GetText("EmailFromAddress", "")
-                                    Call CP.Email.send(task.notifyEmail, notifyFromAddress, "Task Completion Notification", NotifyBody)
-                                End If
-                            End If
-                            task.save(CP)
-                        Next
+                '   Check this server for anything in the tasks queue
+                Dim taskList As List(Of ImportWizardTaskModel) = DbBaseModel.createList(Of ImportWizardTaskModel)(CP, "DateCompleted is null")
+                For Each task As ImportWizardTaskModel In taskList
+                    task.dateCompleted = Now
+                    Dim PreviousProcessAborted As Boolean = (task.dateStarted <> Date.MinValue)
+                    If PreviousProcessAborted Then
+                        task.resultMessage = "This task failed to complete."
+                    Else
+                        '
+                        ' -- Import a CSV file
+                        Dim CSVFilename As String = Replace(task.uploadFilename, "/", "\")
+                        Dim ImportMapFilename As String = Replace(task.importMapFilename, "/", "\")
+                        Dim ResultMessage As String = ProcessCSV(CP, CSVFilename, ImportMapFilename)
+                        Dim NotifyBody As String
+                        If ResultMessage <> "" Then
+                            NotifyBody = "This email is to notify you that your data import is complete for [" & CP.Site.Name & "]" & vbCrLf & "The following errors occurred during import" & vbCrLf & ResultMessage
+                        Else
+                            NotifyBody = "This email is to notify you that your data import is complete for [" & CP.Site.Name & "]"
+                        End If
+                        Dim NotifySubject As String = "Import Completed"
+                        If ResultMessage = "" Then
+                            ResultMessage = "OK"
+                        End If
+                        task.resultMessage = ResultMessage
+                        If Not String.IsNullOrEmpty(task.notifyEmail) And Not String.IsNullOrEmpty(NotifyBody) Then
+                            Dim notifyFromAddress As String = CP.Site.GetText("EmailFromAddress", "")
+                            Call CP.Email.send(task.notifyEmail, notifyFromAddress, "Task Completion Notification", NotifyBody)
+                        End If
                     End If
-                End Using
+                    task.save(CP)
+                Next
+                Return String.Empty
             Catch ex As Exception
                 CP.Site.ErrorReport(ex)
+                Throw
             End Try
-            Return result
         End Function
 
         '

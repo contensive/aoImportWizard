@@ -313,8 +313,8 @@ Namespace Views
                                                 ImportWizardTasks.save(CP)
                                             End If
                                             '
-                                            Dim addon As New processClass()
-                                            addon.Execute(CP)
+                                            'Dim addon As New ProcessClass()
+                                            'addon.Execute(CP)
                                             Call ClearWizardValues(CP)
                                             SubformID = NextSubFormID(SubformID)
                                     End Select

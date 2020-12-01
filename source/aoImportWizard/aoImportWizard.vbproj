@@ -65,11 +65,11 @@
     <AssemblyOriginatorKeyFile>key1.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="ContensiveDbModels, Version=5.2001.3.8, Culture=neutral, PublicKeyToken=c014b235a9c6bb22, processorArchitecture=MSIL">
-      <HintPath>packages\Contensive.DbModels.5.2001.3.8\lib\net461\ContensiveDbModels.dll</HintPath>
+    <Reference Include="ContensiveDbModels, Version=4.1.2.0, Culture=neutral, PublicKeyToken=c014b235a9c6bb22, processorArchitecture=MSIL">
+      <HintPath>packages\Contensive.DbModels.20.10.24.2\lib\net45\ContensiveDbModels.dll</HintPath>
     </Reference>
     <Reference Include="CPBase, Version=4.1.2.0, Culture=neutral, PublicKeyToken=10b3c53389b845fb, processorArchitecture=MSIL">
-      <HintPath>packages\Contensive.CPBaseClass.5.2001.3.8\lib\net472\CPBase.dll</HintPath>
+      <HintPath>packages\Contensive.CPBaseClass.20.10.24.2\lib\net45\CPBase.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -90,8 +90,8 @@
     <Compile Include="Models\Complex\baseComplexModel.vb" />
     <Compile Include="Models\Complex\_blankModel.vb" />
     <Compile Include="Controllers\parseController.vb" />
-    <Compile Include="Views\processClass.vb" />
-    <Compile Include="Views\page.vb" />
+    <Compile Include="Addons\ProcessClass.vb" />
+    <Compile Include="Addons\PageClass.vb" />
     <Compile Include="Views\_sampleAddon.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
@@ -143,6 +143,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Models\DbModels\" />
+    <Folder Include="NewFolder1\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.VisualBasic.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
