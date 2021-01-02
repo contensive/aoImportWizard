@@ -1,8 +1,4 @@
-﻿
-Option Explicit On
-Option Strict On
-Imports Contensive.Addons.ImportWizard
-Imports Contensive.BaseClasses
+﻿Imports Contensive.BaseClasses
 Public Module constants
     '
     Public Const RequestNameSubForm = "SubForm"
@@ -16,6 +12,7 @@ Public Module constants
     Public Const RequestNameImportGroupID = "ImportGroupID"
     Public Const RequestNameImportGroupNew = "inputNewGroupName"
     Public Const RequestNameImportGroupOptionID = "ImportGroupOptionID"
+
     Public Const RequestNameImportEmail = "ImportEmailNotify"
     Public Const RequestNameImportMapFile = "ImportMapFile"
     '
@@ -201,61 +198,6 @@ Public Module constants
     Public Const StructuredDataProcessorGuid = "{65D58FE9-8B76-4490-A2BE-C863B372A6A4}"
     Public Const jQueryFancyBoxGuid = "{24C2DBCF-3D84-44B6-A5F7-C2DE7EFCCE3D}"
     '
-    Public Class WizardType
-        '
-        ' Attributes
-        '
-        'SendMethodID as Integer
-        '
-        ' Form 'includes'
-        '
-        'IncludeTemplateForm As Boolean
-        '
-        ' Value Defaults
-        '
-        'DefaultTemplateID as Integer
-        '
-        ' Instructions
-        '
-        Public SourceFormInstructions As String
-        Public UploadFormInstructions As String
-        Public MappingFormInstructions As String
-        Public GroupFormInstructions As String
-        Public KeyFormInstructions As String
-        '
-
-        ' Current calculated Path
-        '
-        Public Path() As Integer
-        Public PathCnt As Integer
-    End Class
-    '
-    Public Class MapPairType
-        Public SourceFieldPtr As Integer
-        Public SourceFieldName As String
-        Public DbField As String
-        Public DbFieldType As Integer
-    End Class
-    '
-    Public Class ImportMapType
-        Public importToNewContent As Boolean
-        Public ContentName As String
-        Public KeyMethodID As Integer
-        Public SourceKeyField As String
-        Public DbKeyField As String
-        Public DbKeyFieldType As Integer
-        Public GroupOptionID As Integer
-        Public GroupID As Integer
-        Public SkipRowCnt As Integer
-        Public MapPairCnt As Integer
-        Public MapPairs() As MapPairType
-
-        'Public Shared Widening Operator CType(v As String) As ImportMapType
-        '    Throw New NotImplementedException()
-        'End Operator
-    End Class
-
-    '
     ' forms
     '
     Public Const SubFormSource As Integer = 1
@@ -298,17 +240,16 @@ Public Module constants
     '
     'Load Import Map
     '
-    Public Function LoadImportMap(cp As CPBaseClass, ImportMapData As String) As ImportMapType
-        Dim result As ImportMapType = New ImportMapType
+    Public Function loadImportMap(cp As CPBaseClass, ImportMapData As String) As ImportMapType
         Try
-            '
+            Dim result As ImportMapType = New ImportMapType
             Dim Rows() As String
             Dim Pair() As String
             Dim Ptr As Long
             Dim SourceSplit() As String
             Dim MapPtr As Integer
             '
-            If ImportMapData = "" Then
+            If String.IsNullOrEmpty(ImportMapData) Then
                 '
                 ' Defaults
                 '
@@ -339,7 +280,7 @@ Public Module constants
                     result.MapPairCnt = 0
                     '
                     If UBound(Rows) > 8 Then
-                        If Trim(Rows(9)) = "" Then
+                        If String.IsNullOrEmpty(Trim(Rows(9))) Then
                             For Ptr = 10 To UBound(Rows)
                                 Pair = Split(Rows(CInt(Ptr)), "=")
                                 If UBound(Pair) > 0 Then
@@ -360,17 +301,16 @@ Public Module constants
                 End If
 
             End If
-            '
-            ' result = ImportMapData
+            Return result
         Catch ex As Exception
             cp.Site.ErrorReport(ex)
+            Throw
         End Try
-        Return result
     End Function
     '
     ' -- errors for resultErrList
     '
-    Public Enum resultErrorEnum
+    Public Enum ResultErrorEnum
         errPermission = 50
         errDuplicate = 100
         errVerification = 110
@@ -387,7 +327,7 @@ Public Module constants
     End Enum
     '
     ' -- http errors
-    Public Enum httpErrorEnum
+    Public Enum HttpErrorEnum
         badRequest = 400
         unauthorized = 401
         paymentRequired = 402
@@ -431,4 +371,59 @@ Public Module constants
         internalServerError = 500
     End Enum
 End Module
+'
+Public Class WizardType
+    '
+    ' Attributes
+    '
+    'SendMethodID as Integer
+    '
+    ' Form 'includes'
+    '
+    'IncludeTemplateForm As Boolean
+    '
+    ' Value Defaults
+    '
+    'DefaultTemplateID as Integer
+    '
+    ' Instructions
+    '
+    Public SourceFormInstructions As String
+    Public UploadFormInstructions As String
+    Public MappingFormInstructions As String
+    Public GroupFormInstructions As String
+    Public KeyFormInstructions As String
+    '
+
+    ' Current calculated Path
+    '
+    Public Path() As Integer
+    Public PathCnt As Integer
+End Class
+'
+Public Class MapPairType
+    Public SourceFieldPtr As Integer
+    Public SourceFieldName As String
+    Public DbField As String
+    Public DbFieldType As Integer
+End Class
+'
+Public Class ImportMapType
+    Public importToNewContent As Boolean
+    Public ContentName As String
+    Public KeyMethodID As Integer
+    Public SourceKeyField As String
+    Public DbKeyField As String
+    Public DbKeyFieldType As Integer
+    Public GroupOptionID As Integer
+    Public GroupID As Integer
+    Public SkipRowCnt As Integer
+    Public MapPairCnt As Integer
+    Public MapPairs() As MapPairType
+
+    'Public Shared Widening Operator CType(v As String) As ImportMapType
+    '    Throw New NotImplementedException()
+    'End Operator
+End Class
+
 

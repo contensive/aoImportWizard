@@ -1,11 +1,8 @@
 ﻿
-Option Explicit On
-Option Strict On
-
 Imports Contensive.BaseClasses
 
 Namespace Controllers
-    Public NotInheritable Class genericController
+    Public NotInheritable Class GenericController
         Private Sub New()
         End Sub
         '
@@ -69,16 +66,16 @@ Namespace Controllers
         '
         '====================================================================================================
         '
-        Public Shared Function LoadImportMap(cp As CPBaseClass, ImportMapData As String) As ImportMapType
-            Dim result As New ImportMapType
+        Public Shared Function loadImportMap(cp As CPBaseClass, importMapData As String) As ImportMapType
             Try
+                Dim result As New ImportMapType
                 Dim Rows() As String
                 Dim Pair() As String
                 Dim Ptr As Integer
                 Dim SourceSplit() As String
                 Dim MapPtr As Integer
                 '
-                If ImportMapData = "" Then
+                If String.IsNullOrEmpty(importMapData) Then
                     '
                     ' Defaults
                     '
@@ -90,7 +87,7 @@ Namespace Controllers
                     '
                     ' read in what must be saved
                     '
-                    Rows = Split(ImportMapData, vbCrLf)
+                    Rows = Split(importMapData, vbCrLf)
                     If UBound(Rows) <= 7 Then
                         '
                         ' Map file is bad
@@ -109,15 +106,16 @@ Namespace Controllers
                         result.MapPairCnt = 0
                         '
                         If UBound(Rows) > 8 Then
-                            If Trim(Rows(9)) = "" Then
+                            If String.IsNullOrEmpty(Trim(Rows(9))) Then
                                 For Ptr = 10 To UBound(Rows)
                                     Pair = Split(Rows(Ptr), "=")
                                     If UBound(Pair) > 0 Then
                                         MapPtr = result.MapPairCnt
                                         result.MapPairCnt = MapPtr + 1
                                         ReDim Preserve result.MapPairs(MapPtr)
-                                        result.MapPairs(MapPtr) = New MapPairType
-                                        result.MapPairs(MapPtr).DbField = Pair(0)
+                                        result.MapPairs(MapPtr) = New MapPairType With {
+                                            .DbField = Pair(0)
+                                        }
                                         SourceSplit = Split(Pair(1), ",")
                                         If UBound(SourceSplit) > 0 Then
                                             result.MapPairs(MapPtr).SourceFieldPtr = cp.Utils.EncodeInteger(SourceSplit(0))
@@ -128,12 +126,12 @@ Namespace Controllers
                             End If
                         End If
                     End If
-
                 End If
+                Return result
             Catch ex As Exception
+                cp.Site.ErrorReport(ex)
                 Throw
             End Try
-            Return result
         End Function
         '
         '   returns true if after removing this field, it is end of line
@@ -144,8 +142,8 @@ Namespace Controllers
         '   if end of file, return_eof is true
         '
         Public Shared Function parseFieldReturnEol(Source As String, sourcePtr As Integer, ByRef return_cell As String, ByRef return_ptr As Integer, ByRef return_eof As Boolean) As Boolean
-            Dim result As Boolean
             Try
+                Dim result As Boolean
                 '
                 Dim crPtr As Integer
                 Dim endPtr As Integer
@@ -166,9 +164,9 @@ Namespace Controllers
                 hint = "no used"
                 workingPtr = Ptr
                 Do While Mid(Source, workingPtr, 1) = " "
-                    workingPtr = workingPtr + 1
+                    workingPtr += 1
                 Loop
-                hint = hint & ",110"
+                hint &= ",110"
                 If Mid(Source, workingPtr, 1) = """" Then
                     '
                     ' if first non-space is a quote, ignore the leading spaces
@@ -176,12 +174,12 @@ Namespace Controllers
                     Ptr = workingPtr
                     IsQuoted = True
                 End If
-                hint = hint & ",120"
+                hint &= ",120"
                 If Not IsQuoted Then
                     '
                     ' non-Quoted field
                     '
-                    hint = hint & ",120"
+                    hint &= ",120"
                     commaptr = InStr(Ptr, Source, ",")
                     lfPtr = InStr(Ptr, Source, vbLf)
                     crPtr = InStr(Ptr, Source, vbCr)
@@ -198,7 +196,7 @@ Namespace Controllers
                         '
                         ' end of line for crlf line
                         '
-                        hint = hint & ",140"
+                        hint &= ",140"
                         endPtr = workingPtr - 1
                         return_cell = Mid(Source, sourcePtr, endPtr - sourcePtr + 1)
                         return_ptr = workingPtr + 2
@@ -207,7 +205,7 @@ Namespace Controllers
                         '
                         ' end of line for lf line
                         '
-                        hint = hint & ",130"
+                        hint &= ",130"
                         endPtr = workingPtr - 1
                         return_cell = Mid(Source, sourcePtr, endPtr - sourcePtr + 1)
                         return_ptr = workingPtr + 1
@@ -216,7 +214,7 @@ Namespace Controllers
                         '
                         ' end of line for cr line
                         '
-                        hint = hint & ",135"
+                        hint &= ",135"
                         endPtr = workingPtr - 1
                         return_cell = Mid(Source, sourcePtr, endPtr - sourcePtr + 1)
                         return_ptr = workingPtr + 1
@@ -225,7 +223,7 @@ Namespace Controllers
                         '
                         ' end of cell, skip comma
                         '
-                        hint = hint & ",150"
+                        hint &= ",150"
                         endPtr = workingPtr - 1
                         return_cell = Mid(Source, sourcePtr, endPtr - sourcePtr + 1)
                         return_ptr = workingPtr + 1
@@ -234,7 +232,7 @@ Namespace Controllers
                         '
                         ' non of the above (non found) might be end of file
                         '
-                        hint = hint & ",160"
+                        hint &= ",160"
                         endPtr = Len(Source)
                         If (endPtr - sourcePtr + 1 > 0) Then
                             return_cell = Mid(Source, sourcePtr, endPtr - sourcePtr + 1)
@@ -249,46 +247,46 @@ Namespace Controllers
                     '
                     ' Quoted field, pass the initial quote
                     '
-                    hint = hint & ",170"
-                    Ptr = Ptr + 1
+                    hint &= ",170"
+                    Ptr += 1
                     Dim startPtr As Integer
                     startPtr = Ptr
                     '
                     Do While (Ptr <> 0) And (InStr(Ptr, Source, """") = InStr(Ptr, Source, """"""))
                         ' pass the doublequote
-                        hint = hint & ",200"
+                        hint &= ",200"
                         Ptr = InStr(Ptr, Source, """""")
                         If (Ptr = 0) Then
                             '
                             ' neither quote or double quote were found - end of file error
                             '
-                            hint = hint & ",210"
+                            hint &= ",210"
                             endPtr = Len(Source)
                             return_cell = ""
                             return_ptr = endPtr
                             result = True
                             result = True
                         Else
-                            hint = hint & ",220"
-                            Ptr = Ptr + 2
+                            hint &= ",220"
+                            Ptr += 2
                         End If
                     Loop
                     If Ptr <> 0 Then
                         '
                         ' ptr is on the closing quote
                         '
-                        hint = hint & ",230"
+                        hint &= ",230"
                         Ptr = InStr(Ptr, Source, """")
                         endPtr = Ptr - 1
                         ' skip white space to next delimter
                         Do While (Mid(Source, Ptr + 1, 1) = " ") And (Ptr < Len(Source))
-                            Ptr = Ptr + 1
+                            Ptr += 1
                         Loop
                         If (Ptr >= Len(Source)) Then
                             '
                             ' crlf end of line
                             '
-                            hint = hint & ",240"
+                            hint &= ",240"
                             return_cell = Mid(Source, startPtr, endPtr - startPtr + 1)
                             return_ptr = Ptr + 3
                             result = True
@@ -298,7 +296,7 @@ Namespace Controllers
                             '
                             ' crlf end of line
                             '
-                            hint = hint & ",250"
+                            hint &= ",250"
                             return_cell = Mid(Source, startPtr, endPtr - startPtr + 1)
                             return_ptr = Ptr + 3
                             result = True
@@ -306,7 +304,7 @@ Namespace Controllers
                             '
                             ' lf end of line
                             '
-                            hint = hint & ",240"
+                            hint &= ",240"
                             return_cell = Mid(Source, startPtr, endPtr - startPtr + 1)
                             return_ptr = Ptr + 2
                             result = True
@@ -314,7 +312,7 @@ Namespace Controllers
                             '
                             ' cr end of line
                             '
-                            hint = hint & ",240"
+                            hint &= ",240"
                             return_cell = Mid(Source, startPtr, endPtr - startPtr + 1)
                             return_ptr = Ptr + 2
                             result = True
@@ -322,7 +320,7 @@ Namespace Controllers
                             '
                             ' not end of line, skip over anything before the next comma
                             '
-                            hint = hint & ",260"
+                            hint &= ",260"
                             return_cell = Mid(Source, startPtr, endPtr - startPtr + 1)
                             return_ptr = InStr(Ptr, Source, ",")
                             ' ***** 20140131
@@ -332,8 +330,7 @@ Namespace Controllers
                                 '
                                 result = True
                             Else
-                                'If return_ptr > 0 Then
-                                return_ptr = return_ptr + 1
+                                return_ptr += 1
                                 result = False
                             End If
                         End If
@@ -347,14 +344,14 @@ Namespace Controllers
                 '
                 ' determine eof
                 '
-                hint = hint & ",300"
+                hint &= ",300"
                 If return_ptr >= Len(Source) Then
                     return_eof = True
                 End If
+                Return result
             Catch ex As Exception
                 Throw
             End Try
-            Return result
         End Function
         '
         '
@@ -374,7 +371,7 @@ Namespace Controllers
                     EOL = parseFieldReturnEol(Source, return_ptr, Cell, return_ptr, return_eof)
                     ReDim Preserve return_cells(fieldPtr)
                     return_cells(fieldPtr) = Cell
-                    fieldPtr = fieldPtr + 1
+                    fieldPtr += 1
                     If return_ptr = 0 Then
                         return_ptr = return_ptr
                     End If
@@ -387,8 +384,8 @@ Namespace Controllers
         '
         '
         Public Shared Function parseFile(Source As String) As String(,)
-            Dim result As String(,)
             Try
+                Dim result As String(,)
                 '
                 Dim EOL As Boolean
                 Dim srcPtr As Integer
@@ -397,7 +394,7 @@ Namespace Controllers
                 Dim eof As Boolean
                 Dim colCnt As Integer
                 Dim rowCnt As Integer
-                Dim dummyCells As String() = {}
+                Dim dummyCells As String() = Array.Empty(Of String)
                 '
                 ' parse the first row to get colCnt
                 '
@@ -440,21 +437,21 @@ Namespace Controllers
 
                     If EOL Then
                         colPtr = 0
-                        rowPtr = rowPtr + 1
+                        rowPtr += 1
                     Else
                         If colPtr + 1 < colCnt Then
-                            colPtr = colPtr + 1
+                            colPtr += 1
                         Else
                             colPtr = 0
-                            rowPtr = rowPtr + 1
+                            rowPtr += 1
                         End If
                     End If
                 Loop
                 parseFile = result
+                Return result
             Catch ex As Exception
                 Throw
             End Try
-            Return result
         End Function
 
         '
@@ -483,8 +480,6 @@ Namespace Controllers
                 Return 2
             End If
         End Function
-
-
     End Class
 End Namespace
 

@@ -6,7 +6,7 @@
 		<Copy></Copy>
 		<CopyText></CopyText>
 		<ActiveXProgramID></ActiveXProgramID>
-		<DotNetClass><![CDATA[Contensive.Addons.ImportWizard.Views.pageClass]]></DotNetClass>
+		<DotNetClass><![CDATA[Contensive.Addons.ImportWizard.Addons.pageClass]]></DotNetClass>
 		<ArgumentList></ArgumentList>
 		<AsAjax>No</AsAjax>
 		<Filter>No</Filter>
@@ -57,7 +57,7 @@
 		<Copy></Copy>
 		<CopyText></CopyText>
 		<ActiveXProgramID></ActiveXProgramID>
-		<DotNetClass><![CDATA[Contensive.Addons.ImportWizard.Views.ProcessClass]]></DotNetClass>
+		<DotNetClass><![CDATA[Contensive.Addons.ImportWizard.Addons.ProcessClass]]></DotNetClass>
 		<ProcessInterval>1</ProcessInterval>
 	</Addon>
 	<CDef Name="Import Wizard Tasks" Active="1" AdminOnly="0" AllowAdd="1" AllowCalendarEvents="0" AllowContentChildTool="0" AllowContentTracking="0" AllowDelete="1" AllowMetaContent="" AllowTopicRules="0" AllowWorkflowAuthoring="0" AuthoringDataSourceName="Default" AuthoringTableName="importWizardTasks" ContentDataSourceName="Default" ContentTableName="importWizardTasks" DefaultSortMethod="By Name" DeveloperOnly="0" DropDownFieldList="Name" EditorGroupName="" Parent="" IconLink="" IconHeight="0" IconWidth="0" IconSprites="0" isbasecontent="0" guid="{594F760D-EF47-4853-872E-4C9A8717A32A}" >

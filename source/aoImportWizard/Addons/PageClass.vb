@@ -1,21 +1,21 @@
 
-Option Strict On
-Option Explicit On
-
-Imports Contensive.Addons.ImportWizard.Controllers
-Imports Contensive.BaseClasses
-Imports Contensive.Models.Db
 Imports System.Linq
 Imports System.Text
-Imports Contensive.Addons.ImportWizard.Controllers.genericController
+Imports Contensive.Addons.ImportWizard.Controllers
+Imports Contensive.Addons.ImportWizard.Controllers.GenericController
+Imports Contensive.BaseClasses
+Imports Contensive.Models.Db
 
-Namespace Views
-    '
+Namespace Addons
+    ''' <summary>
+    ''' The addon that runs on the page -- setup the import files
+    ''' </summary>
     Public Class PageClass
         Inherits AddonBaseClass
-        '
-        Private Wizard As New WizardType
-        Private DefaultImportMapFile As String
+        ''' <summary>
+        ''' A wizard is the settings to control a mulitple form process
+        ''' </summary>
+        Private ReadOnly Property wizard As New WizardType
         '
         ' ----- Forms - these must be in the order that they are processed
         '               GetnextForm() uses the Email Wizard row to skip the ones that do not apply
@@ -24,8 +24,8 @@ Namespace Views
         '                   2 or 3 always follow 1
         '                   2 picks and email, and the email determines the wizard row to start
         '                   3 picks the wizard row to start
-        Private SourceFieldCnt As Integer
-        Private SourceFields() As String
+        Private Property sourceFieldCnt As Integer
+        Private Property sourceFields As String()
         '
         ' Import Map file layout
         '
@@ -46,16 +46,17 @@ Namespace Views
         '
         '=====================================================================================
         ''' <summary>
-        ''' AddonDescription
+        ''' The addon that runs on the page -- setup the import files
         ''' </summary>
         ''' <param name="CP"></param>
         ''' <returns></returns>
         Public Overrides Function Execute(ByVal CP As CPBaseClass) As Object
-            Dim result As String = ""
             Try
                 '
                 ' -- initialize application. If authentication needed and not login page, pass true
-                Using ae As New applicationController(CP, False)
+                Dim result As String = ""
+                Dim GetForm As String = ""
+                Using ae As New ApplicationController(CP, False)
                     Dim PeopleContentID As Integer = CP.Content.GetRecordID("content", "people")
                     Dim ProcessError As Boolean = False
                     Dim Content As String = ""
@@ -64,7 +65,7 @@ Namespace Views
                         '
                         ' Cancel
                         '
-                        Call ClearWizardValues(CP)
+                        Call clearWizardValues(CP)
                         Call CP.Response.Redirect("\")
                     Else
                         '
@@ -83,20 +84,20 @@ Namespace Views
                             '
                             ' Set defaults and go to first form
                             '
-                            Call ClearWizardValues(CP)
+                            Call clearWizardValues(CP)
                             ImportContentID = CP.Doc.GetInteger("cid")
                             If ImportContentID <> 0 Then
-                                Call SaveWizardValue(CP, RequestNameImportContentID, CStr(ImportContentID))
+                                Call saveWizardValue(CP, RequestNameImportContentID, CStr(ImportContentID))
                             End If
                             SubformID = SubFormSource
-                            Call LoadWizardPath(CP)
+                            Call loadWizardPath(CP)
                         Else
                             '
                             ' Load the importmap with what we have so far
                             '
-                            ImportMapFile = GetWizardValue(CP, RequestNameImportMapFile, GetDefaultImportMapFile)
+                            ImportMapFile = getWizardValue(CP, RequestNameImportMapFile, getDefaultImportMapFile(CP))
                             ImportMapData = CP.CdnFiles.Read(ImportMapFile)
-                            ImportMap = LoadImportMap(CP, ImportMapData)
+                            ImportMap = loadImportMap(CP, ImportMapData)
                             '
                             ' Process incoming form
                             '
@@ -105,14 +106,14 @@ Namespace Views
                                     '
                                     ' Source and ContentName
                                     '
-                                    Call SaveWizardStreamInteger(CP, RequestNameImportSource)
-                                    Call LoadWizardPath(CP)
+                                    Call saveWizardRequestInteger(CP, RequestNameImportSource)
+                                    Call loadWizardPath(CP)
 
                                     Select Case Button
                                         Case ButtonBack2
-                                            SubformID = PreviousSubFormID(SubformID)
+                                            SubformID = previousSubFormID(SubformID)
                                         Case ButtonContinue2
-                                            SubformID = NextSubFormID(SubformID)
+                                            SubformID = nextSubFormID(SubformID)
                                     End Select
                                 Case SubFormSourceUpload
                                     '
@@ -120,14 +121,14 @@ Namespace Views
                                     '
                                     CP.Html.ProcessInputFile(RequestNameImportUpload, "upload")
                                     Filename = CP.Doc.GetText(RequestNameImportUpload)
-                                    Call SaveWizardValue(CP, RequestNameImportUpload, "upload/" & Filename)
-                                    Call LoadWizardPath(CP)
+                                    Call saveWizardValue(CP, RequestNameImportUpload, "upload/" & Filename)
+                                    Call loadWizardPath(CP)
 
                                     Select Case Button
                                         Case ButtonBack2
-                                            SubformID = PreviousSubFormID(SubformID)
+                                            SubformID = previousSubFormID(SubformID)
                                         Case ButtonContinue2
-                                            SubformID = NextSubFormID(SubformID)
+                                            SubformID = nextSubFormID(SubformID)
                                     End Select
                                 Case SubFormSourceUploadFolder
                                     '
@@ -137,14 +138,14 @@ Namespace Views
                                     If Left(Filename, 1) = "\" Then
                                         Filename = Mid(Filename, 2)
                                     End If
-                                    Call SaveWizardValue(CP, RequestNameImportUpload, Filename)
-                                    Call LoadWizardPath(CP)
+                                    Call saveWizardValue(CP, RequestNameImportUpload, Filename)
+                                    Call loadWizardPath(CP)
 
                                     Select Case Button
                                         Case ButtonBack2
-                                            SubformID = PreviousSubFormID(SubformID)
+                                            SubformID = previousSubFormID(SubformID)
                                         Case ButtonContinue2
-                                            SubformID = NextSubFormID(SubformID)
+                                            SubformID = nextSubFormID(SubformID)
                                     End Select
                                 Case SubFormSourceResourceLibrary
                                     '
@@ -152,13 +153,13 @@ Namespace Views
                                     '
                                     ProcessError = True
                                     Call CP.UserError.Add("Under Construction")
-                                    Call LoadWizardPath(CP)
+                                    Call loadWizardPath(CP)
 
                                     Select Case Button
                                         Case ButtonBack2
-                                            SubformID = PreviousSubFormID(SubformID)
+                                            SubformID = previousSubFormID(SubformID)
                                         Case ButtonContinue2
-                                            SubformID = NextSubFormID(SubformID)
+                                            SubformID = nextSubFormID(SubformID)
                                     End Select
                                 Case SubFormDestination
                                     '
@@ -170,8 +171,8 @@ Namespace Views
                                         ImportMap.ContentName = newContentName
                                         ImportMap.importToNewContent = True
                                         ImportMap.SkipRowCnt = 1
-                                        Call SaveImportMap(CP, ImportMap)
-                                        Call SaveWizardStreamInteger(CP, RequestNameImportContentID)
+                                        Call saveImportMap(CP, ImportMap)
+                                        Call saveWizardRequestInteger(CP, RequestNameImportContentID)
                                         Select Case Button
                                             Case ButtonFinish
                                                 SubformID = 1
@@ -187,15 +188,15 @@ Namespace Views
                                         Dim ContentName As String = CP.Content.GetRecordName("content", ContentID)
                                         ImportMap.ContentName = ContentName
                                         ImportMap.importToNewContent = False
-                                        Call SaveImportMap(CP, ImportMap)
-                                        Call SaveWizardStreamInteger(CP, RequestNameImportContentID)
-                                        Call LoadWizardPath(CP)
+                                        Call saveImportMap(CP, ImportMap)
+                                        Call saveWizardRequestInteger(CP, RequestNameImportContentID)
+                                        Call loadWizardPath(CP)
 
                                         Select Case Button
                                             Case ButtonBack2
-                                                SubformID = PreviousSubFormID(SubformID)
+                                                SubformID = previousSubFormID(SubformID)
                                             Case ButtonContinue2
-                                                SubformID = NextSubFormID(SubformID)
+                                                SubformID = nextSubFormID(SubformID)
                                         End Select
                                     End If
                                 Case SubFormNewMapping
@@ -214,10 +215,11 @@ Namespace Views
                                         If FieldCnt > 0 Then
                                             For Ptr = 0 To FieldCnt - 1
                                                 SourceFieldPtr = CP.Doc.GetInteger("SOURCEFIELD" & Ptr)
-                                                ImportMap.MapPairs(Ptr) = New MapPairType()
-                                                ImportMap.MapPairs(Ptr).SourceFieldPtr = SourceFieldPtr
                                                 Dim DbField As String = CP.Doc.GetText("DBFIELD" & Ptr)
-                                                ImportMap.MapPairs(Ptr).DbField = DbField
+                                                ImportMap.MapPairs(Ptr) = New MapPairType With {
+                                                    .SourceFieldPtr = SourceFieldPtr,
+                                                    .DbField = DbField
+                                                }
                                                 Dim fieldList As List(Of ContentFieldModel) = DbBaseModel.createList(Of ContentFieldModel)(CP, "(name=" & CP.Db.EncodeSQLText(DbField) & ")and(contentid=" & CP.Content.GetID(ImportMap.ContentName) & ")")
                                                 If (fieldList.Count > 0) Then
                                                     ImportMap.MapPairs(Ptr).DbFieldType = fieldList.First().type
@@ -225,14 +227,14 @@ Namespace Views
                                             Next
                                         End If
                                     End If
-                                    Call SaveImportMap(CP, ImportMap)
-                                    Call LoadWizardPath(CP)
+                                    Call saveImportMap(CP, ImportMap)
+                                    Call loadWizardPath(CP)
 
                                     Select Case Button
                                         Case ButtonBack2
-                                            SubformID = PreviousSubFormID(SubformID)
+                                            SubformID = previousSubFormID(SubformID)
                                         Case ButtonContinue2
-                                            SubformID = NextSubFormID(SubformID)
+                                            SubformID = nextSubFormID(SubformID)
                                     End Select
                                 Case SubFormKey
                                     '
@@ -241,20 +243,20 @@ Namespace Views
                                     ImportMap.KeyMethodID = CP.Doc.GetInteger(RequestNameImportKeyMethodID)
                                     ImportMap.SourceKeyField = CP.Doc.GetText(RequestNameImportSourceKeyFieldPtr)
                                     ImportMap.DbKeyField = CP.Doc.GetText(RequestNameImportDbKeyField)
-                                    If ImportMap.DbKeyField <> "" Then
+                                    If Not String.IsNullOrEmpty(ImportMap.DbKeyField) Then
                                         Dim fieldList As List(Of ContentFieldModel) = DbBaseModel.createList(Of ContentFieldModel)(CP, "(name=" & CP.Db.EncodeSQLText(ImportMap.DbKeyField) & ")and(contentid=" & CP.Content.GetID(ImportMap.ContentName) & ")")
                                         If (fieldList.Count > 0) Then
                                             ImportMap.DbKeyFieldType = fieldList.First().type
                                         End If
                                     End If
-                                    Call SaveImportMap(CP, ImportMap)
-                                    Call LoadWizardPath(CP)
+                                    Call saveImportMap(CP, ImportMap)
+                                    Call loadWizardPath(CP)
 
                                     Select Case Button
                                         Case ButtonBack2
-                                            SubformID = PreviousSubFormID(SubformID)
+                                            SubformID = previousSubFormID(SubformID)
                                         Case ButtonContinue2
-                                            SubformID = NextSubFormID(SubformID)
+                                            SubformID = nextSubFormID(SubformID)
                                     End Select
                                 Case SubFormGroup
                                     '
@@ -263,7 +265,7 @@ Namespace Views
                                     Dim newGroupName As String
                                     Dim newGroupID As Integer
                                     newGroupName = CP.Doc.GetText(RequestNameImportGroupNew)
-                                    If newGroupName <> "" Then
+                                    If Not String.IsNullOrEmpty(newGroupName) Then
                                         Dim groupmodellist As List(Of GroupModel) = DbBaseModel.createList(Of GroupModel)(CP, "(name=" & CP.Db.EncodeSQLText(newGroupName) & ")")
                                         If (groupmodellist.Count <> 0) Then
                                             Dim newGroup As GroupModel = groupmodellist.First
@@ -284,39 +286,39 @@ Namespace Views
                                         ImportMap.GroupID = CP.Doc.GetInteger(RequestNameImportGroupID)
                                     End If
                                     ImportMap.GroupOptionID = CP.Doc.GetInteger(RequestNameImportGroupOptionID)
-                                    Call SaveImportMap(CP, ImportMap)
-                                    Call LoadWizardPath(CP)
+                                    Call saveImportMap(CP, ImportMap)
+                                    Call loadWizardPath(CP)
 
                                     Select Case Button
                                         Case ButtonBack2
-                                            SubformID = PreviousSubFormID(SubformID)
+                                            SubformID = previousSubFormID(SubformID)
                                         Case ButtonContinue2
-                                            SubformID = NextSubFormID(SubformID)
+                                            SubformID = nextSubFormID(SubformID)
                                     End Select
                                 Case SubFormFinish
                                     '
                                     ' Determine next or previous form
                                     '
-                                    Call LoadWizardPath(CP)
-                                    Call SaveWizardStream(CP, RequestNameImportEmail)
+                                    Call loadWizardPath(CP)
+                                    Call saveWizardRequestText(CP, RequestNameImportEmail)
 
                                     Select Case Button
                                         Case ButtonBack2
-                                            SubformID = PreviousSubFormID(SubformID)
+                                            SubformID = previousSubFormID(SubformID)
                                         Case ButtonFinish
                                             Dim ImportWizardTasks = DbBaseModel.addDefault(Of ImportWizardTaskModel)(CP)
                                             If (ImportWizardTasks IsNot Nothing) Then
                                                 ImportWizardTasks.name = Now() & " CSV Import" 'Call Main.SetCS(CS, "Name", Now() & " CSV Import")
-                                                ImportWizardTasks.uploadFilename = GetWizardValue(CP, RequestNameImportUpload, "")
-                                                ImportWizardTasks.notifyEmail = GetWizardValue(CP, RequestNameImportEmail, "")
-                                                ImportWizardTasks.importMapFilename = GetWizardValue(CP, RequestNameImportMapFile, GetDefaultImportMapFile)
+                                                ImportWizardTasks.uploadFilename = getWizardValue(CP, RequestNameImportUpload, "")
+                                                ImportWizardTasks.notifyEmail = getWizardValue(CP, RequestNameImportEmail, "")
+                                                ImportWizardTasks.importMapFilename = getWizardValue(CP, RequestNameImportMapFile, getDefaultImportMapFile(CP))
                                                 ImportWizardTasks.save(CP)
                                             End If
                                             '
                                             'Dim addon As New ProcessClass()
                                             'addon.Execute(CP)
-                                            Call ClearWizardValues(CP)
-                                            SubformID = NextSubFormID(SubformID)
+                                            Call clearWizardValues(CP)
+                                            SubformID = nextSubFormID(SubformID)
                                     End Select
                                 Case SubFormDone
                                     '
@@ -328,7 +330,7 @@ Namespace Views
                         ' Get Next Form
                         '
                         Dim HeaderCaption As String = "Import Wizard"
-                        Content = Content & CP.Html.Hidden(RequestNameSubForm, SubformID.ToString)
+                        Content &= CP.Html.Hidden(RequestNameSubForm, SubformID.ToString)
                         Dim SourceFieldSelect As String
                         Dim Description As String
                         Dim WizardContent As String = ""
@@ -338,7 +340,7 @@ Namespace Views
                                 '
                                 ' Source
                                 '
-                                Dim ImportSource As Integer = CP.Utils.EncodeInteger(GetWizardValue(CP, RequestNameImportSource, CP.Utils.EncodeText(ImportSourceUpload)))
+                                Dim ImportSource As Integer = CP.Utils.EncodeInteger(getWizardValue(CP, RequestNameImportSource, CP.Utils.EncodeText(ImportSourceUpload)))
                                 Description = CP.Html.h4("Select the import source") & CP.Html.p("There are several sources you can use for your data")
                                 Content = Content _
                                     & "<div>" _
@@ -350,7 +352,7 @@ Namespace Views
                                     & "</table>" _
                                     & "</div>" _
                                     & ""
-                                WizardContent = GetWizardContent(CP, HeaderCaption, ButtonCancel, "", ButtonContinue2, Description, Content)
+                                WizardContent = getWizardContent(CP, HeaderCaption, ButtonCancel, "", ButtonContinue2, Description, Content)
                             Case SubFormSourceUpload
                                 '
                                 ' Upload file to Upload folder
@@ -365,7 +367,7 @@ Namespace Views
                                     & "</div>" _
                                     & ""
                                 'WizardContent = "hello world"
-                                WizardContent = GetWizardContent(CP, HeaderCaption, ButtonCancel, ButtonBack2, ButtonContinue2, Description, Content)
+                                WizardContent = getWizardContent(CP, HeaderCaption, ButtonCancel, ButtonBack2, ButtonContinue2, Description, Content)
                             Case SubFormSourceUploadFolder
                                 '
                                 ' Select a file from the upload folder
@@ -384,12 +386,12 @@ Namespace Views
 
 
                                 Call CP.Doc.AddRefreshQueryString(RequestNameSubForm, CType("", String))
-                                WizardContent = GetWizardContent(CP, HeaderCaption, ButtonCancel, ButtonBack2, ButtonContinue2, Description, Content)
+                                WizardContent = getWizardContent(CP, HeaderCaption, ButtonCancel, ButtonBack2, ButtonContinue2, Description, Content)
                             Case SubFormDestination
                                 '
                                 ' Destination
                                 '
-                                ImportContentID = CP.Utils.EncodeInteger(GetWizardValue(CP, RequestNameImportContentID, CP.Utils.EncodeText(PeopleContentID)))
+                                ImportContentID = CP.Utils.EncodeInteger(getWizardValue(CP, RequestNameImportContentID, CP.Utils.EncodeText(PeopleContentID)))
                                 If ImportContentID = 0 Then
                                     ImportContentID = CP.Content.GetID("People")
                                 End If
@@ -403,56 +405,58 @@ Namespace Views
                                     inputRadioExistingContent = "<input type=""radio"" name=""useNewContentName"" class=""mr-2"" value=""0"" checked>"
                                 End If
                                 Description = CP.Html.h4("Select the destination for your data") & CP.Html.p("For example, to import a list in to people, select People.")
+                                Dim contentSelect As String = CP.Html.SelectContent(RequestNameImportContentID, ImportContentID.ToString, "Content", "", "", "form-control")
+                                contentSelect = contentSelect.Replace("<select ", "<select style=""max-width:300px; display:inline;"" ")
                                 Content = Content _
                                     & "<div>" _
                                     & "<TABLE border=0 cellpadding=10 cellspacing=0 width=100%>" _
-                                    & "<TR><TD colspan=""2"">Import into an existing content table</td></tr>" _
-                                    & "<TR><TD colspan=""2"">" & inputRadioExistingContent & CP.Html.SelectContent(RequestNameImportContentID, ImportContentID.ToString, "Content") & "</td></tr>" _
-                                    & "<TR><TD colspan=""2"">Create a new content table</td></tr>" _
-                                    & "<TR><TD colspan=""2"">" & inputRadioNewContent & "<input type=""text"" name=""newContentName"" value=""" & newContentName & """></td></tr>" _
+                                    & "<tr><td colspan=""2"">Import into an existing content table</td></tr>" _
+                                    & "<tr><td colspan=""2"">" & inputRadioExistingContent & contentSelect & "</td></tr>" _
+                                    & "<tr><td colspan=""2"">Create a new content table</td></tr>" _
+                                    & "<tr><td colspan=""2"">" & inputRadioNewContent & "<input style=""max-width:300px; display:inline;"" type=""text"" name=""newContentName"" value=""" & newContentName & """ class=""form-control""></td></tr>" _
                                     & "</table>" _
                                     & "</div>" _
                                     & ""
-                                WizardContent = GetWizardContent(CP, HeaderCaption, ButtonCancel, ButtonBack2, ButtonContinue2, Description, Content)
+                                WizardContent = getWizardContent(CP, HeaderCaption, ButtonCancel, ButtonBack2, ButtonContinue2, Description, Content)
                             Case SubFormNewMapping
                                 '
                                 ' Get Mapping fields
                                 '
                                 Dim FileData As String = ""
                                 Description = CP.Html.h4("Create a New Mapping") & CP.Html.p("This step lets you select which fields in your database you would like each field in your upload to be assigned.")
-                                Filename = GetWizardValue(CP, RequestNameImportUpload, "")
-                                If Filename <> "" Then
+                                Filename = getWizardValue(CP, RequestNameImportUpload, "")
+                                If Not String.IsNullOrEmpty(Filename) Then
                                     If Left(Filename, 1) = "\" Then
                                         Filename = Mid(Filename, 2)
                                     End If
                                     FileData = CP.CdnFiles.Read(Filename)
                                 End If
-                                If FileData = "" Then
+                                If String.IsNullOrEmpty(FileData) Then
                                     '
                                     ' no data in upload
                                     '
-                                    Content = Content & "<P>The file you are importing is empty. Please go back and select a different file.</P>"
-                                    WizardContent = GetWizardContent(CP, HeaderCaption, ButtonCancel, ButtonBack2, "", Description, Content)
+                                    Content &= "<P>The file you are importing is empty. Please go back and select a different file.</P>"
+                                    WizardContent = getWizardContent(CP, HeaderCaption, ButtonCancel, ButtonBack2, "", Description, Content)
                                 Else
                                     '
                                     ' Skip first Row checkbox
                                     '
-                                    Content = Content & CP.Html.CheckBox(RequestNameImportSkipFirstRow, (ImportMap.SkipRowCnt <> 0)) & "&nbsp;First row contains field names"
-                                    Content = Content & "<div>&nbsp;</div>"
+                                    Content &= CP.Html.CheckBox(RequestNameImportSkipFirstRow, (ImportMap.SkipRowCnt <> 0)) & "&nbsp;First row contains field names"
+                                    Content &= "<div>&nbsp;</div>"
                                     '
                                     ' Build FileColumns
                                     '
-                                    Dim DefaultSourceFieldSelect As String = GetSourceFieldSelect(CP, Filename, "none")
+                                    Dim DefaultSourceFieldSelect As String = getSourceFieldSelect(CP, Filename, "none")
                                     '
                                     ' Build the Database field list
                                     '
-                                    ImportContentID = CInt(GetWizardValue(CP, RequestNameImportContentID, PeopleContentID.ToString))
+                                    ImportContentID = CInt(getWizardValue(CP, RequestNameImportContentID, PeopleContentID.ToString))
                                     ImportContentName = CP.Content.GetRecordName("content", ImportContentID)
-                                    Dim DBFields() As String = Split(GetDbFieldList(CP, ImportContentName, False), ",")
+                                    Dim DBFields() As String = Split(getDbFieldList(CP, ImportContentName, False), ",")
                                     '
                                     ' Output the table
                                     '
-                                    Content = Content & vbCrLf & "<TABLE border=0 cellpadding=2 cellspacing=0 width=100%>"
+                                    Content &= vbCrLf & "<TABLE border=0 cellpadding=2 cellspacing=0 width=100%>"
                                     Content = Content _
                                         & vbCrLf _
                                         & "<TR>" _
@@ -461,9 +465,9 @@ Namespace Views
                                         & "<TD align=left width=200>Database&nbsp;Field</TD>" _
                                         & "<TD align=left width=200>Type</TD>" _
                                         & "</TR>"
-                                    ImportMapFile = GetWizardValue(CP, RequestNameImportMapFile, GetDefaultImportMapFile)
+                                    ImportMapFile = getWizardValue(CP, RequestNameImportMapFile, getDefaultImportMapFile(CP))
                                     ImportMapData = CP.CdnFiles.Read(ImportMapFile)
-                                    ImportMap = LoadImportMap(CP, ImportMapData)
+                                    ImportMap = loadImportMap(CP, ImportMapData)
                                     For Ptr = 0 To UBound(DBFields)
                                         Dim DBFieldName As String = DBFields(Ptr)
                                         Dim field As ContentFieldModel = Nothing
@@ -503,7 +507,7 @@ Namespace Views
                                         SourceFieldSelect = DefaultSourceFieldSelect
                                         SourceFieldSelect = Replace(SourceFieldSelect, "xxxx", "SourceField" & Ptr)
                                         SourceFieldPtr = -1
-                                        If DBFieldName <> "" Then
+                                        If Not String.IsNullOrEmpty(DBFieldName) Then
                                             '
                                             ' Find match in current ImportMap
                                             '
@@ -524,9 +528,9 @@ Namespace Views
                                                 ' Find a default field - one that matches the DBFieldName if possible
                                                 '
                                                 Dim TestName As String
-                                                If SourceFieldCnt > 0 Then
-                                                    For SourceFieldPtr = 0 To SourceFieldCnt - 1
-                                                        TestName = SourceFields(SourceFieldPtr)
+                                                If sourceFieldCnt > 0 Then
+                                                    For SourceFieldPtr = 0 To sourceFieldCnt - 1
+                                                        TestName = sourceFields(SourceFieldPtr)
                                                         TestName = LCase(TestName)
                                                         TestName = Replace(TestName, " ", "")
                                                         '
@@ -600,9 +604,9 @@ Namespace Views
                                     & "<TD style=" & RowStyle & " align=left>&nbsp;" & DbFieldType & "</td>" _
                                     & "</TR>"
                                     Next
-                                    Content = Content & "<input type=hidden name=Ccnt value=" & Ptr & ">"
-                                    Content = Content & "</TABLE>"
-                                    WizardContent = GetWizardContent(CP, HeaderCaption, ButtonCancel, ButtonBack2, ButtonContinue2, Description, Content)
+                                    Content &= "<input type=hidden name=Ccnt value=" & Ptr & ">"
+                                    Content &= "</TABLE>"
+                                    WizardContent = getWizardContent(CP, HeaderCaption, ButtonCancel, ButtonBack2, ButtonContinue2, Description, Content)
                                 End If
                             Case SubFormKey
                                 '
@@ -615,16 +619,16 @@ Namespace Views
                                     KeyMethodID = KeyMethodUpdateOnMatchInsertOthers
                                 End If
                                 '
-                                If ImportMap.SourceKeyField <> "" Then
+                                If Not String.IsNullOrEmpty(ImportMap.SourceKeyField) Then
                                     SourceKeyFieldPtr = CP.Utils.EncodeInteger(ImportMap.SourceKeyField)
                                 Else
                                     SourceKeyFieldPtr = -1
                                 End If
-                                Filename = GetWizardValue(CP, RequestNameImportUpload, "")
-                                SourceFieldSelect = Replace(GetSourceFieldSelect(CP, Filename, "Select One"), "xxxx", RequestNameImportSourceKeyFieldPtr)
+                                Filename = getWizardValue(CP, RequestNameImportUpload, "")
+                                SourceFieldSelect = Replace(getSourceFieldSelect(CP, Filename, "Select One"), "xxxx", RequestNameImportSourceKeyFieldPtr)
                                 SourceFieldSelect = Replace(SourceFieldSelect, "value=" & SourceKeyFieldPtr, "value=" & SourceKeyFieldPtr & " selected", , , vbTextCompare)
                                 '
-                                ImportContentID = CP.Utils.EncodeInteger(GetWizardValue(CP, RequestNameImportContentID, PeopleContentID.ToString))
+                                ImportContentID = CP.Utils.EncodeInteger(getWizardValue(CP, RequestNameImportContentID, PeopleContentID.ToString))
                                 ImportContentName = CP.Content.GetRecordName("content", ImportContentID)
                                 Dim note As String
 
@@ -636,9 +640,9 @@ Namespace Views
                                     '
                                     DbKeyField = ImportMap.DbKeyField
                                     Dim LookupContentName As String
-                                    LookupContentName = CP.Content.GetRecordName("content", CP.Utils.EncodeInteger(GetWizardValue(CP, RequestNameImportContentID, PeopleContentID.ToString)))
+                                    LookupContentName = CP.Content.GetRecordName("content", CP.Utils.EncodeInteger(getWizardValue(CP, RequestNameImportContentID, PeopleContentID.ToString)))
                                     ' LookupContentName = Main.GetContentNamebyid(kmaEncodeInteger(GetWizardValue(RequestNameImportContentID, CStr(PeopleContentID))))
-                                    DBFieldSelect = Replace(GetDbFieldSelect(CP, LookupContentName, "Select One", True), "xxxx", RequestNameImportDbKeyField)
+                                    DBFieldSelect = Replace(getDbFieldSelect(CP, LookupContentName, "Select One", True), "xxxx", RequestNameImportDbKeyField)
                                     DBFieldSelect = Replace(DBFieldSelect, ">" & DbKeyField & "<", " selected>" & DbKeyField & "<", , , vbTextCompare)
                                     note = ""
                                 Else
@@ -646,7 +650,7 @@ Namespace Views
                                     ' non-developer in ccMembers table - limit key fields
                                     '
                                     DBFieldSelect = "" _
-                                    & "<select name=" & RequestNameImportDbKeyField & ">" _
+                                    & "<select name=" & RequestNameImportDbKeyField & " class=""form-control"">" _
                                     & "<Option value="""">Select One</Option>" _
                                     & "<Option value=ID>Contensive ID</Option>" _
                                     & "<Option value=email>Email</Option>" _
@@ -675,7 +679,7 @@ Namespace Views
                                     & "</table>" _
                                     & "</div>" _
                                     & ""
-                                WizardContent = GetWizardContent(CP, HeaderCaption, ButtonCancel, ButtonBack2, ButtonContinue2, Description, Content)
+                                WizardContent = getWizardContent(CP, HeaderCaption, ButtonCancel, ButtonBack2, ButtonContinue2, Description, Content)
                             Case SubFormGroup
                                 '
                                 ' Select a group to add
@@ -689,9 +693,9 @@ Namespace Views
                                     & "<div>" _
                                     & "<TABLE border=0 cellpadding=4 cellspacing=0 width=100%>" _
                                     & "<TR><TD colspan=2>Add to Existing Group</td></tr>" _
-                                    & "<TR><TD width=10>&nbsp;</td><td width=99% align=left>" & CP.Html.SelectContent(RequestNameImportGroupID, ImportMap.GroupID.ToString, "Groups") & "</td></tr>" _
+                                    & "<TR><TD width=10>&nbsp;</td><td width=99% align=left>" & CP.Html.SelectContent(RequestNameImportGroupID, ImportMap.GroupID.ToString, "Groups", "", "", "form-control") & "</td></tr>" _
                                     & "<TR><TD colspan=2>Create New Group</td></tr>" _
-                                    & "<TR><TD width=10>&nbsp;</td><td width=99% align=left>" & CP.Html.InputText(RequestNameImportGroupNew, "") & "</td></tr>" _
+                                    & "<TR><TD width=10>&nbsp;</td><td width=99% align=left>" & CP.Html.InputText(RequestNameImportGroupNew, "", 100, "form-control") & "</td></tr>" _
                                     & "<TR><TD colspan=2>Group Options</td></tr>" _
                                     & "<TR><TD width=10>" & CP.Html.RadioBox(RequestNameImportGroupOptionID, GroupOptionNone.ToString, GroupOptionID.ToString) & "</td><td width=99% align=left>Do not add to a group.</td></tr>" _
                                     & "<TR><TD width=10>" & CP.Html.RadioBox(RequestNameImportGroupOptionID, GroupOptionAll.ToString, GroupOptionID.ToString) & "</td><td width=99% align=left>Add everyone to the the group.</td></tr>" _
@@ -700,152 +704,185 @@ Namespace Views
                                     & "</table>" _
                                     & "</div>" _
                                     & ""
-                                WizardContent = GetWizardContent(CP, HeaderCaption, ButtonCancel, ButtonBack2, ButtonContinue2, Description, Content)
+                                WizardContent = getWizardContent(CP, HeaderCaption, ButtonCancel, ButtonBack2, ButtonContinue2, Description, Content)
                             Case SubFormFinish
                                 '
                                 ' Ask for an email address to notify when the list is complete
                                 '
                                 Description = CP.Html.h4("Finish") & CP.Html.p("Your list will be submitted for import when you hit the finish button. Processing may take several minutes, depending on the size and complexity of your import. If you supply an email address, you will be notified with the import is complete.")
                                 Content &= "<div Class=""p-2""><label for=""name381"">Email</label><div class=""ml-5"">" & CP.Html5.InputText(RequestNameImportEmail, 255, CP.User.Email) & "</div><div class=""ml-5""><small class=""form-text text-muted""></small></div></div>"
-                                WizardContent = GetWizardContent(CP, HeaderCaption, ButtonCancel, ButtonBack2, ButtonFinish, Description, Content)
+                                WizardContent = getWizardContent(CP, HeaderCaption, ButtonCancel, ButtonBack2, ButtonFinish, Description, Content)
                             Case SubFormDone
                                 '
                                 ' Thank you
                                 '
                                 Description = CP.Html.h4("Import Requested") & CP.Html.p("Your import is underway and should only take a moment.")
-                                WizardContent = GetWizardContent(CP, HeaderCaption, ButtonCancel, ButtonBack2, ButtonFinish, Description, Content)
+                                WizardContent = getWizardContent(CP, HeaderCaption, ButtonCancel, ButtonBack2, ButtonFinish, Description, Content)
                             Case Else
                         End Select
                         '
-                        'GetForm = WizardContent
-                        GetForm = GetAdminFormBody(CP, "", "", "", True, True, "", "", 20, WizardContent)
+                        GetForm = getAdminFormBody(CP, WizardContent)
                     End If
                     result = GetForm.ToString
                 End Using
+                Return result
             Catch ex As Exception
                 CP.Site.ErrorReport(ex)
+                Throw
             End Try
-            Return result
         End Function
-
-        Private ReadOnly Property GetAdminFormBody(cp As CPBaseClass, v1 As String, v2 As String, v3 As String, v4 As Boolean, v5 As Boolean, v6 As String, v7 As String, v8 As Integer, wizardContent As String) As Object
+        '
+        '=====================================================================================
+        ''' <summary>
+        ''' Wrap the wizard content in a form
+        ''' </summary>
+        ''' <param name="cp"></param>
+        ''' <param name="wizardContent"></param>
+        ''' <returns></returns>
+        Private ReadOnly Property getAdminFormBody(cp As CPBaseClass, wizardContent As String) As String
             Get
-                Dim result As String = ""
-                result = cp.Html.div(wizardContent)
-                result = cp.Html.Form(result)
-                Return result
-
-                'If wizardContent = "" Then
-                '    Return cp.Html.Form(My.Resources.importWizardSelectLayout)
-                'Else
-                '    Return cp.Html.Form(wizardContent)
-                'End If
+                Try
+                    Return cp.Html.Form(cp.Html.div(wizardContent))
+                Catch ex As Exception
+                    cp.Site.ErrorReport(ex)
+                    Throw
+                End Try
             End Get
         End Property
-
-
-        Public Const RequestNameSubForm = "SubForm"
-
-        Private ReadOnly Property GetWizardContent(cp As CPBaseClass, headerCaption As String, buttonCancel As String, buttonback2 As String, buttonContinue2 As String, description As String, WizardContent As String) As String
+        '
+        '=====================================================================================
+        ''' <summary>
+        ''' Get the html for the current wizard form
+        ''' </summary>
+        ''' <param name="cp"></param>
+        ''' <param name="headerCaption"></param>
+        ''' <param name="buttonCancel"></param>
+        ''' <param name="buttonback2"></param>
+        ''' <param name="buttonContinue2"></param>
+        ''' <param name="description"></param>
+        ''' <param name="WizardContent"></param>
+        ''' <returns></returns>
+        Private ReadOnly Property getWizardContent(cp As CPBaseClass, headerCaption As String, buttonCancel As String, buttonback2 As String, buttonContinue2 As String, description As String, WizardContent As String) As String
             Get
-                Dim body As String = ""
-                If buttonback2 = "" Then
-                    body = "<div Class=""bg-white p-4"">" _
+                Try
+                    Dim body As String = ""
+                    If String.IsNullOrEmpty(buttonback2) Then
+                        body = "<div Class=""bg-white p-4"">" _
                             & cp.Html.h2(headerCaption) _
                             & cp.Html.div(description) _
                             & cp.Html.div(WizardContent) _
                             & cp.Html.div(cp.Html.Button("button", buttonCancel) & cp.Html.Button("button", buttonContinue2), "", "p-2 bg-secondary")
 
-                Else
-                    body = "<div Class=""bg-white p-4"">" _
+                    Else
+                        body = "<div Class=""bg-white p-4"">" _
                             & cp.Html.h2(headerCaption) _
                             & cp.Html.div(description) _
                             & cp.Html.div(WizardContent) _
                             & cp.Html.div(cp.Html.Button("button", buttonCancel) & cp.Html.Button("button", buttonback2) & cp.Html.Button("button", buttonContinue2), "", "p-2 bg-secondary")
-                End If
-                Return body
+                    End If
+                    Return body
+                Catch ex As Exception
+                    cp.Site.ErrorReport(ex)
+                    Throw
+                End Try
             End Get
         End Property
+        '
+        '=====================================================================================
+        ''' <summary>
+        ''' Clear the wizard
+        ''' </summary>
+        ''' <param name="cp"></param>
+        Private Sub clearWizardValues(cp As CPBaseClass)
+            Try
+                Call cp.Db.ExecuteNonQuery("delete from ccProperties where name Like 'ImportWizard.%' and typeid=1 and keyid=" & cp.Visit.Id)
+            Catch ex As Exception
+                cp.Site.ErrorReport(ex)
+                Throw
 
-        Public Property GetForm As Object
-
-        Private Sub ClearWizardValues(cp As CPBaseClass)
-            Call cp.Db.ExecuteNonQuery("delete from ccProperties where name Like 'ImportWizard.%' and typeid=1 and keyid=" & cp.Visit.Id)
+            End Try
         End Sub
         '
-        '
-        '
-        Private Function NextSubFormID(SubformID As Integer) As Integer
-            Dim Ptr As Integer
-            '
-            Ptr = 0
-            Do While Ptr < SubFormMax
-                If SubformID = Wizard.Path(Ptr) Then
-                    NextSubFormID = Wizard.Path(Ptr + 1)
-                    Exit Do
-                End If
-                Ptr = Ptr + 1
-            Loop
-        End Function
-        '
-        '
-        '
-        Private Function PreviousSubFormID(SubformID As Integer) As Integer
-            Dim Ptr As Integer
-            '
-            Ptr = 1
-            Do While Ptr < SubFormMax
-                If SubformID = Wizard.Path(Ptr) Then
-                    PreviousSubFormID = Wizard.Path(Ptr - 1)
-                    Exit Do
-                End If
-                Ptr = Ptr + 1
-            Loop
-        End Function
-        '
-        '====================================================================================================
-        ' Load the wizard variables, and build the .Path used for next and previous calls
-        '
-        ' If the WizardId property is set, load it and use it
-        ' If no Wizard ID, use the Group wizard by default
-        ' If during form processing, the wizard changes, the process must save the new wizardid
-        '
-        '====================================================================================================
-        '
-        Private Sub LoadWizardPath(cp As CPBaseClass)
-            Dim result As String = ""
+        '=====================================================================================
+        ''' <summary>
+        ''' Get next wizard form
+        ''' </summary>
+        ''' <param name="SubformID"></param>
+        ''' <returns></returns>
+        Private Function nextSubFormID(SubformID As Integer) As Integer
             Try
+                Dim Ptr As Integer = 0
+                Do While Ptr < SubFormMax
+                    If SubformID = wizard.Path(Ptr) Then
+                        nextSubFormID = wizard.Path(Ptr + 1)
+                        Exit Do
+                    End If
+                    Ptr += 1
+                Loop
+            Catch ex As Exception
+                Throw
+            End Try
+        End Function
+        '
+        '=====================================================================================
+        ''' <summary>
+        ''' get previous wizard form
+        ''' </summary>
+        ''' <param name="SubformID"></param>
+        ''' <returns></returns>
+        Private Function previousSubFormID(SubformID As Integer) As Integer
+            Try
+                Dim Ptr As Integer
                 '
+                Ptr = 1
+                Do While Ptr < SubFormMax
+                    If SubformID = wizard.Path(Ptr) Then
+                        previousSubFormID = wizard.Path(Ptr - 1)
+                        Exit Do
+                    End If
+                    Ptr += 1
+                Loop
+            Catch ex As Exception
+                Throw
+            End Try
+        End Function
+        '
+        '====================================================================================================
+        ''' <summary>
+        ''' Load the wizard variables, and build the .Path used for next and previous calls. If the WizardId property is set, load it and use it. If no Wizard ID, use the Group wizard by default. If during form processing, the wizard changes, the process must save the new wizardid
+        ''' </summary>
+        ''' <param name="cp"></param>
+        Private Sub loadWizardPath(cp As CPBaseClass)
+            Try
                 Dim ImportWizardID As Integer
                 Dim EmailCID As Integer
                 '
                 ' Get the saved ImportWizardID
-                ImportWizardID = cp.Utils.EncodeInteger(GetWizardValue(cp, RequestNameImportWizardID, ""))
+                ImportWizardID = cp.Utils.EncodeInteger(getWizardValue(cp, RequestNameImportWizardID, ""))
                 '
                 If ImportWizardID = 0 Then
                     '
                     ' Default Wizard, for any type of email, nothing disabled
                     EmailCID = cp.Content.GetRecordID("content", "Email Templates")
-                    Wizard.GroupFormInstructions = "Select Group"
-                    Wizard.KeyFormInstructions = "Select the key field"
-                    Wizard.MappingFormInstructions = "Set Mapping"
-                    Wizard.SourceFormInstructions = "Select the source"
-                    Wizard.UploadFormInstructions = "Upload the file"
+                    wizard.GroupFormInstructions = "Select Group"
+                    wizard.KeyFormInstructions = "Select the key field"
+                    wizard.MappingFormInstructions = "Set Mapping"
+                    wizard.SourceFormInstructions = "Select the source"
+                    wizard.UploadFormInstructions = "Upload the file"
                     '        '
-                Else
-                    Call LoadWizard(ImportWizardID)
+
                 End If
                 '
                 ' Build Wizard path from path properties
                 '
-                With Wizard
+                With wizard
                     .PathCnt = 0
                     ReDim .Path(SubFormMax)
                     '
                     .Path(.PathCnt) = SubFormSource
                     .PathCnt = .PathCnt + 1
 
-                    Select Case cp.Utils.EncodeInteger(GetWizardValue(cp, RequestNameImportSource, CType(ImportSourceUpload, String)))
+                    Select Case cp.Utils.EncodeInteger(getWizardValue(cp, RequestNameImportSource, CType(ImportSourceUpload, String)))
                         Case ImportSourceUpload
                             '
                             '
@@ -883,7 +920,7 @@ Namespace Views
                     '
                     '
                     '
-                    If cp.Utils.EncodeInteger(GetWizardValue(cp, RequestNameImportContentID, "0")) = cp.Content.GetID("people") Then
+                    If cp.Utils.EncodeInteger(getWizardValue(cp, RequestNameImportContentID, "0")) = cp.Content.GetID("people") Then
                         '
                         ' if importing into people, get them the option of adding to a group
                         '
@@ -904,238 +941,205 @@ Namespace Views
                 '
             Catch ex As Exception
                 cp.Site.ErrorReport(ex)
+                Throw
             End Try
-            Return
         End Sub
         '
-        '
-        '
-        Private Sub SaveWizardValue(cp As CPBaseClass, Name As String, Value As String)
+        '====================================================================================================
+        ''' <summary>
+        ''' save a wizard visit property
+        ''' </summary>
+        ''' <param name="cp"></param>
+        ''' <param name="Name"></param>
+        ''' <param name="Value"></param>
+        Private Sub saveWizardValue(cp As CPBaseClass, Name As String, Value As String)
             Call cp.Visit.SetProperty("ImportWizard." & Name, Value)
         End Sub
         '
-        '
-        '
-        Private Function GetWizardValue(cp As CPBaseClass, Name As String, DefaultValue As String) As String
-            GetWizardValue = cp.Visit.GetText("ImportWizard." & Name, DefaultValue)
+        '====================================================================================================
+        ''' <summary>
+        ''' Get a wizard visit property
+        ''' </summary>
+        ''' <param name="cp"></param>
+        ''' <param name="Name"></param>
+        ''' <param name="DefaultValue"></param>
+        ''' <returns></returns>
+        Private Function getWizardValue(cp As CPBaseClass, Name As String, DefaultValue As String) As String
+            getWizardValue = cp.Visit.GetText("ImportWizard." & Name, DefaultValue)
         End Function
         '
-        '
-        '
-        Private Sub SaveWizardStreamInteger(cp As CPBaseClass, RequestName As String)
-            Call SaveWizardValue(cp, RequestName, cp.Doc.GetText(RequestName))
+        '====================================================================================================
+        ''' <summary>
+        ''' save a wizard value from the current request
+        ''' </summary>
+        ''' <param name="cp"></param>
+        ''' <param name="RequestName"></param>
+        Private Sub saveWizardRequestInteger(cp As CPBaseClass, RequestName As String)
+            Call saveWizardValue(cp, RequestName, cp.Doc.GetText(RequestName))
         End Sub
         '
-        '
-        '
-        Private Sub SaveWizardStream(cp As CPBaseClass, RequestName As String)
-            Call SaveWizardValue(cp, RequestName, cp.Doc.GetText(RequestName))
+        '====================================================================================================
+        ''' <summary>
+        ''' save a wizard value from the current request
+        ''' </summary>
+        ''' <param name="cp"></param>
+        ''' <param name="RequestName"></param>
+        Private Sub saveWizardRequestText(cp As CPBaseClass, RequestName As String)
+            Call saveWizardValue(cp, RequestName, cp.Doc.GetText(RequestName))
         End Sub
         '
-        '
-        '
-        Private Sub SaveWizardFileValue(cp As CPBaseClass, Name As String, Value As String)
-            Dim Filename As String
-            '
-            Filename = GetWizardValue(cp, Name, "Temp/ImportWizard_Visit" & cp.Visit.Id & ".txt")
-            If Filename = "" Then
-                Filename = "Temp/ImportWizard_Visit" & cp.Visit.Id & ".txt"
-                Call SaveWizardValue(cp, Name, Filename)
-            End If
-            Call cp.CdnFiles.Save(Filename, Value)
-        End Sub
-
-        '
-        '
-        '
-        Private Function GetWizardFileValue(cp As CPBaseClass, Name As String, DefaultValue As String) As String
+        '====================================================================================================
+        ''' <summary>
+        ''' Get the database field list for this content
+        ''' </summary>
+        ''' <param name="cp"></param>
+        ''' <param name="ContentName"></param>
+        ''' <param name="AllowID"></param>
+        ''' <returns></returns>
+        Private Function getDbFieldList(cp As CPBaseClass, ContentName As String, AllowID As Boolean) As String
             Try
-                Dim result As String = ""
-                Dim Filename As String = GetWizardValue(cp, Name, "Temp/ImportWizard_Visit" & cp.Visit.Id & ".txt")
-                If Filename <> "" Then
-                    result = cp.CdnFiles.Read(Filename)
+                Dim result As String = "," & cp.Content.GetProperty(ContentName, "SELECTFIELDLIST") & ","
+                If Not AllowID Then
+                    result = Replace(result, ",ID,", ",", , , vbTextCompare)
                 End If
-                If result = "" Then
-                    result = DefaultValue
-                    Call SaveWizardFileValue(cp, Name, result)
-                End If
+                result = Replace(result, ",CONTENTCONTROLID,", ",", , , vbTextCompare)
+                result = Replace(result, ",EDITSOURCEID,", ",", , , vbTextCompare)
+                result = Replace(result, ",EDITBLANK,", ",", , , vbTextCompare)
+                result = Replace(result, ",EDITARCHIVE,", ",", , , vbTextCompare)
+                result = Replace(result, ",DEVELOPER,", ",", , , vbTextCompare)
+                result = Mid(result, 2, Len(result) - 2)
+                '
                 Return result
             Catch ex As Exception
                 cp.Site.ErrorReport(ex)
-                Return String.Empty
+                Throw
             End Try
         End Function
         '
-        '
-        '
-        Private Sub LoadAllImportWizardValues(EmailID As Integer)
-
-        End Sub
-        '
-        '
-        '
-        Private Sub LoadWizard(ImportWizardID As Integer)
-            '    On Error GoTo ErrorTrap
-        End Sub
-        '
-        '
-        '
-        Private Function getMemberSelect(cp As CPBaseClass, RequestName As String, MemberID As Integer) As String
-            Dim result As String = ""
-            Try
-                Dim ContentID As Integer = 0
-                Dim fieldList As List(Of ContentFieldModel) = DbBaseModel.createList(Of ContentFieldModel)(cp, "(name='testmemberid')and(contentid=" & cp.Content.GetID("email") & ")")
-                If (fieldList.Count > 0) Then
-                    ContentID = fieldList.First().lookupContentId
-                End If
-                Dim ContentName As String = cp.Content.GetRecordName("content", ContentID)
-                If ContentName = "" Then
-                    ContentName = "Members"
-                End If
-                Dim cs1 As CPCSBaseClass = cp.CSNew()
-                cs1.Open(ContentName)
-                If cs1.OK Then
-                    result &= "<div>There are no members to select</div>"
-                Else
-                    result &= "<select size=1 name=" & RequestName & "><option value=0>Select One</Option>"
-                    Do While cs1.OK
-                        Dim recordId As Integer = cs1.GetInteger("ID")
-                        Dim Email As String = cs1.GetText("email")
-                        result &= "<option value=" & recordId
-                        If recordId = MemberID Then
-                            result &= " selected "
-                        End If
-                        If Email = "" Then
-                            result &= ">" & cs1.GetText("name") & " &lt;no email address&gt;</option>"
-                        Else
-                            result &= ">" & cs1.GetText("name") & " &lt;" & Email & "&gt;</option>"
-                        End If
-                        cs1.GoNext()
-                    Loop
-                    result &= "</select>"
-                End If
-                Call cs1.Close()
-                '
-            Catch ex As Exception
-                cp.Site.ErrorReport(ex)
-            End Try
-            Return result
-        End Function
-        '
-        '
-        '
-        Private Function GetDbFieldList(cp As CPBaseClass, ContentName As String, AllowID As Boolean) As String
-            Dim result As String = ""
+        '====================================================================================================
+        ''' <summary>
+        ''' Get an html select with teh current content's fields
+        ''' </summary>
+        ''' <param name="cp"></param>
+        ''' <param name="ContentName"></param>
+        ''' <param name="NoneCaption"></param>
+        ''' <param name="AllowID"></param>
+        ''' <returns></returns>
+        Private Function getDbFieldSelect(cp As CPBaseClass, ContentName As String, NoneCaption As String, AllowID As Boolean) As String
             Try
                 '
-                GetDbFieldList = "," & cp.Content.GetProperty(ContentName, "SELECTFIELDLIST") & ","
-                If Not AllowID Then
-                    GetDbFieldList = Replace(GetDbFieldList, ",ID,", ",", , , vbTextCompare)
-                End If
-                GetDbFieldList = Replace(GetDbFieldList, ",CONTENTCONTROLID,", ",", , , vbTextCompare)
-                GetDbFieldList = Replace(GetDbFieldList, ",EDITSOURCEID,", ",", , , vbTextCompare)
-                GetDbFieldList = Replace(GetDbFieldList, ",EDITBLANK,", ",", , , vbTextCompare)
-                GetDbFieldList = Replace(GetDbFieldList, ",EDITARCHIVE,", ",", , , vbTextCompare)
-                GetDbFieldList = Replace(GetDbFieldList, ",DEVELOPER,", ",", , , vbTextCompare)
-                GetDbFieldList = Mid(GetDbFieldList, 2, Len(GetDbFieldList) - 2)
-                '
-                result = GetDbFieldList
-            Catch ex As Exception
-                cp.Site.ErrorReport(ex)
-            End Try
-            Return result
-        End Function
-        '
-        '
-        '
-        Private Function GetDbFieldSelect(cp As CPBaseClass, ContentName As String, NoneCaption As String, AllowID As Boolean) As String
-            Dim result As String = ""
-            Try
-                '
-                GetDbFieldSelect = "" _
-                & "<select name=xxxx><option value="""" style=""Background-color:#E0E0E0;"">" & NoneCaption & "</option>" _
-                & "<option>" & Replace(GetDbFieldList(cp, ContentName, AllowID), ",", "</option><option>") & "</option>" _
+                Dim result As String = "" _
+                & "<select class=""form-control"" name=xxxx><option value="""" style=""Background-color:#E0E0E0;"">" & NoneCaption & "</option>" _
+                & "<option>" & Replace(getDbFieldList(cp, ContentName, AllowID), ",", "</option><option>") & "</option>" _
                 & "</select>"
                 '
-                result = GetDbFieldSelect
+                Return result
             Catch ex As Exception
                 cp.Site.ErrorReport(ex)
+                Throw
             End Try
-            Return result
         End Function
-
         '
-        '
-        '
-        Private Sub LoadSourceFields(cp As CPBaseClass, Filename As String)
-            Dim result As String = ""
+        '====================================================================================================
+        ''' <summary>
+        ''' Load the sourceField and sourceFieldCnt from a wizard file
+        ''' </summary>
+        ''' <param name="cp"></param>
+        ''' <param name="Filename"></param>
+        Private Sub loadSourceFields(cp As CPBaseClass, Filename As String)
             Try
-                '
                 Dim FileData As String
                 Dim ignoreLong As Integer
                 Dim ignoreBoolean As Boolean
+                Dim foundFirstName As Boolean = False
+                Dim foundLastName As Boolean = False
+                Dim foundName As Boolean = False
                 '
-                If Filename <> "" Then
-                    If SourceFieldCnt = 0 Then
+                If Not String.IsNullOrEmpty(Filename) Then
+                    If sourceFieldCnt = 0 Then
                         FileData = cp.CdnFiles.Read(Filename)
-                        If FileData <> "" Then
+                        If Not String.IsNullOrEmpty(FileData) Then
                             '
                             ' Build FileColumns
                             '
-                            Call parseLine(FileData, 1, SourceFields, ignoreLong, ignoreBoolean)
-                            SourceFieldCnt = UBound(SourceFields) + 1
+                            Call parseLine(FileData, 1, sourceFields, ignoreLong, ignoreBoolean)
+                            For Each field As String In sourceFields
+                                foundFirstName = foundFirstName Or field.ToLowerInvariant().Equals("firstname") Or field.ToLowerInvariant().Equals("first name")
+                                foundLastName = foundLastName Or field.ToLowerInvariant().Equals("lastname") Or field.ToLowerInvariant().Equals("last name")
+                                foundName = foundName Or field.ToLowerInvariant().Equals("name")
+                            Next
+                            If (foundName And Not foundFirstName) Then
+                                '
+                                ' -- add firstname and lastname from name
+                                sourceFields.Append("Name-first-half]")
+                            End If
+                            If (foundName And Not foundLastName) Then
+                                '
+                                ' -- add firstname and lastname from name
+                                sourceFields.Append("Name-last-half")
+                            End If
+                            If (Not foundName And foundFirstName And foundLastName) Then
+                                '
+                                ' -- add firstname and lastname from name
+                                sourceFields.Append("First-Name Last-Name")
+                            End If
+                            sourceFieldCnt = UBound(sourceFields) + 1
                         End If
                     End If
                 End If
-
-                '
             Catch ex As Exception
                 cp.Site.ErrorReport(ex)
+                Throw
             End Try
-            Return
         End Sub
-
-
         '
-        '
-        '
-        Private Function GetSourceFieldSelect(cp As CPBaseClass, Filename As String, NoneCaption As String) As String
-            Dim result As String = ""
+        '====================================================================================================
+        ''' <summary>
+        ''' get an html select with all the fields from the uploaded source data
+        ''' </summary>
+        ''' <param name="cp"></param>
+        ''' <param name="Filename"></param>
+        ''' <param name="NoneCaption"></param>
+        ''' <returns></returns>
+        Private Function getSourceFieldSelect(cp As CPBaseClass, Filename As String, NoneCaption As String) As String
             Try
+                Dim result As String = ""
                 Dim Ptr As Integer
-                Dim ColumnName As String
-                If Filename <> "" Then
-                    Call LoadSourceFields(cp, Filename)
-                    '
-                    ' Build FileColumns
-                    '
-                    result = vbCrLf & "<select name=xxxx><option style=""Background-color:#E0E0E0;"" value=-1>" & NoneCaption & "</option>"
-                    For Ptr = 0 To SourceFieldCnt - 1
-                        ColumnName = SourceFields(Ptr)
-                        If ColumnName = "" Then
-                            ColumnName = "[blank]"
-                        End If
-                        result = result & vbCrLf & "<option value=""" & Ptr & """>" & (Ptr + 1) & " (" & ColumnName & ")</option>"
-                    Next
-                    result = result & vbCrLf & "</select>"
-                End If
+                If String.IsNullOrEmpty(Filename) Then Return String.Empty
+                Call loadSourceFields(cp, Filename)
+                If (sourceFieldCnt.Equals(0)) Then Return String.Empty
+                '
+                ' Build FileColumns
+                '
+                result = vbCrLf & "<select name=xxxx class=""form-control""><option style=""Background-color:#E0E0E0;"" value=-1>" & NoneCaption & "</option>"
+                For Ptr = 0 To sourceFieldCnt - 1
+                    Dim columnHeader As String = sourceFields(Ptr)
+                    If String.IsNullOrEmpty(columnHeader) Then
+                        columnHeader = "[blank]"
+                    End If
+                    result &= vbCrLf & "<option value=""" & Ptr & """>column " & (Ptr + 1) & " (" & columnHeader & ")</option>"
+                Next
+                result &= vbCrLf & "</select>"
                 Return result
             Catch ex As Exception
                 cp.Site.ErrorReport(ex)
-                Return ""
+                Throw
             End Try
         End Function
         '
-        '
-        '
-        Private Sub SaveImportMap(cp As CPBaseClass, ImportMap As ImportMapType)
-            Dim result As String = ""
+        '====================================================================================================
+        ''' <summary>
+        ''' Save the import map data
+        ''' </summary>
+        ''' <param name="cp"></param>
+        ''' <param name="ImportMap"></param>
+        Private Sub saveImportMap(cp As CPBaseClass, ImportMap As ImportMapType)
             Try
                 Dim ImportMapFile As String
                 Dim ImportMapData As String
                 Dim Ptr As Integer
                 '
-                ImportMapFile = GetWizardValue(cp, RequestNameImportMapFile, GetDefaultImportMapFile)
+                ImportMapFile = getWizardValue(cp, RequestNameImportMapFile, getDefaultImportMapFile(cp))
                 ImportMapData = "" _
                 & ImportMap.KeyMethodID _
                 & vbCrLf & ImportMap.SourceKeyField _
@@ -1155,20 +1159,24 @@ Namespace Views
                 Call cp.CdnFiles.Save(ImportMapFile, ImportMapData)
             Catch ex As Exception
                 cp.Site.ErrorReport(ex)
+                Throw
             End Try
         End Sub
-
         '
-        '
-        '
-        Private Function GetDefaultImportMapFile() As String
-            If DefaultImportMapFile = "" Then
-                Dim GetRandomInteger As String = Nothing
-                DefaultImportMapFile = "ImportWizard\ImportMap" & GetRandomInteger & ".txt"
-            End If
-            GetDefaultImportMapFile = DefaultImportMapFile
-
-        End Function
+        '====================================================================================================
+        ''' <summary>
+        ''' return the content from the import map file
+        ''' </summary>
+        ''' <param name="cp"></param>
+        ''' <returns></returns>
+        Private ReadOnly Property getDefaultImportMapFile(cp As CPBaseClass) As String
+            Get
+                If Not String.IsNullOrEmpty(defaultImportMapFile) Then Return defaultImportMapFile
+                defaultImportMapFile = "ImportWizard\ImportMap" & cp.Utils.GetRandomInteger & ".txt"
+                Return defaultImportMapFile
+            End Get
+        End Property
+        Private defaultImportMapFile As String = Nothing
 
     End Class
 End Namespace
