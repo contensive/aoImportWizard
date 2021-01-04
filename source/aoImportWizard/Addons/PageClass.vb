@@ -1063,26 +1063,28 @@ Namespace Addons
                             ' Build FileColumns
                             '
                             Call parseLine(FileData, 1, sourceFields, ignoreLong, ignoreBoolean)
-                            For Each field As String In sourceFields
-                                foundFirstName = foundFirstName Or field.ToLowerInvariant().Equals("firstname") Or field.ToLowerInvariant().Equals("first name")
-                                foundLastName = foundLastName Or field.ToLowerInvariant().Equals("lastname") Or field.ToLowerInvariant().Equals("last name")
-                                foundName = foundName Or field.ToLowerInvariant().Equals("name")
-                            Next
-                            If (foundName And Not foundFirstName) Then
-                                '
-                                ' -- add firstname and lastname from name
-                                sourceFields.Append("Name-first-half]")
-                            End If
-                            If (foundName And Not foundLastName) Then
-                                '
-                                ' -- add firstname and lastname from name
-                                sourceFields.Append("Name-last-half")
-                            End If
-                            If (Not foundName And foundFirstName And foundLastName) Then
-                                '
-                                ' -- add firstname and lastname from name
-                                sourceFields.Append("First-Name Last-Name")
-                            End If
+                            '
+                            ' todo - implement new fields to allow name/firstname/lastname population
+                            'For Each field As String In sourceFields
+                            '    foundFirstName = foundFirstName Or field.ToLowerInvariant().Equals("firstname") Or field.ToLowerInvariant().Equals("first name")
+                            '    foundLastName = foundLastName Or field.ToLowerInvariant().Equals("lastname") Or field.ToLowerInvariant().Equals("last name")
+                            '    foundName = foundName Or field.ToLowerInvariant().Equals("name")
+                            'Next
+                            'If (foundName And Not foundFirstName) Then
+                            '    '
+                            '    ' -- add firstname and lastname from name
+                            '    sourceFields.Append("Name-first-half]")
+                            'End If
+                            'If (foundName And Not foundLastName) Then
+                            '    '
+                            '    ' -- add firstname and lastname from name
+                            '    sourceFields.Append("Name-last-half")
+                            'End If
+                            'If (Not foundName And foundFirstName And foundLastName) Then
+                            '    '
+                            '    ' -- add firstname and lastname from name
+                            '    sourceFields.Append("First-Name Last-Name")
+                            'End If
                             sourceFieldCnt = UBound(sourceFields) + 1
                         End If
                     End If
