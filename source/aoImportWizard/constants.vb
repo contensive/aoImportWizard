@@ -181,22 +181,23 @@ Public Module constants
     Public Const FieldTypeHTMLFile = 22       ' TextFile field that expects HTML content
     Public Const FieldTypeMax = 22
     '
-    Public Const adminCommonAddonGuid = "{76E7F79E-489F-4B0F-8EE5-0BAC3E4CD782}"
-    Public Const DashboardAddonGuid = "{4BA7B4A2-ED6C-46C5-9C7B-8CE251FC8FF5}"
-    Public Const PersonalizationGuid = "{C82CB8A6-D7B9-4288-97FF-934080F5FC9C}"
-    Public Const TextBoxGuid = "{7010002E-5371-41F7-9C77-0BBFF1F8B728}"
-    Public Const ContentBoxGuid = "{E341695F-C444-4E10-9295-9BEEC41874D8}"
-    Public Const DynamicMenuGuid = "{DB1821B3-F6E4-4766-A46E-48CA6C9E4C6E}"
-    Public Const ChildListGuid = "{D291F133-AB50-4640-9A9A-18DB68FF363B}"
-    Public Const DynamicFormGuid = "{8284FA0C-6C9D-43E1-9E57-8E9DD35D2DCC}"
-    Public Const AddonManagerGuid = "{1DC06F61-1837-419B-AF36-D5CC41E1C9FD}"
-    Public Const FormWizardGuid = "{2B1384C4-FD0E-4893-B3EA-11C48429382F}"
-    Public Const ImportWizardGuid = "{37F66F90-C0E0-4EAF-84B1-53E90A5B3B3F}"
-    Public Const JQueryGuid = "{9C882078-0DAC-48E3-AD4B-CF2AA230DF80}"
-    Public Const JQueryUIGuid = "{840B9AEF-9470-4599-BD47-7EC0C9298614}"
-    Public Const ImportProcessAddonGuid = "{5254FAC6-A7A6-4199-8599-0777CC014A13}"
-    Public Const StructuredDataProcessorGuid = "{65D58FE9-8B76-4490-A2BE-C863B372A6A4}"
-    Public Const jQueryFancyBoxGuid = "{24C2DBCF-3D84-44B6-A5F7-C2DE7EFCCE3D}"
+    'Public Const adminCommonAddonGuid = "{76E7F79E-489F-4B0F-8EE5-0BAC3E4CD782}"
+    'Public Const DashboardAddonGuid = "{4BA7B4A2-ED6C-46C5-9C7B-8CE251FC8FF5}"
+    'Public Const PersonalizationGuid = "{C82CB8A6-D7B9-4288-97FF-934080F5FC9C}"
+    'Public Const TextBoxGuid = "{7010002E-5371-41F7-9C77-0BBFF1F8B728}"
+    'Public Const ContentBoxGuid = "{E341695F-C444-4E10-9295-9BEEC41874D8}"
+    'Public Const DynamicMenuGuid = "{DB1821B3-F6E4-4766-A46E-48CA6C9E4C6E}"
+    'Public Const ChildListGuid = "{D291F133-AB50-4640-9A9A-18DB68FF363B}"
+    'Public Const DynamicFormGuid = "{8284FA0C-6C9D-43E1-9E57-8E9DD35D2DCC}"
+    'Public Const AddonManagerGuid = "{1DC06F61-1837-419B-AF36-D5CC41E1C9FD}"
+    'Public Const FormWizardGuid = "{2B1384C4-FD0E-4893-B3EA-11C48429382F}"
+    'Public Const ImportWizardGuid = "{37F66F90-C0E0-4EAF-84B1-53E90A5B3B3F}"
+    'Public Const JQueryGuid = "{9C882078-0DAC-48E3-AD4B-CF2AA230DF80}"
+    'Public Const JQueryUIGuid = "{840B9AEF-9470-4599-BD47-7EC0C9298614}"
+    'Public Const ImportProcessAddonGuid = "{5254FAC6-A7A6-4199-8599-0777CC014A13}"
+    'Public Const StructuredDataProcessorGuid = "{65D58FE9-8B76-4490-A2BE-C863B372A6A4}"
+    'Public Const jQueryFancyBoxGuid = "{24C2DBCF-3D84-44B6-A5F7-C2DE7EFCCE3D}"
+    Public Const guidAddonImportTask As String = "{8EB631A1-C4D6-4538-A087-5033E5B6E7D9}"
     '
     ' forms
     '
@@ -242,7 +243,7 @@ Public Module constants
     '
     Public Function loadImportMap(cp As CPBaseClass, ImportMapData As String) As ImportMapType
         Try
-            Dim result As ImportMapType = New ImportMapType
+            Dim result As New ImportMapType
             Dim Rows() As String
             Dim Pair() As String
             Dim Ptr As Long

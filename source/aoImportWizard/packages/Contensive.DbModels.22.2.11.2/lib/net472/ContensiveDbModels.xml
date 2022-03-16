@@ -4,9 +4,49 @@
         <name>ContensiveDbModels</name>
     </assembly>
     <members>
+        <member name="T:Contensive.Models.Db.ActivityLogModel">
+            <summary>
+            Logs events related to user actvity
+            </summary>
+        </member>
         <member name="P:Contensive.Models.Db.ActivityLogModel.tableMetadata">
             <summary>
             table definition
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.ActivityLogModel.link">
+            <summary>
+            The url of the event
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.ActivityLogModel.memberId">
+            <summary>
+            the user who the event effects
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.ActivityLogModel.message">
+            <summary>
+            a description of the event
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.ActivityLogModel.organizationId">
+            <summary>
+            the organization effected by the event
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.ActivityLogModel.visitId">
+            <summary>
+            The visit session in which the event occured
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.ActivityLogModel.visitorId">
+            <summary>
+            the visitor in effect when the event occured
+            </summary>
+        </member>
+        <member name="T:Contensive.Models.Db.AddonCategoryModel">
+            <summary>
+            Addon Categories
             </summary>
         </member>
         <member name="P:Contensive.Models.Db.AddonCategoryModel.tableMetadata">
@@ -14,9 +54,19 @@
             table definition
             </summary>
         </member>
+        <member name="T:Contensive.Models.Db.AddonCollectionCDefRuleModel">
+            <summary>
+            Rules that connnect collections to content definitions
+            </summary>
+        </member>
         <member name="P:Contensive.Models.Db.AddonCollectionCDefRuleModel.tableMetadata">
             <summary>
             table definition
+            </summary>
+        </member>
+        <member name="T:Contensive.Models.Db.AddonCollectionModel">
+            <summary>
+            records that represent addon collections
             </summary>
         </member>
         <member name="P:Contensive.Models.Db.AddonCollectionModel.tableMetadata">
@@ -27,6 +77,36 @@
         <member name="P:Contensive.Models.Db.AddonCollectionModel.blockNavigatorNode">
             <summary>
             field properties
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.AddonCollectionModel.contentFileList">
+            <summary>
+            files to install in cdn
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.AddonCollectionModel.dataRecordList">
+            <summary>
+            list of records to export to data nodes
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.AddonCollectionModel.execFileList">
+            <summary>
+            files to export and install in collection folder
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.AddonCollectionModel.help">
+            <summary>
+            help text
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.AddonCollectionModel.helpLink">
+            <summary>
+            help link
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.AddonCollectionModel.lastChangeDate">
+            <summary>
+            date of the last change
             </summary>
         </member>
         <member name="P:Contensive.Models.Db.AddonCollectionParentRuleModel.tableMetadata">
@@ -81,7 +161,27 @@
         </member>
         <member name="P:Contensive.Models.Db.AddonModel.admin">
             <summary>
-            field properties
+            display on admin navigator under collection
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.AddonModel.argumentList">
+            <summary>
+            name=value pairs added to doc properties before execution, if the name does not already exist. Can be added to {% {json} %} execution to override properties
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.AddonModel.aliasList">
+            <summary>
+            other names that can be used to execute the addon (routes for example)
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.AddonModel.asAjax">
+            <summary>
+            deprecated
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.AddonModel.blockEditTools">
+            <summary>
+            when true, pageManager does not display the advanced edit tool
             </summary>
         </member>
         <member name="P:Contensive.Models.Db.AddonModel.processTimeout">
@@ -177,9 +277,124 @@
             date time when this lock expires
             </summary>
         </member>
+        <member name="T:Contensive.Models.Db.ConditionalEmailModel">
+            <summary>
+            Send emails based on a group condition
+            </summary>
+        </member>
         <member name="P:Contensive.Models.Db.ConditionalEmailModel.tableMetadata">
             <summary>
             table definition
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.ConditionalEmailModel.conditionId">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.ConditionalEmailModel.subject">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.ConditionalEmailModel.submitted">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.ConditionalEmailModel.testMemberId">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.ConditionalEmailModel.toAll">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.ConditionalEmailModel.conditionPeriod">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.ConditionalEmailModel.copyFilename">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.ConditionalEmailModel.addLinkEId">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.ConditionalEmailModel.allowSpamFooter">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.ConditionalEmailModel.blockSiteStyles">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.ConditionalEmailModel.conditionExpireDate">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.ConditionalEmailModel.emailTemplateId">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.ConditionalEmailModel.emailWizardId">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.ConditionalEmailModel.fromAddress">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.ConditionalEmailModel.inlineStyles">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.ConditionalEmailModel.lastSendTestDate">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.ConditionalEmailModel.scheduleDate">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.ConditionalEmailModel.sent">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.ConditionalEmailModel.stylesFilename">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="T:Contensive.Models.Db.ConditionEmailConditionId">
+            <summary>
+            define the process for sending the email
+            </summary>
+        </member>
+        <member name="F:Contensive.Models.Db.ConditionEmailConditionId.DaysBeforeExpiration">
+            <summary>
+            Send email before the expiration from a group
+            </summary>
+        </member>
+        <member name="F:Contensive.Models.Db.ConditionEmailConditionId.DaysAfterJoining">
+            <summary>
+            dend the email after joining a grooup
             </summary>
         </member>
         <member name="P:Contensive.Models.Db.ContentFieldHelpModel.tableMetadata">
@@ -228,6 +443,11 @@
             <param name="collectionId"></param>
             <returns></returns>
         </member>
+        <member name="T:Contensive.Models.Db.ContentWatchListModel">
+            <summary>
+            Content Watch List, a list of links related to content topics
+            </summary>
+        </member>
         <member name="P:Contensive.Models.Db.ContentWatchListModel.tableMetadata">
             <summary>
             table definition
@@ -258,7 +478,7 @@
             table definition
             </summary>
         </member>
-        <member name="P:Contensive.Models.Db.CountryModelModel.tableMetadata">
+        <member name="P:Contensive.Models.Db.CountryModel.tableMetadata">
             <summary>
             table definition
             </summary>
@@ -713,19 +933,19 @@
             </summary>
             <param name="cp"></param>
             <param name="userId"></param>
-            <param name="asyncSave"></param>
+            <param name="asyncSave">Not implemented</param>
             <returns></returns>
         </member>
         <member name="M:Contensive.Models.Db.DbBaseModel.delete``1(Contensive.BaseClasses.CPBaseClass,System.Int32)">
             <summary>
-            delete an existing database record by id
+            delete a database record by id and invalidate record and table invalidation keys
             </summary>
             <param name="cp"></param>
             <param name="recordId"></param>
         </member>
         <member name="M:Contensive.Models.Db.DbBaseModel.delete``1(Contensive.BaseClasses.CPBaseClass,System.String)">
             <summary>
-            delete an existing database record by guid
+            delete a database record by guid and invalidate record and table invalidation keys
             </summary>
             <param name="cp"></param>
             <param name="guid"></param>
@@ -900,17 +1120,11 @@
         </member>
         <member name="M:Contensive.Models.Db.DbBaseModel.deleteRows``1(Contensive.BaseClasses.CPBaseClass,System.String)">
             <summary>
-            Delete a selection of records
+            Delete a selection of records. sqlCriteria is required and cannot be blank
             </summary>
             <typeparam name="T"></typeparam>
             <param name="cp"></param>
             <param name="sqlCriteria"></param>
-        </member>
-        <member name="M:Contensive.Models.Db.DbBaseModel.isAppInvalid(Contensive.BaseClasses.CPBaseClass)">
-            <summary>
-            if invalid application, log the error and return true
-            </summary>
-            <returns></returns>
         </member>
         <member name="M:Contensive.Models.Db.DbBaseModel.containsField``1(System.String)">
             <summary>
@@ -1022,7 +1236,7 @@
         </member>
         <member name="M:Contensive.Models.Db.DbBaseModel.getCount``1(Contensive.BaseClasses.CPBaseClass,System.String)">
             <summary>
-            create a list of objects based on the sql criteria and sort order, and add a cache object to an argument
+            returns he number of records that match the criteria.
             </summary>
             <param name="cp"></param>
             <param name="sqlCriteria"></param>
@@ -1040,7 +1254,7 @@
             Get count of all records in the table
             </summary>
             <typeparam name="T"></typeparam>
-            <param name="core"></param>
+            <param name="cp"></param>
             <returns></returns>
         </member>
         <member name="M:Contensive.Models.Db.DbBaseModel.getLowerCaseKey(System.Collections.Generic.Dictionary{System.String,System.String})">
@@ -1156,9 +1370,114 @@
             table definition
             </summary>
         </member>
+        <member name="T:Contensive.Models.Db.EmailModel">
+            <summary>
+            
+            </summary>
+        </member>
         <member name="P:Contensive.Models.Db.EmailModel.tableMetadata">
             <summary>
             table definition
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.EmailModel.addonList">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.EmailModel.addLinkEId">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.EmailModel.allowSpamFooter">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.EmailModel.blockSiteStyles">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.EmailModel.sent">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.EmailModel.stylesFilename">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.EmailModel.subject">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.EmailModel.submitted">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.EmailModel.testMemberId">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.EmailModel.toAll">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.EmailModel.conditionExpireDate">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.EmailModel.conditionId">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.EmailModel.conditionPeriod">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.EmailModel.copyFilename">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.EmailModel.emailTemplateId">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.EmailModel.emailWizardId">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.EmailModel.fromAddress">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.EmailModel.inlineStyles">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.EmailModel.lastSendTestDate">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.EmailModel.scheduleDate">
+            <summary>
+            
             </summary>
         </member>
         <member name="P:Contensive.Models.Db.EmailQueueModel.tableMetadata">
@@ -1191,9 +1510,109 @@
             table definition
             </summary>
         </member>
+        <member name="T:Contensive.Models.Db.GroupEmailModel">
+            <summary>
+            
+            </summary>
+        </member>
         <member name="P:Contensive.Models.Db.GroupEmailModel.tableMetadata">
             <summary>
             table definition
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.GroupEmailModel.addLinkEId">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.GroupEmailModel.allowSpamFooter">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.GroupEmailModel.blockSiteStyles">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.GroupEmailModel.conditionExpireDate">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.GroupEmailModel.conditionId">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.GroupEmailModel.conditionPeriod">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.GroupEmailModel.copyFilename">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.GroupEmailModel.emailTemplateId">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.GroupEmailModel.emailWizardId">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.GroupEmailModel.fromAddress">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.GroupEmailModel.inlineStyles">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.GroupEmailModel.lastSendTestDate">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.GroupEmailModel.scheduleDate">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.GroupEmailModel.sent">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.GroupEmailModel.stylesFilename">
+            <summary>
+            /
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.GroupEmailModel.subject">
+            <summary>
+            /
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.GroupEmailModel.submitted">
+            <summary>
+            /
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.GroupEmailModel.testMemberId">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.GroupEmailModel.toAll">
+            <summary>
+            
             </summary>
         </member>
         <member name="P:Contensive.Models.Db.GroupModel.tableMetadata">
@@ -1216,6 +1635,63 @@
             </summary>
         </member>
         <member name="P:Contensive.Models.Db.GroupRuleModel.tableMetadata">
+            <summary>
+            table definition
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.GroupTextMessageGroupRuleModel.tableMetadata">
+            <summary>
+            table definition
+            </summary>
+        </member>
+        <member name="T:Contensive.Models.Db.GroupTextMessageModel">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.GroupTextMessageModel.tableMetadata">
+            <summary>
+            table definition
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.GroupTextMessageModel.body">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.GroupTextMessageModel.testMemberID">
+            <summary>
+            The person who tests it, and receives the confirmation after a send
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.GroupTextMessageModel.submitted">
+            <summary>
+            /
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.GroupTextMessageModel.sent">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.GroupTextMessageModel.lastSendTestDate">
+            <summary>
+            The date and time of the last test. Used to detect if the message has been tested
+            </summary>
+        </member>
+        <member name="M:Contensive.Models.Db.GroupTextMessageModel.setSubmitted(Contensive.BaseClasses.CPBaseClass,System.Int32)">
+            <summary>
+            Set a text message submitted
+            </summary>
+            <param name="cp"></param>
+            <param name="recordId"></param>
+        </member>
+        <member name="M:Contensive.Models.Db.GroupTextMessageModel.getGroupTextMessageList(Contensive.BaseClasses.CPBaseClass)">
+            <summary>
+            Return a list of group text messages that need to be sent
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.GroupTextMessageTopicRuleModel.tableMetadata">
             <summary>
             table definition
             </summary>
@@ -1440,6 +1916,16 @@
             table definition
             </summary>
         </member>
+        <member name="P:Contensive.Models.Db.PageContentModel.isSecure">
+            <summary>
+            deprecated. https vs http should be controlled by the webserver software.
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.PageContentModel.menuClass">
+            <summary>
+            html class added to the LI element of dynamic bootstrap menus
+            </summary>
+        </member>
         <member name="M:Contensive.Models.Db.PageContentModel.markReviewed(Contensive.BaseClasses.CPBaseClass,System.Int32)">
             <summary>
             mark record reviewed
@@ -1467,14 +1953,89 @@
             table definition
             </summary>
         </member>
+        <member name="P:Contensive.Models.Db.PageTemplateModel.isSecure">
+            <summary>
+            deprecated
+            </summary>
+        </member>
+        <member name="T:Contensive.Models.Db.PageViewSummaryModel">
+            <summary>
+            Summary tables for page viewings
+            </summary>
+        </member>
         <member name="P:Contensive.Models.Db.PageViewSummaryModel.tableMetadata">
             <summary>
             table definition
             </summary>
         </member>
+        <member name="T:Contensive.Models.Db.PersonModel">
+            <summary>
+            person model
+            </summary>
+        </member>
         <member name="P:Contensive.Models.Db.PersonModel.tableMetadata">
             <summary>
             table definition
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.PersonModel.address">
+            <summary>
+            contact address line 1
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.PersonModel.address2">
+            <summary>
+            contact address line 2
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.PersonModel.admin">
+            <summary>
+            if true, use is an administrator
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.PersonModel.allowBulkEmail">
+            <summary>
+            if true, email can be sent to the user
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.PersonModel.blockTextMessage">
+            <summary>
+            if true, text messages can be sent to the person
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.PersonModel.allowToolsPanel">
+            <summary>
+            enable/disable tool panel
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.PersonModel.autoLogin">
+            <summary>
+            if true, the user allows auto login. It must be enabled on the site as well.
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.PersonModel.cellPhone">
+            <summary>
+            contact cell-phone, moved here from ecommerce to support SMS interface
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.PersonModel.phone">
+            <summary>
+            content alt-phone, previous phone
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.PersonModel.title">
+            <summary>
+            optional. like CEO or President
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.PersonModel.prefix">
+            <summary>
+            Optional, like Mr, or Ms
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.PersonModel.suffix">
+            <summary>
+            optional, like Jr, or Sr
             </summary>
         </member>
         <member name="M:Contensive.Models.Db.PersonModel.createListFromGroupNameList(Contensive.BaseClasses.CPBaseClass,System.Collections.Generic.List{System.String},System.Boolean)">
@@ -1528,6 +2089,146 @@
             </summary>
         </member>
         <member name="P:Contensive.Models.Db.SystemEmailModel.tableMetadata">
+            <summary>
+            table definition
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.SystemEmailModel.fromAddress">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.SystemEmailModel.inlineStyles">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.SystemEmailModel.lastSendTestDate">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.SystemEmailModel.scheduleDate">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.SystemEmailModel.sent">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.SystemEmailModel.stylesFilename">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.SystemEmailModel.subject">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.SystemEmailModel.submitted">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.SystemEmailModel.testMemberId">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.SystemEmailModel.toAll">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.SystemEmailModel.addLinkEId">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.SystemEmailModel.allowSpamFooter">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.SystemEmailModel.blockSiteStyles">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.SystemEmailModel.conditionExpireDate">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.SystemEmailModel.conditionId">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.SystemEmailModel.conditionPeriod">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.SystemEmailModel.copyFilename">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.SystemEmailModel.emailTemplateId">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.SystemEmailModel.emailWizardId">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.SystemTextMessageGroupRuleModel.tableMetadata">
+            <summary>
+            table definition
+            </summary>
+        </member>
+        <member name="T:Contensive.Models.Db.SystemTextMessageModel">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.SystemTextMessageModel.tableMetadata">
+            <summary>
+            table definition
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.SystemTextMessageModel.body">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.SystemTextMessageModel.testMemberId">
+            <summary>
+            The person who tests it, and receives the confirmation after a send
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.SystemTextMessageModel.scheduleDate">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.SystemTextMessageModel.expireDate">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.SystemTextMessageModel.lastSendTestDate">
+            <summary>
+            The date and time of the last test. Used to detect if the message has been tested
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.SystemTextMessageTopicRuleModel.tableMetadata">
             <summary>
             table definition
             </summary>
@@ -1594,6 +2295,17 @@
             table definition
             </summary>
         </member>
+        <member name="P:Contensive.Models.Db.TextMessageQueueModel.tableMetadata">
+            <summary>
+            table definition
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.TextMessageQueueModel.sendSerialNumber">
+            <summary>
+            assigned during send. The sending process sets this then selects it back to gaurantee the same text isnt sent twice.
+            the dateModified is also set and the serial number expires after 1 minute
+            </summary>
+        </member>
         <member name="P:Contensive.Models.Db.TopicHabitModel.tableMetadata">
             <summary>
             table definition
@@ -1624,9 +2336,109 @@
             table definition
             </summary>
         </member>
+        <member name="T:Contensive.Models.Db.VisitModel">
+            <summary>
+            Auditing table to track each visit (=session)
+            </summary>
+        </member>
         <member name="P:Contensive.Models.Db.VisitModel.tableMetadata">
             <summary>
             table definition
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.VisitModel.bot">
+            <summary>
+            if true, this visit is from a bot
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.VisitModel.browser">
+            <summary>
+            the browser string prsented by the client browser during the visit
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.VisitModel.cookieSupport">
+            <summary>
+            true if cookie support verified (second hit)
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.VisitModel.excludeFromAnalytics">
+            <summary>
+            flag can be used to exclude this visit from analytics
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.VisitModel.http_referer">
+            <summary>
+            the refering page on the first hit from the visit
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.VisitModel.lastVisitTime">
+            <summary>
+            The datetime of the last hit during the visit
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.VisitModel.loginAttempts">
+            <summary>
+            count of login attempts during this visit
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.VisitModel.memberId">
+            <summary>
+            The people record associated with the visit. Can change during authentication
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.VisitModel.memberNew">
+            <summary>
+            true if this visit created a new people record
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.VisitModel.mobile">
+            <summary>
+            browser indicates mobile
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.VisitModel.pageVisits">
+            <summary>
+            number of hits in this visit
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.VisitModel.refererPathPage">
+            <summary>
+            pathPage of referer
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.VisitModel.remote_addr">
+            <summary>
+            request ip address
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.VisitModel.startDateValue">
+            <summary>
+            integer of start date
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.VisitModel.startTime">
+            <summary>
+            time portion of startDate
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.VisitModel.timeToLastHit">
+            <summary>
+            seconds between firsthit and lasthit
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.VisitModel.visitAuthenticated">
+            <summary>
+            if true, this visit was authenticated to memberId
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.VisitModel.visitorId">
+            <summary>
+            visitor for this visit
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.VisitModel.visitorNew">
+            <summary>
+            if true, the visitor was created for this visit
             </summary>
         </member>
         <member name="M:Contensive.Models.Db.VisitModel.getLastVisitByVisitor(Contensive.BaseClasses.CPBaseClass,System.Int32,System.Int32)">
@@ -1638,9 +2450,29 @@
             <param name="visitorId"></param>
             <returns></returns>
         </member>
+        <member name="T:Contensive.Models.Db.VisitorModel">
+            <summary>
+            record to track persistent cookie. Small footprint because we want to save an archive
+            </summary>
+        </member>
         <member name="P:Contensive.Models.Db.VisitorModel.tableMetadata">
             <summary>
             table definition
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.VisitorModel.memberId">
+            <summary>
+            The last people record associated with this visitor (not necessarily authenticated)
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.VisitorModel.bot">
+            <summary>
+            if true, this visitor is from a bot. Used to housekeep unneeded visitors
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.VisitorModel.cookieSupport">
+            <summary>
+            the browser string prsented by the client browser during the visit. Used to housekeep unneeded visitors
             </summary>
         </member>
         <member name="P:Contensive.Models.Db.VisitSummaryModel.tableMetadata">
@@ -1651,11 +2483,6 @@
         <member name="P:Contensive.Models.Db.VisitSummaryModel.authenticatedVisits">
             <summary>
             field properties
-            </summary>
-        </member>
-        <member name="P:Contensive.Models.Db._blankModel.tableMetadata">
-            <summary>
-            table definition
             </summary>
         </member>
     </members>

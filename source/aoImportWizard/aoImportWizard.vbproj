@@ -68,10 +68,10 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="ContensiveDbModels, Version=4.1.2.0, Culture=neutral, PublicKeyToken=c014b235a9c6bb22, processorArchitecture=MSIL">
-      <HintPath>packages\Contensive.DbModels.20.12.6.18\lib\net45\ContensiveDbModels.dll</HintPath>
+      <HintPath>packages\Contensive.DbModels.22.2.11.2\lib\net472\ContensiveDbModels.dll</HintPath>
     </Reference>
     <Reference Include="CPBase, Version=4.1.2.0, Culture=neutral, PublicKeyToken=10b3c53389b845fb, processorArchitecture=MSIL">
-      <HintPath>packages\Contensive.CPBaseClass.20.12.6.18\lib\net45\CPBase.dll</HintPath>
+      <HintPath>packages\Contensive.CPBaseClass.22.2.11.2\lib\net472\CPBase.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -89,8 +89,8 @@
   <ItemGroup>
     <Compile Include="constants.vb" />
     <Compile Include="Controllers\applicationController.vb" />
-    <Compile Include="Addons\ProcessClass.vb" />
-    <Compile Include="Addons\PageClass.vb" />
+    <Compile Include="Addons\ImportTask.vb" />
+    <Compile Include="Addons\ImportWizardAddon.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
       <AutoGen>True</AutoGen>

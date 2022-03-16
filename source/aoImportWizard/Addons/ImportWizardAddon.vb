@@ -10,7 +10,7 @@ Namespace Addons
     ''' <summary>
     ''' The addon that runs on the page -- setup the import files
     ''' </summary>
-    Public Class PageClass
+    Public Class ImportWizardAddon
         Inherits AddonBaseClass
         ''' <summary>
         ''' A wizard is the settings to control a mulitple form process
@@ -314,6 +314,7 @@ Namespace Addons
                                                 ImportWizardTasks.importMapFilename = getWizardValue(CP, RequestNameImportMapFile, getDefaultImportMapFile(CP))
                                                 ImportWizardTasks.save(CP)
                                             End If
+                                            CP.Addon.ExecuteAsProcess(guidAddonImportTask)
                                             '
                                             'Dim addon As New ProcessClass()
                                             'addon.Execute(CP)

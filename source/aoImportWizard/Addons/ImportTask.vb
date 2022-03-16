@@ -45,7 +45,7 @@ Namespace Addons
     ''' <summary>
     ''' Process the import
     ''' </summary>
-    Public Class ProcessClass
+    Public Class ImportTask
         Inherits AddonBaseClass
         '
         '=====================================================================================
@@ -67,23 +67,23 @@ Namespace Addons
                     Else
                         '
                         ' -- Import a CSV file
-                        Dim CSVFilename As String = Replace(task.uploadFilename, "/", "\")
-                        Dim ImportMapFilename As String = Replace(task.importMapFilename, "/", "\")
-                        Dim ResultMessage As String = processCSV(CP, CSVFilename, ImportMapFilename)
-                        Dim NotifyBody As String
-                        If Not String.IsNullOrEmpty(ResultMessage) Then
-                            NotifyBody = "This email is to notify you that your data import is complete for [" & CP.Site.Name & "]" & vbCrLf & "The following errors occurred during import" & vbCrLf & ResultMessage
+                        Dim cvsFilename As String = Replace(task.uploadFilename, "/", "\")
+                        Dim importMapFilename As String = Replace(task.importMapFilename, "/", "\")
+                        Dim resultMessage As String = processCSV(CP, cvsFilename, importMapFilename)
+                        Dim notifyBody As String
+                        If Not String.IsNullOrEmpty(resultMessage) Then
+                            notifyBody = "This email is to notify you that your data import is complete for [" & CP.Site.Name & "]" & vbCrLf & "The following errors occurred during import" & vbCrLf & resultMessage
                         Else
-                            NotifyBody = "This email is to notify you that your data import is complete for [" & CP.Site.Name & "]"
+                            notifyBody = "This email is to notify you that your data import is complete for [" & CP.Site.Name & "]"
                         End If
-                        Dim NotifySubject As String = "Import Completed"
-                        If String.IsNullOrEmpty(ResultMessage) Then
-                            ResultMessage = "OK"
+                        Dim notifySubject As String = "Import Completed"
+                        If String.IsNullOrEmpty(resultMessage) Then
+                            resultMessage = "OK"
                         End If
-                        task.resultMessage = ResultMessage
-                        If Not String.IsNullOrEmpty(task.notifyEmail) And Not String.IsNullOrEmpty(NotifyBody) Then
+                        task.resultMessage = If(resultMessage.Length > 255, resultMessage.Substring(0, 254), resultMessage)
+                        If Not String.IsNullOrEmpty(task.notifyEmail) And Not String.IsNullOrEmpty(notifyBody) Then
                             Dim notifyFromAddress As String = CP.Site.GetText("EmailFromAddress", "")
-                            Call CP.Email.send(task.notifyEmail, notifyFromAddress, "Task Completion Notification", NotifyBody)
+                            Call CP.Email.send(task.notifyEmail, notifyFromAddress, "Task Completion Notification", notifyBody)
                         End If
                     End If
                     task.save(CP)
