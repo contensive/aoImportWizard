@@ -252,6 +252,9 @@ Namespace Addons
                                 End If
                             End If
                             '
+                            ' -- store textfile fields to be updated manually after the upate
+                            Dim textFileManualUpdate As New List(Of textFileModel)
+                            '
                             ' If Insert, Build KeyCriteria and setup CS
                             Dim updateSQLFieldSet As String = ""
                             If (insertRecord Or updateRecord) Then
@@ -312,11 +315,18 @@ Namespace Addons
                                                 '
                                                 ' long text, null is empty
                                                 updateSQLFieldSet &= "," & dBFieldName & "=" & cp.Db.EncodeSQLText(sourceData)
-                                            Case FieldTypeFile, FieldTypeImage, FieldTypeTextFile, FieldTypeCSSFile, FieldTypeXMLFile, FieldTypeJavascriptFile, FieldTypeHTMLFile
+                                            'Case FieldTypeFile, FieldTypeImage, FieldTypeTextFile, FieldTypeCSSFile, FieldTypeXMLFile, FieldTypeJavascriptFile, FieldTypeHTMLFile
+                                            '    '
+                                            '    ' filenames, can not import these, but at least update the filename
+                                            '    Dim sourceConverted As String = If(String.IsNullOrEmpty(sourceData), "", If(sourceData.Length < 256, sourceData, Left(sourceData, 255)))
+                                            '    updateSQLFieldSet &= "," & dBFieldName & "=" & cp.Db.EncodeSQLText(sourceConverted)
+                                            Case FieldTypeTextFile, FieldTypeCSSFile, FieldTypeHTMLFile, FieldTypeJavascriptFile, FieldTypeXMLFile
                                                 '
-                                                ' filenames, can not import these, but at least update the filename
-                                                Dim sourceConverted As String = If(String.IsNullOrEmpty(sourceData), "", If(sourceData.Length < 256, sourceData, Left(sourceData, 255)))
-                                                updateSQLFieldSet &= "," & dBFieldName & "=" & cp.Db.EncodeSQLText(sourceConverted)
+                                                ' -- text files, like notes
+                                                textFileManualUpdate.Add(New textFileModel With {
+                                                    .fieldName = dBFieldName,
+                                                    .fieldValue = sourceData
+                                                })
                                         End Select
                                     End If
                                 Next
@@ -382,6 +392,19 @@ Namespace Addons
                                         result &= vbCrLf & "Row " & (rowPtr + 1) & " could not be imported. [" & Err.Description & "]"
                                     End If
                                 End If
+                                '
+                                ' -- if there are manual update fields (textfile) then update them now
+                                If textFileManualUpdate.Count > 0 Then
+                                    Using manualUpdateCs As CPCSBaseClass = cp.CSNew()
+                                        If manualUpdateCs.Open(importMap.ContentName, KeyCriteria) Then
+                                            For Each textfile As textFileModel In textFileManualUpdate
+                                                manualUpdateCs.SetField(textfile.fieldName, textfile.fieldValue)
+                                            Next
+                                        End If
+                                    End Using
+                                End If
+                                '
+                                '
                                 If importMap.GroupOptionID <> GroupOptionNone Then
                                     '
                                     ' update/insert OK and records are People
@@ -456,5 +479,10 @@ Namespace Addons
                 Throw
             End Try
         End Function
+    End Class
+    '
+    Public Class textFileModel
+        Public Property fieldName As String
+        Public Property fieldValue As String
     End Class
 End Namespace
