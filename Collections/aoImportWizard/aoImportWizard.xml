@@ -17,9 +17,20 @@
 		<BlockEditTools>Yes</BlockEditTools>
 		<FormXML></FormXML>
 		<IsInline>No</IsInline>
-		<JavascriptInHead></JavascriptInHead>
+		<JavascriptInHead><![CDATA[
+			document.addEventListener("DOMContentLoaded", function (event) {
+				console.log('import wizard onready');
+				$('body').on('change','.js-import-select',function(){
+					console.log('import wizard onchange:' + $(this).val());
+					if($(this).val()==-2) {
+						$(this).closest('tr').find('.js-import-manual-data').first().show();
+					} else {
+						$(this).closest('tr').find('.js-import-manual-data').first().hide();
+					}
+				});
+			});
+		]]></JavascriptInHead>
 		<javascriptForceHead>No</javascriptForceHead>
-		<JSHeadScriptSrc></JSHeadScriptSrc>
 		<!-- deprecated --><JSBodyScriptSrc></JSBodyScriptSrc>
 		<!-- deprecated --><JavascriptBodyEnd></JavascriptBodyEnd>
 		<!-- deprecated --><JavascriptOnLoad></JavascriptOnLoad>

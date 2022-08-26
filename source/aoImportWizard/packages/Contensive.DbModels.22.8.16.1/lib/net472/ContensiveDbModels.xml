@@ -16,32 +16,58 @@
         </member>
         <member name="P:Contensive.Models.Db.ActivityLogModel.link">
             <summary>
-            The url of the event
+            The url of the event (video meeting, etc)
             </summary>
         </member>
         <member name="P:Contensive.Models.Db.ActivityLogModel.memberId">
             <summary>
-            the user who the event effects
+            The user who the event affects. In the CRM, this is the lead/customer whose page this activity apears. The user who received the email.
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.ActivityLogModel.typeId">
+            <summary>
+            see ActivityLogTypeEnum, 1=online visit, 2=online purchase, 3=email-to, 4=email-from, 5=call-to, 6=call-from, 7=text-to, 8=text-from, 9=meeting-video, 10=meeting-in-person
             </summary>
         </member>
         <member name="P:Contensive.Models.Db.ActivityLogModel.message">
             <summary>
-            a description of the event
-            </summary>
-        </member>
-        <member name="P:Contensive.Models.Db.ActivityLogModel.organizationId">
-            <summary>
-            the organization effected by the event
+            plain text. a description of the event
             </summary>
         </member>
         <member name="P:Contensive.Models.Db.ActivityLogModel.visitId">
             <summary>
-            The visit session in which the event occured
+            For Tracking only. The visit session in which the event occured
             </summary>
         </member>
         <member name="P:Contensive.Models.Db.ActivityLogModel.visitorId">
             <summary>
-            the visitor in effect when the event occured
+            tracking. the visitor in effect when the event occured
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.ActivityLogModel.scheduledStaffId">
+            <summary>
+            for meetings, this is the person in the staff group who is to meet. 
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.ActivityLogModel.dateScheduled">
+            <summary>
+            If this activity is a future scheduled event, this is the start of the event
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.ActivityLogModel.dateCompleted">
+            <summary>
+            If this activity is a scheduled event, this is when the activity was marked completed.
+            Not necessarily the exact start or end time of the event.
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.ActivityLogModel.dateCanceled">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.ActivityLogModel.duration">
+            <summary>
+            If this activity is a future scheduled event, this is the duration of the event in minutes
             </summary>
         </member>
         <member name="T:Contensive.Models.Db.AddonCategoryModel">
@@ -184,6 +210,36 @@
             when true, pageManager does not display the advanced edit tool
             </summary>
         </member>
+        <member name="P:Contensive.Models.Db.AddonModel.isInline">
+            <summary>
+            The addon is and html display-inline.
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.AddonModel.javascriptForceHead">
+            <summary>
+            if true, jsHeadScriptSrc and JSHeadScriptPlatform5Src will be added to the head instead of end-of-body
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.AddonModel.jsHeadScriptSrc">
+            <summary>
+            The src used for html platform 4 (or unset)
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.AddonModel.JSHeadScriptPlatform5Src">
+            <summary>
+            The src used for html platform 5
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.AddonModel.stylesLinkHref">
+            <summary>
+            The link to a stylesheet, used for html platform 4 or when the platform is unset
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.AddonModel.StylesLinkPlatform5Href">
+            <summary>
+            The link to a stylesheet, used for html platform 5
+            </summary>
+        </member>
         <member name="P:Contensive.Models.Db.AddonModel.processTimeout">
             <summary>
             The time in seconds for this addon if run the background
@@ -237,6 +293,13 @@
             <param name="recordName"></param>
             <returns></returns>
         </member>
+        <member name="M:Contensive.Models.Db.AddonModel.setRunNow(Contensive.BaseClasses.CPBaseClass,System.String)">
+            <summary>
+            set an addon execute in the next few seconds
+            </summary>
+            <param name="cp"></param>
+            <param name="addonGuid"></param>
+        </member>
         <member name="P:Contensive.Models.Db.AddonPageRuleModel.tableMetadata">
             <summary>
             table definition
@@ -245,6 +308,16 @@
         <member name="P:Contensive.Models.Db.AddonPageRuleModel.addonId">
             <summary>
             field properties
+            </summary>
+        </member>
+        <member name="T:Contensive.Models.Db.AdminRecentModel">
+            <summary>
+            Addon Categories
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.AdminRecentModel.tableMetadata">
+            <summary>
+            table definition
             </summary>
         </member>
         <member name="P:Contensive.Models.Db.AddonTemplateRuleModel.tableMetadata">
@@ -413,6 +486,94 @@
         <member name="P:Contensive.Models.Db.ContentFieldModel.tableMetadata">
             <summary>
             table definition
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.ContentFieldModel.adminOnly">
+            <summary>
+            admin editing restrited to admin or developer.
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.ContentFieldModel.authorable">
+            <summary>
+            admin editing disabled
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.ContentFieldModel.caption">
+            <summary>
+            The admin editing caption
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.ContentFieldModel.contentId">
+            <summary>
+            the table metadata
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.ContentFieldModel.defaultValue">
+            <summary>
+            value added to admin edit new records, cs.insert() and model.addDefault()
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.ContentFieldModel.developerOnly">
+            <summary>
+            field only visible to developers, hidden to admin and content managers
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.ContentFieldModel.editorAddonId">
+            <summary>
+            if adddon selected, this addon will be used as the admin editor
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.ContentFieldModel.editSortPriority">
+            <summary>
+            in admin edit, this is used as the sort order after editTab
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.ContentFieldModel.editTab">
+            <summary>
+            admin edit, tab
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.ContentFieldModel.htmlContent">
+            <summary>
+            (legacy) previously used to set an html field as wysiwyg editor
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.ContentFieldModel.indexColumn">
+            <summary>
+            In admin list, the column number
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.ContentFieldModel.indexSortDirection">
+            <summary>
+            if indexcolumn is valid, this is the default sort direction for this field
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.ContentFieldModel.indexSortPriority">
+            if indexcolumn is valid, this is the sorting priority 
+        </member>
+        <member name="P:Contensive.Models.Db.ContentFieldModel.indexWidth">
+            <summary>
+            if indexcolumn is valid, this is the relative width of the admin list
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.ContentFieldModel.installedByCollectionId">
+            <summary>
+            The id of the collection that installed this field
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.ContentFieldModel.lookupContentId">
+            <summary>
+            if field type is lookup, this field is a foreign key into this table metadata
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.ContentFieldModel.lookupList">
+            <summary>
+            if field type is lookup and lookupcontentid is 0, this is a 1-based comma separated list of index values
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.ContentFieldModel.manyToManyContentId">
+            <summary>
+            for manytomany field types, the other content referenced by the m2m rules
             </summary>
         </member>
         <member name="P:Contensive.Models.Db.ContentFieldTypeModel.tableMetadata">
@@ -1124,7 +1285,7 @@
             </summary>
             <typeparam name="T"></typeparam>
             <param name="cp"></param>
-            <param name="sqlCriteria"></param>
+            <param name="sqlCriteria">The sql delete statement where criteria. Cannot be blank.</param>
         </member>
         <member name="M:Contensive.Models.Db.DbBaseModel.containsField``1(System.String)">
             <summary>
@@ -1335,10 +1496,14 @@
             the default code to execute for this domain
             </summary>
         </member>
-        <member name="P:Contensive.Models.Db.DomainModel.allowCORS">
+        <member name="M:Contensive.Models.Db.DomainModel.getWildcardDomain(Contensive.BaseClasses.CPBaseClass)">
             <summary>
-            if true, add the default CORS headers
+            Return (do not save) a domain record with name = '*' that can be used when no domain is available.
+            This domain will be used when no other matching domain is found
             </summary>
+            <param name="cp"></param>
+            <param name="requestDomain"></param>
+            <returns></returns>
         </member>
         <member name="P:Contensive.Models.Db.DownloadModel.tableMetadata">
             <summary>
@@ -1348,6 +1513,16 @@
         <member name="P:Contensive.Models.Db.DownloadModel.filename">
             <summary>
             
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.EmailBounceListModel.tableMetadata">
+            <summary>
+            table definition
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.EmailBounceListModel.details">
+            <summary>
+            field properties
             </summary>
         </member>
         <member name="P:Contensive.Models.Db.EmailDropModel.tableMetadata">
@@ -1713,7 +1888,12 @@
         </member>
         <member name="P:Contensive.Models.Db.LayoutModel.layout">
             <summary>
-            
+            The default html compatible text file for this layout. This layout should be used when no other layout is provided, or when the site is set to Html Platform version 4 (bootstrap 4 based designs). The Html Platform version is a site property the coordinates resources like style and layouts for one set of standards (like Bootstrap 4 vs 5).
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.LayoutModel.layoutPlatform5">
+            <summary>
+            The html compatible text file for this layout when the site is set to Html Platform version 5 (bootstrap 5 based designs). The Html Platform version is a site property the coordinates resrources like style and layouts for one set of standards.
             </summary>
         </member>
         <member name="P:Contensive.Models.Db.LayoutModel.installedByCollectionId">
@@ -2047,11 +2227,45 @@
             <param name="requireBulkEmail"></param>
             <returns></returns>
         </member>
+        <member name="M:Contensive.Models.Db.PersonModel.createListFromGroupSql(Contensive.BaseClasses.CPBaseClass,System.String,System.Boolean)">
+            <summary>
+            return a list of people that match the group criteria. Called from createListFromIdList and createListFromNameList
+            </summary>
+            <param name="cp"></param>
+            <param name="sqlGroups">required. formatted as '(a=1)and(b=2)' </param>
+            <param name="requireBulkEmail">if true, only people with allow group email are included</param>
+            <returns></returns>
+        </member>
         <member name="M:Contensive.Models.Db.PersonModel.getDisplayName">
             <summary>
             return the best name available for this record
             </summary>
             <returns></returns>
+        </member>
+        <member name="T:Contensive.Models.Db.PropertyModel">
+            <summary>
+            The underlying table that saves user, visit, and visitor properties.
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.PropertyModel.tableMetadata">
+            <summary>
+            table definition
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.PropertyModel.TypeId">
+            <summary>
+            The type of property. See PropertyTypeEnum. 0=user, 1=visit, 2=visitor
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.PropertyModel.KeyID">
+            <summary>
+            The id of the ccmembers, ccvisits, or ccvisitor table that represents this user, visit or visitor
+            </summary>
+        </member>
+        <member name="P:Contensive.Models.Db.PropertyModel.fieldValue">
+            <summary>
+            A string representation of the actual data stored in this property for this user/visit/visitor
+            </summary>
         </member>
         <member name="P:Contensive.Models.Db.RemoteQueryModel.tableMetadata">
             <summary>

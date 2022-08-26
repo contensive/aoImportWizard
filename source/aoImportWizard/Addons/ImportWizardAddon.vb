@@ -345,12 +345,16 @@ Namespace Addons
                                 Description = CP.Html.h4("Select the import source") & CP.Html.p("There are several sources you can use for your data")
                                 Content = Content _
                                     & "<div>" _
-                                    & "<TABLE border=0 cellpadding=10 cellspacing=0 width=100%>" _
-                                    & "<TR><TD width=1>" & CP.Html.RadioBox(RequestNameImportSource, ImportSourceUpload.ToString, ImportSource.ToString) & "</td>" _
-                                    & "<td width=99% align=left>Upload a comma delimited text file (up to 5 MBytes).</td></tr>" _
-                                    & "<TR><TD width=1>" & CP.Html.RadioBox(RequestNameImportSource, ImportSourceUploadFolder.ToString, ImportSource.ToString) & "</td>" _
-                                    & "<td width=99% align=left>Use a file already uploaded into your Upload Folder.</td></tr>" _
-                                    & "</table>" _
+                                    & "<div class=""pb-2"">" _
+                                    & "<label>" _
+                                    & CP.Html.RadioBox(RequestNameImportSource, ImportSourceUpload.ToString, ImportSource.ToString, "mr-2") _
+                                    & "Upload a comma delimited text file (up to 5 MBytes).</label>" _
+                                    & "</div>" _
+                                    & "<div class=""pb-2"">" _
+                                    & "<label>" _
+                                    & CP.Html.RadioBox(RequestNameImportSource, ImportSourceUploadFolder.ToString, ImportSource.ToString, "mr-2") _
+                                    & "Use a file already uploaded into your Upload Folder.</label>" _
+                                    & "</div>" _
                                     & "</div>" _
                                     & ""
                                 WizardContent = getWizardContent(CP, HeaderCaption, ButtonCancel, "", ButtonContinue2, Description, Content)
@@ -379,7 +383,7 @@ Namespace Addons
                                 Dim uploadPtr As Integer = 0
                                 For Each file In CP.CdnFiles.FileList("upload")
                                     Dim uploadId As String = "upload" & uploadPtr
-                                    Dim input As String = "<label for=""" & uploadId & """>" & CP.Html.RadioBox("selectfile", "upload\" & file.Name, "", "", uploadId) & "&nbsp;" & file.Name & "</label>"
+                                    Dim input As String = "<label for=""" & uploadId & """>" & CP.Html.RadioBox("selectfile", "upload\" & file.Name, "", "mr-2", uploadId) & file.Name & "</label>"
                                     fileList2.Append(CP.Html.div(input, "", "pb-2"))
                                     uploadPtr += 1
                                 Next
@@ -447,7 +451,7 @@ Namespace Addons
                                     '
                                     ' Build FileColumns
                                     '
-                                    Dim DefaultSourceFieldSelect As String = getSourceFieldSelect(CP, Filename, "none")
+                                    Dim DefaultSourceFieldSelect As String = getSourceFieldSelect(CP, Filename, "Ignore")
                                     '
                                     ' Build the Database field list
                                     '
@@ -457,56 +461,81 @@ Namespace Addons
                                     '
                                     ' Output the table
                                     '
-                                    Content &= vbCrLf & "<TABLE border=0 cellpadding=2 cellspacing=0 width=100%>"
-                                    Content = Content _
-                                        & vbCrLf _
+                                    Content &= "<TABLE border=0 cellpadding=2 cellspacing=0 width=100%>"
+                                    Content &= "" _
                                         & "<TR>" _
-                                        & "<TD align=left>Imported&nbsp;Field</TD>" _
+                                        & "<TD align=left>Data From</TD>" _
+                                        & "<TD align=left width=200>Set Value</TD>" _
                                         & "<TD align=center width=10></TD>" _
-                                        & "<TD align=left width=200>Database&nbsp;Field</TD>" _
+                                        & "<TD align=left width=200>Save Data To</TD>" _
                                         & "<TD align=left width=200>Type</TD>" _
                                         & "</TR>"
                                     ImportMapFile = getWizardValue(CP, RequestNameImportMapFile, getDefaultImportMapFile(CP))
                                     ImportMapData = CP.CdnFiles.Read(ImportMapFile)
                                     ImportMap = loadImportMap(CP, ImportMapData)
                                     For Ptr = 0 To UBound(DBFields)
+                                        '
+                                        ' -- classes for each column
+                                        Dim cell0Style As String = ""
+                                        Dim cell1Style As String = ""
+                                        Dim cell2Style As String = ""
+                                        Dim cell3Style As String = ""
+                                        Dim cell4Style As String = ""
+                                        '
+                                        ' -- get field data
                                         Dim DBFieldName As String = DBFields(Ptr)
                                         Dim field As ContentFieldModel = Nothing
                                         Dim fieldList As List(Of ContentFieldModel) = DbBaseModel.createList(Of ContentFieldModel)(CP, "(name=" & CP.Db.EncodeSQLText(DBFieldName) & ")and(contentid=" & CP.Content.GetID(ImportContentName) & ")")
-                                        If (fieldList.Count > 0) Then
+                                        If fieldList.Count > 0 Then
                                             field = fieldList.First()
                                         End If
+                                        '
+                                        ' -- get row data specific to field type
                                         Dim DbFieldType As String
-                                        If (field Is Nothing) Then
-                                            DbFieldType = "Text (255 chr)"
+                                        Dim dataEditor As String = ""
+                                        If field Is Nothing Then
+                                            DbFieldType = "Text (255 char)"
+                                            dataEditor = "<input name="""" type=""text"">"
                                         Else
+                                            Dim setValueInput As String = "setValueField" & field.id
                                             Select Case field.type
                                                 Case FieldTypeBoolean
                                                     DbFieldType = "true/false"
+                                                    dataEditor = "<input type=""checkbox"" name=""" & setValueInput & """ class=""js-import-manual-data"" style=""display:none;"">"
+                                                    cell1Style &= "vertical-align:middle;text-align:center;"
                                                 Case FieldTypeCurrency, FieldTypeFloat
                                                     DbFieldType = "Number"
+                                                    dataEditor = "<input type=""number"" name=""" & setValueInput & """ class=""form-control js-import-manual-data"" style=""display:none;"">"
                                                 Case FieldTypeDate
                                                     DbFieldType = "Date"
+                                                    dataEditor = "<input type=""date"" name=""" & setValueInput & """ class=""form-control js-import-manual-data"" style=""display:none;"">"
                                                 Case FieldTypeFile, FieldTypeImage, FieldTypeTextFile, FieldTypeCSSFile, FieldTypeXMLFile, FieldTypeJavascriptFile, FieldTypeHTMLFile
                                                     DbFieldType = "Filename"
+                                                    dataEditor = "<input type=""file"" name=""" & setValueInput & """ class=""form-control js-import-manual-data"" style=""display:none;"">"
                                                 Case FieldTypeInteger
                                                     DbFieldType = "Integer"
+                                                    dataEditor = "<input type=""number"" name=""" & setValueInput & """ class=""form-control js-import-manual-data"" style=""display:none;"">"
                                                 Case FieldTypeLongText, FieldTypeHTML
-                                                    DbFieldType = "Text (8000 chr)"
+                                                    DbFieldType = "Text (8000 char)"
+                                                    dataEditor = "<input type=""text"" name=""" & setValueInput & """ class=""form-control js-import-manual-data"" style=""display:none;"">"
                                                 Case FieldTypeLookup
                                                     DbFieldType = "Integer ID"
+                                                    dataEditor = "<select name=""" & setValueInput & """ class=""form-control js-import-manual-data"" style=""display:none;""><option name=""""></option></select>"
                                                 Case FieldTypeManyToMany
                                                     DbFieldType = "Integer ID"
+                                                    dataEditor = ""
                                                 Case FieldTypeMemberSelect
                                                     DbFieldType = "Integer ID"
+                                                    dataEditor = "<select name=""" & setValueInput & """ class=""form-control js-import-manual-data"" style=""display:none;""><option name=""""></option></select>"
                                                 Case FieldTypeText, FieldTypeLink, FieldTypeResourceLink
-                                                    DbFieldType = "Text (255 chr)"
+                                                    DbFieldType = "Text (255 char)"
+                                                    dataEditor = "<input type=""text"" name=""" & setValueInput & """ class=""form-control js-import-manual-data"" style=""display:none;"">"
                                                 Case Else
                                                     DbFieldType = "Invalid [" & field.type & "]"
+                                                    dataEditor = ""
                                             End Select
                                         End If
-                                        SourceFieldSelect = DefaultSourceFieldSelect
-                                        SourceFieldSelect = Replace(SourceFieldSelect, "xxxx", "SourceField" & Ptr)
+                                        SourceFieldSelect = DefaultSourceFieldSelect.Replace("{{fieldId}}", field.id.ToString()).Replace("{{inputName}}", "SourceField" & Ptr)
                                         SourceFieldPtr = -1
                                         If Not String.IsNullOrEmpty(DBFieldName) Then
                                             '
@@ -590,20 +619,22 @@ Namespace Addons
                                                     DBFieldCaption = "Contensive ID"
                                             End Select
                                         End If
-                                        Dim RowStyle As String
+                                        Dim rowStyle As String
+                                        Dim cellClass As String = "text-align:center;vertical-align:middle;"
                                         If Ptr Mod 2 = 0 Then
-                                            RowStyle = """border-top:1px solid #e0e0e0;border-right:1px solid white;background-color:white;"""
+                                            rowStyle = "border-top:1px solid #e0e0e0;border-right:1px solid white;background-color:white;"
                                         Else
-                                            RowStyle = """border-top:1px solid #e0e0e0;border-right:1px solid white;background-color:#f0f0f0;"""
+                                            rowStyle = "border-top:1px solid #e0e0e0;border-right:1px solid white;background-color:#f0f0f0;"
                                         End If
                                         Content = Content _
-                                    & vbCrLf _
-                                    & "<TR>" _
-                                    & "<TD style=" & RowStyle & " align=left>" & SourceFieldSelect & "</td>" _
-                                    & "<TD style=" & RowStyle & " align=center>&gt;&gt;</TD>" _
-                                    & "<TD style=" & RowStyle & " align=left>&nbsp;" & DBFieldCaption & "<input type=hidden name=DbField" & Ptr & " value=""" & DBFieldName & """></td>" _
-                                    & "<TD style=" & RowStyle & " align=left>&nbsp;" & DbFieldType & "</td>" _
-                                    & "</TR>"
+                                            & vbCrLf _
+                                            & "<TR>" _
+                                            & "<TD style=""" & cell0Style & rowStyle & """ align=left>" & SourceFieldSelect & "</td>" _
+                                            & "<TD style=""" & cell1Style & rowStyle & """ align=left>" & dataEditor & "</td>" _
+                                            & "<TD style=""" & cell2Style & rowStyle & """ align=center>&gt;&gt;</TD>" _
+                                            & "<TD style=""" & cell3Style & rowStyle & """ align=left>&nbsp;" & DBFieldCaption & "<input type=hidden name=DbField" & Ptr & " value=""" & DBFieldName & """></td>" _
+                                            & "<TD style=""" & cell4Style & rowStyle & """ align=left>&nbsp;" & DbFieldType & "</td>" _
+                                            & "</TR>"
                                     Next
                                     Content &= "<input type=hidden name=Ccnt value=" & Ptr & ">"
                                     Content &= "</TABLE>"
@@ -1101,28 +1132,25 @@ Namespace Addons
         ''' get an html select with all the fields from the uploaded source data
         ''' </summary>
         ''' <param name="cp"></param>
-        ''' <param name="Filename"></param>
-        ''' <param name="NoneCaption"></param>
+        ''' <param name="filename"></param>
+        ''' <param name="noneCaption"></param>
         ''' <returns></returns>
-        Private Function getSourceFieldSelect(cp As CPBaseClass, Filename As String, NoneCaption As String) As String
+        Private Function getSourceFieldSelect(cp As CPBaseClass, filename As String, noneCaption As String) As String
             Try
-                Dim result As String = ""
-                Dim Ptr As Integer
-                If String.IsNullOrEmpty(Filename) Then Return String.Empty
-                Call loadSourceFields(cp, Filename)
-                If (sourceFieldCnt.Equals(0)) Then Return String.Empty
+                If String.IsNullOrEmpty(filename) Then Return String.Empty
+                Call loadSourceFields(cp, filename)
+                If sourceFieldCnt.Equals(0) Then Return String.Empty
                 '
                 ' Build FileColumns
                 '
-                result = vbCrLf & "<select name=xxxx class=""form-control""><option style=""Background-color:#E0E0E0;"" value=-1>" & NoneCaption & "</option>"
-                For Ptr = 0 To sourceFieldCnt - 1
-                    Dim columnHeader As String = sourceFields(Ptr)
-                    If String.IsNullOrEmpty(columnHeader) Then
-                        columnHeader = "[blank]"
-                    End If
-                    result &= vbCrLf & "<option value=""" & Ptr & """>column " & (Ptr + 1) & " (" & columnHeader & ")</option>"
+                Dim result As String = ""
+                result = "<select name={{inputName}} class=""form-control js-import-select"" id=""js-import-select-{{fieldId}}"">"
+                result &= "<option value=-1>" & noneCaption & "</option>"
+                result &= "<option value=-2>Set Value</option>"
+                For Ptr As Integer = 0 To sourceFieldCnt - 1
+                    result &= "<option value=""" & Ptr & """>column " & (Ptr + 1) & " (" & If(String.IsNullOrEmpty(sourceFields(Ptr)), "[blank]", sourceFields(Ptr)) & ")</option>"
                 Next
-                result &= vbCrLf & "</select>"
+                result &= "</select>"
                 Return result
             Catch ex As Exception
                 cp.Site.ErrorReport(ex)

@@ -2069,21 +2069,22 @@
         </member>
         <member name="M:Contensive.BaseClasses.CPCacheBaseClass.CreateTableDependencyKey(System.String)">
             <summary>
-            Create a key for a database table. Use this key to invalidate all keys based on thsi table using dependent keys.
+            Create a dependency cacheKey for a database table. Use a dependency cacheKey as an argument in setCache(). 
+            If any record is updated in this table, any cache that includes this dependency will be invalidated
             </summary>
             <param name="tableName"></param>
             <returns></returns>
         </member>
         <member name="M:Contensive.BaseClasses.CPCacheBaseClass.invalidateTableDependencyKey(System.String)">
             <summary>
-            Updates the cache dependency key for this table that a record in this table has been modified
+            Invalidate all cache objects created with CreateRecordKey() and including this tableName
             </summary>
             <param name="tableName"></param>
             <returns></returns>
         </member>
         <member name="M:Contensive.BaseClasses.CPCacheBaseClass.CreateRecordKey(System.Int32,System.String,System.String)">
             <summary>
-            Create a cache key for a database model object
+            Create a cacheKey for a database model object. A cacheKey argument is required for many cache methods.
             </summary>
             <param name="recordId"></param>
             <param name="tableName"></param>
@@ -2092,7 +2093,7 @@
         </member>
         <member name="M:Contensive.BaseClasses.CPCacheBaseClass.CreateRecordKey(System.Int32,System.String)">
             <summary>
-            Create a key for a database record in the default datasource
+            Create a cacheKey for a database record in the default datasource.  A cacheKey argument is required for many cache methods.
             </summary>
             <param name="recordId"></param>
             <param name="tableName"></param>
@@ -2100,22 +2101,22 @@
         </member>
         <member name="M:Contensive.BaseClasses.CPCacheBaseClass.CreateKey(System.String,System.String)">
             <summary>
-            Create a cache key for a domain model. ObjectName can be generic domain model name. The unique Identifier must be unique, for example the id of a core record in the model.
+            deprecated. Use CreateKey( uniqueName )
             </summary>
-            <param name="objectName"></param>
+            <param name="uniqueName"></param>
             <param name="objectUniqueIdentifier"></param>
             <returns></returns>
         </member>
         <member name="M:Contensive.BaseClasses.CPCacheBaseClass.CreateKey(System.String)">
             <summary>
-            Create a cache key for a domain model.
+            Createconvert a unique name to a cache key
             </summary>
-            <param name="objectName"></param>
+            <param name="uniqueName"></param>
             <returns></returns>
         </member>
         <member name="M:Contensive.BaseClasses.CPCacheBaseClass.CreatePtrKeyforDbRecordGuid(System.String,System.String,System.String)">
             <summary>
-            Create a key pointer for a db model object.
+            Create a pointer cacheKey for a db model object.
             A Ptr key doesnt contain the object, but points to a key for an object.
             When you get a cache object from a Ptr Key, the object it points to is returned.
             For example, data may be stored in a cache named for the id of a record, then a pointer created for the guid of the record.
@@ -2127,7 +2128,7 @@
         </member>
         <member name="M:Contensive.BaseClasses.CPCacheBaseClass.CreatePtrKeyforDbRecordGuid(System.String,System.String)">
             <summary>
-            Create a key pointer for a db model object.
+            Create a cachKeyPointer for a db model object. 
             </summary>
             <param name="guid"></param>
             <param name="tableName"></param>
@@ -2615,12 +2616,33 @@
             <returns></returns>
             <remarks></remarks>
         </member>
+        <member name="M:Contensive.BaseClasses.CPContentBaseClass.GetEditLink(System.String,System.String,System.Boolean,System.String,System.Boolean,System.String)">
+            <summary>
+            Get the system edit link
+            </summary>
+            <param name="contentName"></param>
+            <param name="recordId"></param>
+            <param name="allowCut"></param>
+            <param name="recordLabel"></param>
+            <param name="IsEditing"></param>
+            <param name="customCaption"></param>
+            <returns></returns>
+        </member>
         <member name="M:Contensive.BaseClasses.CPContentBaseClass.GetEditLink(System.String,System.Int32)">
             <summary>
             Get the system edit link
             </summary>
             <param name="contentName"></param>
             <param name="recordId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPContentBaseClass.GetEditLink(System.String,System.Int32,System.String)">
+            <summary>
+            Get the system edit link
+            </summary>
+            <param name="contentName"></param>
+            <param name="recordId"></param>
+            <param name="customCaption"></param>
             <returns></returns>
         </member>
         <member name="M:Contensive.BaseClasses.CPContentBaseClass.GetEditLink(System.String,System.String)">
@@ -2631,6 +2653,15 @@
             <param name="recordGuid"></param>
             <returns></returns>
         </member>
+        <member name="M:Contensive.BaseClasses.CPContentBaseClass.GetEditLink(System.String,System.String,System.String)">
+            <summary>
+            Get the system edit link
+            </summary>
+            <param name="contentName"></param>
+            <param name="recordGuid"></param>
+            <param name="customCaption"></param>
+            <returns></returns>
+        </member>
         <member name="M:Contensive.BaseClasses.CPContentBaseClass.GetEditLink(System.Int32,System.Int32)">
             <summary>
             Get the system edit link
@@ -2639,12 +2670,30 @@
             <param name="recordId"></param>
             <returns></returns>
         </member>
+        <member name="M:Contensive.BaseClasses.CPContentBaseClass.GetEditLink(System.Int32,System.Int32,System.String)">
+            <summary>
+            Get the system edit link
+            </summary>
+            <param name="contentId"></param>
+            <param name="recordId"></param>
+            <param name="customCaption"></param>
+            <returns></returns>
+        </member>
         <member name="M:Contensive.BaseClasses.CPContentBaseClass.GetEditLink(System.Int32,System.String)">
             <summary>
             Get the system edit link
             </summary>
             <param name="contentId"></param>
             <param name="recordGuid"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPContentBaseClass.GetEditLink(System.Int32,System.String,System.String)">
+            <summary>
+            Get the system edit link
+            </summary>
+            <param name="contentId"></param>
+            <param name="recordGuid"></param>
+            <param name="customCaption"></param>
             <returns></returns>
         </member>
         <member name="M:Contensive.BaseClasses.CPContentBaseClass.GetEditWrapper(System.String)">
@@ -2663,6 +2712,16 @@
             <param name="recordId"></param>
             <returns></returns>
         </member>
+        <member name="M:Contensive.BaseClasses.CPContentBaseClass.GetEditWrapper(System.String,System.String,System.Int32,System.String)">
+            <summary>
+            wrap content in system editing region style with an edit link.
+            </summary>
+            <param name="innerHtml"></param>
+            <param name="contentName"></param>
+            <param name="recordId"></param>
+            <param name="editCaption"></param>
+            <returns></returns>
+        </member>
         <member name="M:Contensive.BaseClasses.CPContentBaseClass.GetEditWrapper(System.String,System.String,System.String)">
             <summary>
             wrap content in system editing region style with an edit link.
@@ -2670,6 +2729,16 @@
             <param name="innerHtml"></param>
             <param name="contentName"></param>
             <param name="recordGuid"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPContentBaseClass.GetEditWrapper(System.String,System.String,System.String,System.String)">
+            <summary>
+            wrap content in system editing region style with an edit link.
+            </summary>
+            <param name="innerHtml"></param>
+            <param name="contentName"></param>
+            <param name="recordGuid"></param>
+            <param name="editCaption"></param>
             <returns></returns>
         </member>
         <member name="M:Contensive.BaseClasses.CPContentBaseClass.GetEditWrapper(System.String,System.Int32,System.Int32)">
@@ -2681,6 +2750,16 @@
             <param name="recordId"></param>
             <returns></returns>
         </member>
+        <member name="M:Contensive.BaseClasses.CPContentBaseClass.GetEditWrapper(System.String,System.Int32,System.Int32,System.String)">
+            <summary>
+            wrap content in system editing region style with an edit link.
+            </summary>
+            <param name="innerHtml"></param>
+            <param name="contentId"></param>
+            <param name="recordId"></param>
+            <param name="editCaption"></param>
+            <returns></returns>
+        </member>
         <member name="M:Contensive.BaseClasses.CPContentBaseClass.GetEditWrapper(System.String,System.Int32,System.String)">
             <summary>
             wrap content in system editing region style with an edit link.
@@ -2688,6 +2767,16 @@
             <param name="innerHtml"></param>
             <param name="contentId"></param>
             <param name="recordGuid"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPContentBaseClass.GetEditWrapper(System.String,System.Int32,System.String,System.String)">
+            <summary>
+            wrap content in system editing region style with an edit link.
+            </summary>
+            <param name="innerHtml"></param>
+            <param name="contentId"></param>
+            <param name="recordGuid"></param>
+            <param name="editCaption"></param>
             <returns></returns>
         </member>
         <member name="M:Contensive.BaseClasses.CPContentBaseClass.GetLinkAliasByPageID(System.Int32,System.String,System.String)">
@@ -3489,7 +3578,12 @@
             provate consistent JSON methods in a single updateable layer
             </summary>
         </member>
-        <!-- Badly formed XML comment ignored for member "P:Contensive.BaseClasses.CPDateBaseClass.TimeZone" -->
+        <member name="P:Contensive.BaseClasses.CPDateBaseClass.TimeZone">
+            <summary>
+            Not yet implemented. The TimeZone for the business's primary location (the store).
+            </summary>
+            <returns></returns>
+        </member>
         <member name="P:Contensive.BaseClasses.CPDateBaseClass.Now">
             <summary>
             Not yet implemented. The local date and time at the business's location (the store). If the business has multiple locations, this is the selected location or the primary.
@@ -3497,8 +3591,18 @@
             </summary>
             <returns></returns>
         </member>
-        <!-- Badly formed XML comment ignored for member "P:Contensive.BaseClasses.CPDateBaseClass.NowUtc" -->
-        <!-- Badly formed XML comment ignored for member "M:Contensive.BaseClasses.CPDateBaseClass.ConvertToLocal(System.DateTime,System.TimeZone)" -->
+        <member name="P:Contensive.BaseClasses.CPDateBaseClass.NowUtc">
+            <summary>
+            Not yet implemented. The current date and time in UTC (the server time). DateTime should be saved to the Db in UTC
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPDateBaseClass.ConvertToLocal(System.DateTime,System.TimeZone)">
+            <summary>
+            Not yet implemented. The current date and time in UTC (the server time)
+            </summary>
+            <returns></returns>
+        </member>
         <member name="M:Contensive.BaseClasses.CPDateBaseClass.UserNow(System.Int32)">
             <summary>
             Not yet implemented. The current date and time for this user. 
@@ -3602,7 +3706,7 @@
             Delete the record specified by tablename and guid
             </summary>
             <param name="tableName"></param>
-            <param name="sqlCriteria"></param>
+            <param name="sqlCriteria">The sql delete statement where criteria. Cannot be blank.</param>
         </member>
         <member name="M:Contensive.BaseClasses.CPDbBaseClass.GetConnectionString">
             <summary>
@@ -5438,19 +5542,82 @@
             Image methods
             </summary>
         </member>
+        <member name="M:Contensive.BaseClasses.CPImageBaseClass.GetAvatarCdnPathFilename(System.Int32,System.Int32)">
+            <summary>
+            Return the avatar CDN pathFilename for the current user, resized to the provided dimensions. 
+            To use the returned pathFilename as a link, prefix it with CP.Http.CdnFilePathPrefixAbsolute.
+            To access the file directly, use CP.CdnFiles.
+            </summary>
+            <param name="holeWidth">The width of the final image to be returned.</param>
+            <param name="holeHeight">The height of the final image to be returned.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPImageBaseClass.GetAvatarCdnPathFilename(System.Int32,System.Int32,System.Int32)">
+            <summary>
+            Return the avatar CDN pathFilename for the provided user, resized to the provided dimensions. 
+            To use the returned pathFilename as a link, prefix it with CP.Http.CdnFilePathPrefixAbsolute.
+            To access the file directly, use CP.CdnFiles.
+            </summary>
+            <param name="holeWidth">The width of the final image to be returned.</param>
+            <param name="holeHeight">The height of the final image to be returned.</param>
+            <param name="userId"></param>
+            <returns></returns>
+        </member>
         <member name="M:Contensive.BaseClasses.CPImageBaseClass.GetBestFit(System.String,System.Int32,System.Int32,System.Collections.Generic.List{System.String})">
             <summary>
             Return an image resized and cropped to best fit the hole. 
+            To use the returned pathFilename as a link, prefix it with CP.Http.CdnFilePathPrefixAbsolute.
+            To access the file directly, use CP.CdnFiles.
+            The image is never scaled up. If the hole is larger than the image, the original is returned.
+            The source imagePathFilename is expected to be in the CdnFiles filesystem. 
+            New image is saved back to the same path.
+            imageAltSizeList is a list of comma separated strings. the first string is the original filename. The rest are the sizes already created and expected to be in the cdn folder, in the format width + "x" + height. 
+            </summary>
+            <param name="imagePathFilename">The source image. The is expected to be in CdnFiles (accessible with CP.CdnFiles methods).</param>
+            <param name="holeWidth">The width of the final image to be returned.</param>
+            <param name="holeHeight">The height of the final image to be returned.</param>
+            <param name="imageAltSizeList"></param>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPImageBaseClass.GetBestFit(System.String,System.Int32,System.Int32)">
+            <summary>
+            Return an image resized and cropped to best fit the hole. 
+            To use the returned pathFilename as a link, prefix it with CP.Http.CdnFilePathPrefixAbsolute.
+            To access the file directly, use Cp.CdnFiles.
+            The image is never scaled up. If the hole is larger than the image, the original is returned.
             The source imagePathFilename is expected to be in the CdnFiles filesystem. 
             New image is saved back to the same path.  
-            imageAltSizeList is a list of strings, each representing a previous resize of this image in the format "filename-000x000". The method checks this list for the size requested and if found returns success. 
-            If the size requested is not in the list, it is created, saved to the path, and this new size is added to the list. On return, if the imageAltSizeList.count changes, save this new list with the image for future calls. 
-            Test if in cache first, else load record and test for resized in alt list, else Resize the image and save back to the image's record
             </summary>
-            <param name="imagePathFilename"></param>
-            <param name="holeWidth"></param>
-            <param name="holeHeight"></param>
+            <param name="imagePathFilename">The source image. The is expected to be in CdnFiles (accessible with CP.CdnFiles methods).</param>
+            <param name="holeWidth">The width of the final image to be returned.</param>
+            <param name="holeHeight">The height of the final image to be returned.</param>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPImageBaseClass.GetBestFitWebP(System.String,System.Int32,System.Int32,System.Collections.Generic.List{System.String})">
+            <summary>
+            Return an image resized and cropped to best fit the hole, in .webP format.
+            To use the returned pathFilename as a link, prefix it with CP.Http.CdnFilePathPrefixAbsolute.
+            To access the file directly, use Cp.CdnFiles.
+            The image is never scaled up. If the hole is larger than the image, the original is returned.
+            The source imagePathFilename is expected to be in the CdnFiles filesystem. 
+            New image is saved back to the same path.  
+            imageAltSizeList is a list of comma separated strings. the first string is the original filename. The rest are the sizes already created and expected to be in the cdn folder, in the format width + "x" + height. 
+            </summary>
+            <param name="imagePathFilename">The source image. The is expected to be in CdnFiles (accessible with CP.CdnFiles methods).</param>
+            <param name="holeWidth">The width of the final image to be returned.</param>
+            <param name="holeHeight">The height of the final image to be returned.</param>
             <param name="imageAltSizeList"></param>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPImageBaseClass.GetBestFitWebP(System.String,System.Int32,System.Int32)">
+            <summary>
+            Return an image resized and cropped to best fit the hole, in .webP format. 
+            To use the returned pathFilename as a link, prefix it with CP.Http.CdnFilePathPrefixAbsolute.
+            To access the file directly, use Cp.CdnFiles.
+            The image is never scaled up. If the hole is larger than the image, the original is returned.
+            The source imagePathFilename is expected to be in the CdnFiles filesystem. 
+            New image is saved back to the same path.  
+            </summary>
+            <param name="imagePathFilename">The source image. The is expected to be in CdnFiles (accessible with CP.CdnFiles methods).</param>
+            <param name="holeWidth">The width of the final image to be returned.</param>
+            <param name="holeHeight">The height of the final image to be returned.</param>
         </member>
         <member name="T:Contensive.BaseClasses.CPJSONBaseClass">
             <summary>
@@ -5524,6 +5691,19 @@
             <param name="layoutGuid"></param>
             <param name="defaultLayoutName"></param>
             <param name="defaultLayoutCdnPathFilename"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPLayoutBaseClass.GetLayout(System.String,System.String,System.String,System.String)">
+            <summary>
+            returns a layout by Guid. 
+            If missing, the layout record is created with the default name and layouts
+            The default layout is used when platform5 is not appropriate (platform not set, set to 4, platform5 layout is blank)
+            The platform5 layout is used for platform5 (sites set to bootstrap 5 platform)
+            </summary>
+            <param name="layoutGuid"></param>
+            <param name="defaultLayoutName"></param>
+            <param name="defaultLayoutCdnPathFilename"></param>
+            <param name="platform5LayoutCdnPathFilename"></param>
             <returns></returns>
         </member>
         <member name="M:Contensive.BaseClasses.CPLayoutBaseClass.Transform(System.String)">
@@ -6006,6 +6186,14 @@
             Application settings and methods
             </summary>
         </member>
+        <member name="P:Contensive.BaseClasses.CPSiteBaseClass.htmlPlatformVersion">
+            <summary>
+            The html platform version for this site.
+            replaces the site property html platform version
+            htmlPlatform 0-4 is Bootstrap 4.
+            htmlPlaform 5 is Bootstrap 5.
+            </summary>
+        </member>
         <member name="P:Contensive.BaseClasses.CPSiteBaseClass.Name">
             <summary>
             The application name
@@ -6149,11 +6337,64 @@
         </member>
         <member name="M:Contensive.BaseClasses.CPSiteBaseClass.LogActivity(System.String,System.Int32,System.Int32)">
             <summary>
-            Log a user activity to the activity log.
+            Deprecated. Use LogActivity(subject, degtails, userId)
             </summary>
-            <param name="message"></param>
-            <param name="userID"></param>
-            <param name="organizationId"></param>
+            <param name="details"></param>
+            <param name="userId"></param>
+            <param name="ignoreId"></param>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPSiteBaseClass.AddActivity(System.String)">
+            <summary>
+            Log a simple activity for the current user
+            </summary>
+            <param name="subject">A brief name for the activity to be shown in a list of other activities. Typically 'Call', 'Message', 'Meeting', 'Online Form', etc.</param>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPSiteBaseClass.AddActivity(System.String,System.String)">
+            <summary>
+            Log an activity for the current user
+            </summary>
+            <param name="subject">A brief name for the activity to be shown in a list of other activities. Typically 'Call', 'Message', 'Meeting', 'Online Form', etc.</param>
+            <param name="detailsText">The details of the activity, non-html plain text.</param>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPSiteBaseClass.AddActivity(System.String,System.String,System.Int32)">
+            <summary>
+            Log an activity for the specified user
+            </summary>
+            <param name="subject">A brief name for the activity to be shown in a list of other activities. Typically 'Call', 'Message', 'Meeting', 'Online Form', etc.</param>
+            <param name="detailsText">The details of the activity, non-html plain text.</param>
+            <param name="activityUserId"></param>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPSiteBaseClass.AddActivity(System.String,System.String,System.Int32,System.Int32)">
+            <summary>
+            Log an activity for the specified user
+            </summary>
+            <param name="subject">A brief name for the activity to be shown in a list of other activities. Typically 'Call', 'Message', 'Meeting', 'Online Form', etc.</param>
+            <param name="detailsText">The details of the activity, non-html plain text.</param>
+            <param name="activityUserId"></param>
+            <param name="typeId">see ActivityLogTypeEnum, 1=visit online, 2=email-to, 3=email-from, 4=call-to, 5=call-from, 6=text-to, 7=text-from, 8=meeting-video, 9=meeting-in-person</param>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPSiteBaseClass.AddActivity(System.String,System.String,System.Int32,System.Int32,System.DateTime,System.Int32,System.Int32)">
+            <summary>
+            Log an activity for the specified user for a scheduled event
+            </summary>
+            <param name="subject">A brief name for the activity to be shown in a list of other activities. Typically 'Call', 'Message', 'Meeting', 'Online Form', etc.</param>
+            <param name="detailsText">The details of the activity, non-html plain text.</param>
+            <param name="activityUserId"></param>
+            <param name="typeId">see ActivityLogTypeEnum, 1=online visit, 2=online purchase, 3=email-to, 4=email-from, 5=call-to, 6=call-from, 7=text-to, 8=text-from, 9=meeting-video, 10=meeting-in-person, </param>
+            <param name="dateScheduled"></param>
+            <param name="duration"></param>
+            <param name="scheduledStaffId"></param>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPSiteBaseClass.AddActivity(System.String,System.String,System.Int32,System.DateTime,System.Int32,System.Int32)">
+            <summary>
+            Log an activity for the specified user for a scheduled event
+            </summary>
+            <param name="subject">A brief name for the activity to be shown in a list of other activities. Typically 'Call', 'Message', 'Meeting', 'Online Form', etc.</param>
+            <param name="detailsText">The details of the activity, non-html plain text.</param>
+            <param name="activityUserId"></param>
+            <param name="dateScheduled"></param>
+            <param name="duration"></param>
+            <param name="scheduledStaffId"></param>
         </member>
         <member name="M:Contensive.BaseClasses.CPSiteBaseClass.ErrorReport(System.String)">
             <summary>
@@ -6368,10 +6609,19 @@
         </member>
         <member name="M:Contensive.BaseClasses.CPSMSBaseClass.Send(System.String,System.String)">
             <summary>
-            Send an text message with SMS to the phone numnber
+            Send an text message with SMS to the phone numnber.
             </summary>
             <param name="smsPhoneNumber"></param>
             <param name="smsMessage"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPSMSBaseClass.SendSystem(System.String,System.String,System.Int32)">
+            <summary>
+            Send s system text message
+            </summary>
+            <param name="systemTextMessageGuid"></param>
+            <param name="additionalCopy"></param>
+            <param name="additionalUserID"></param>
             <returns></returns>
         </member>
         <member name="T:Contensive.BaseClasses.CPUserBaseClass">
@@ -7252,7 +7502,7 @@
         </member>
         <member name="M:Contensive.BaseClasses.CPUtilsBaseClass.ModifyLinkQueryString(System.String,System.String,System.Boolean,System.Boolean)">
             <summary>
-            Update or add a key=value pair within a url like "/path/page?key=value&amp;key=value"
+            Update or add a key=value pair within a url, like "/path/page?key=value&amp;key=value"
             </summary>
             <param name="url"></param>
             <param name="key"></param>
@@ -7262,7 +7512,7 @@
         </member>
         <member name="M:Contensive.BaseClasses.CPUtilsBaseClass.ModifyLinkQueryString(System.String,System.String,System.DateTime)">
             <summary>
-            Update or add a key=value pair within a url like "/path/page?key=value&amp;key=value"
+            Update or add a key=value pair within a url, like "/path/page?key=value&amp;key=value"
             </summary>
             <param name="url"></param>
             <param name="key"></param>
@@ -7271,7 +7521,7 @@
         </member>
         <member name="M:Contensive.BaseClasses.CPUtilsBaseClass.ModifyLinkQueryString(System.String,System.String,System.DateTime,System.Boolean)">
             <summary>
-            Update or add a key=value pair within a url like "/path/page?key=value&amp;key=value"
+            Update or add a key=value pair within a url, like "/path/page?key=value&amp;key=value"
             </summary>
             <param name="url"></param>
             <param name="key"></param>
@@ -7283,102 +7533,102 @@
             <summary>
             Update or add a key=value pair within key value pair string like "key=value&amp;key=value"
             </summary>
-            <param name="WorkingQuery"></param>
-            <param name="QueryName"></param>
-            <param name="QueryValue"></param>
-            <param name="AddIfMissing"></param>
+            <param name="sourceQueryString"></param>
+            <param name="key"></param>
+            <param name="value"></param>
+            <param name="addIfMissing"></param>
             <returns></returns>
         </member>
         <member name="M:Contensive.BaseClasses.CPUtilsBaseClass.ModifyQueryString(System.String,System.String,System.String)">
             <summary>
             Update or add a key=value pair within key value pair string like "key=value&amp;key=value"
             </summary>
-            <param name="WorkingQuery"></param>
-            <param name="QueryName"></param>
-            <param name="QueryValue"></param>
+            <param name="sourceQueryString"></param>
+            <param name="key"></param>
+            <param name="value"></param>
             <returns></returns>
         </member>
         <member name="M:Contensive.BaseClasses.CPUtilsBaseClass.ModifyQueryString(System.String,System.String,System.Int32)">
             <summary>
             Update or add a key=value pair within key value pair string like "key=value&amp;key=value"
             </summary>
-            <param name="WorkingQuery"></param>
-            <param name="QueryName"></param>
-            <param name="QueryValue"></param>
+            <param name="sourceQueryString"></param>
+            <param name="key"></param>
+            <param name="value"></param>
             <returns></returns>
         </member>
         <member name="M:Contensive.BaseClasses.CPUtilsBaseClass.ModifyQueryString(System.String,System.String,System.Int32,System.Boolean)">
             <summary>
             Update or add a key=value pair within key value pair string like "key=value&amp;key=value"
             </summary>
-            <param name="WorkingQuery"></param>
-            <param name="QueryName"></param>
-            <param name="QueryValue"></param>
-            <param name="AddIfMissing"></param>
+            <param name="sourceQueryString"></param>
+            <param name="key"></param>
+            <param name="value"></param>
+            <param name="addIfMissing"></param>
             <returns></returns>
         </member>
         <member name="M:Contensive.BaseClasses.CPUtilsBaseClass.ModifyQueryString(System.String,System.String,System.Double)">
             <summary>
             Update or add a key=value pair within key value pair string like "key=value&amp;key=value"
             </summary>
-            <param name="WorkingQuery"></param>
-            <param name="QueryName"></param>
-            <param name="QueryValue"></param>
+            <param name="sourceQueryString"></param>
+            <param name="key"></param>
+            <param name="value"></param>
             <returns></returns>
         </member>
         <member name="M:Contensive.BaseClasses.CPUtilsBaseClass.ModifyQueryString(System.String,System.String,System.Double,System.Boolean)">
             <summary>
             Update or add a key=value pair within key value pair string like "key=value&amp;key=value"
             </summary>
-            <param name="WorkingQuery"></param>
-            <param name="QueryName"></param>
-            <param name="QueryValue"></param>
-            <param name="AddIfMissing"></param>
+            <param name="sourceQueryString"></param>
+            <param name="key"></param>
+            <param name="value"></param>
+            <param name="aAddIfMissing"></param>
             <returns></returns>
         </member>
         <member name="M:Contensive.BaseClasses.CPUtilsBaseClass.ModifyQueryString(System.String,System.String,System.Boolean)">
             <summary>
             Update or add a key=value pair within key value pair string like "key=value&amp;key=value"
             </summary>
-            <param name="WorkingQuery"></param>
-            <param name="QueryName"></param>
-            <param name="QueryValue"></param>
+            <param name="sourceQueryString"></param>
+            <param name="key"></param>
+            <param name="value"></param>
             <returns></returns>
         </member>
         <member name="M:Contensive.BaseClasses.CPUtilsBaseClass.ModifyQueryString(System.String,System.String,System.Boolean,System.Boolean)">
             <summary>
             Update or add a key=value pair within key value pair string like "key=value&amp;key=value"
             </summary>
-            <param name="WorkingQuery"></param>
-            <param name="QueryName"></param>
-            <param name="QueryValue"></param>
-            <param name="AddIfMissing"></param>
+            <param name="sourceQueryString"></param>
+            <param name="key"></param>
+            <param name="value"></param>
+            <param name="addIfMissing"></param>
             <returns></returns>
         </member>
         <member name="M:Contensive.BaseClasses.CPUtilsBaseClass.ModifyQueryString(System.String,System.String,System.DateTime)">
             <summary>
             Update or add a key=value pair within key value pair string like "key=value&amp;key=value"
             </summary>
-            <param name="WorkingQuery"></param>
-            <param name="QueryName"></param>
-            <param name="QueryValue"></param>
+            <param name="sourceQueryString"></param>
+            <param name="key"></param>
+            <param name="value"></param>
             <returns></returns>
         </member>
         <member name="M:Contensive.BaseClasses.CPUtilsBaseClass.ModifyQueryString(System.String,System.String,System.DateTime,System.Boolean)">
             <summary>
             Update or add a key=value pair within key value pair string like "key=value&amp;key=value"
             </summary>
-            <param name="WorkingQuery"></param>
-            <param name="QueryName"></param>
-            <param name="QueryValue"></param>
-            <param name="AddIfMissing"></param>
+            <param name="sourceQueryString"></param>
+            <param name="key"></param>
+            <param name="value"></param>
+            <param name="addIfMissing"></param>
             <returns></returns>
         </member>
         <member name="M:Contensive.BaseClasses.CPUtilsBaseClass.SeparateURL(System.String,System.String@,System.String@,System.String@,System.String@,System.String@)">
             <summary>
             return the components of a url
             </summary>
-            <param name="url"></param>
+            <param name="sourceUrl"></param>
             <param name="return_protocol"></param>
             <param name="return_domain"></param>
             <param name="return_path"></param>
@@ -7389,7 +7639,7 @@
             <summary>
             return the components of a url
             </summary>
-            <param name="url"></param>
+            <param name="sourceUrl"></param>
             <param name="return_protocol"></param>
             <param name="return_domain"></param>
             <param name="return_port"></param>
