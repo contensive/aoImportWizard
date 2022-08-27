@@ -1,9 +1,9 @@
 ﻿
-Imports Contensive.Addons.ImportWizard.Controllers
+Imports Contensive.ImportWizard.Controllers
 Imports Contensive.BaseClasses
 Imports Contensive.Models.Db
 
-Namespace Addons
+Namespace Contensive.ImportWizard.Addons
     '
     '========================================================================
     '

@@ -7,7 +7,8 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{5A2EAEEE-CDFE-4E0B-BF3C-EE50C0BA76F0}</ProjectGuid>
     <OutputType>Library</OutputType>
-    <RootNamespace>Contensive.Addons.ImportWizard</RootNamespace>
+    <RootNamespace>
+    </RootNamespace>
     <AssemblyName>aoImportWizard</AssemblyName>
     <MyType>Windows</MyType>
     <SccProjectName>
@@ -73,6 +74,9 @@
     <Reference Include="CPBase, Version=4.1.2.0, Culture=neutral, PublicKeyToken=10b3c53389b845fb, processorArchitecture=MSIL">
       <HintPath>packages\Contensive.CPBaseClass.22.8.16.1\lib\net472\CPBase.dll</HintPath>
     </Reference>
+    <Reference Include="PortalFramework, Version=21.11.11.0, Culture=neutral, PublicKeyToken=df99052d01433f97, processorArchitecture=MSIL">
+      <HintPath>packages\Contensive.PortalApi.22.8.21.1\lib\net472\PortalFramework.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Web.Extensions" />
@@ -88,13 +92,17 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="constants.vb" />
-    <Compile Include="Controllers\applicationController.vb" />
+    <Compile Include="Controllers\ApplicationController.vb" />
     <Compile Include="Addons\ImportTask.vb" />
     <Compile Include="Addons\ImportWizardAddon.vb" />
+    <Compile Include="Controllers\HtmlController.vb" />
+    <Compile Include="Controllers\WizardController.vb" />
+    <Compile Include="Controllers\MapController.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
       <AutoGen>True</AutoGen>
       <DependentUpon>Application.myapp</DependentUpon>
+      <DesignTime>True</DesignTime>
     </Compile>
     <Compile Include="My Project\Resources.Designer.vb">
       <AutoGen>True</AutoGen>
@@ -106,6 +114,9 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
+    <Compile Include="Views\SelectSourceView.vb" />
+    <Compile Include="Views\UploadView.vb" />
+    <Compile Include="Views\_blankView.vb" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="My Project\Resources.resx">
@@ -130,7 +141,7 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Controllers\genericController.vb" />
+    <Compile Include="Controllers\GenericController.vb" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Resources\Importwizard2layout.txt" />
@@ -140,7 +151,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Models\" />
-    <Folder Include="Views\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.VisualBasic.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

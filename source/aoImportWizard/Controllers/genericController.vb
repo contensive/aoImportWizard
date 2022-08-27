@@ -1,7 +1,7 @@
 ﻿
 Imports Contensive.BaseClasses
 
-Namespace Controllers
+Namespace Contensive.ImportWizard.Controllers
     Public NotInheritable Class GenericController
         Private Sub New()
         End Sub
@@ -457,7 +457,7 @@ Namespace Controllers
         '
         '
         '
-        Private Shared Function firstNonZero(a As Integer, b As Integer) As Integer
+        Public Shared Function firstNonZero(a As Integer, b As Integer) As Integer
             Dim v As Integer
             v = kmaGetFirstNonZeroLong(a, b)
             If v = 1 Then
