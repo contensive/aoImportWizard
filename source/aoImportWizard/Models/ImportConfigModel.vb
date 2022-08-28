@@ -1,13 +1,13 @@
 ﻿
 
 Namespace Contensive.ImportWizard.Models
-    Public Class ImportDataModel
+    Public Class ImportConfigModel
         Public Property importSource As ImportDataModel_ImportTypeEnum
         ''' <summary>
         ''' the uploaded data filename
         ''' </summary>
         ''' <returns></returns>
-        Public Property privateCsvPathFilename As String
+        Public Property privateUploadPathFilename As String
         '
         Public Property importMapPathFilename As String
         '
@@ -23,16 +23,17 @@ Namespace Contensive.ImportWizard.Models
         ''' </summary>
         ''' <param name="app"></param>
         ''' <returns></returns>
-        Public Shared Function create(app As ApplicationModel) As ImportDataModel
-            Dim result As ImportDataModel = app.cp.Visit.GetObject(Of ImportDataModel)("ImportWizardData")
+        Public Shared Function create(app As ApplicationModel) As ImportConfigModel
+            Dim result As ImportConfigModel = app.cp.Visit.GetObject(Of ImportConfigModel)("ImportWizardData")
             '
             ' -- return data
             If result IsNot Nothing Then Return result
             '
             ' -- return default
-            result = New ImportDataModel()
+            Dim rightNow As DateTime = Now
+            result = New ImportConfigModel()
             result.importSource = ImportDataModel_ImportTypeEnum.UploadFile
-            result.importMapPathFilename = "ImportWizard\ImportMap" & app.cp.Utils.GetRandomInteger & ".txt"
+            result.importMapPathFilename = constants.privateFilesMapFolder & "user" & app.cp.User.Id & "\map" & "-" & rightNow.Year & "-" & rightNow.Month & "-" & rightNow.Day & "-" & rightNow.Hour & "-" & rightNow.Minute & "-" & rightNow.Second & ".txt"
             result.save(app)
             Return result
         End Function

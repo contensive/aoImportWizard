@@ -1,6 +1,8 @@
 ﻿
+Imports System.Linq
 Imports Contensive.BaseClasses
 Imports Contensive.ImportWizard.Models
+Imports Contensive.Models.Db
 
 Namespace Contensive.ImportWizard.Controllers
     Public Class SelectTableView
@@ -18,14 +20,14 @@ Namespace Contensive.ImportWizard.Controllers
                 If Button = ButtonCancel Then
                     '
                     ' Cancel
-                    ImportDataModel.clear(app)
+                    ImportConfigModel.clear(app)
                     Return viewIdReturnBlank
                 End If
                 '
                 ' Load the importmap with what we have so far
                 '
-                Dim importData As ImportDataModel = ImportDataModel.create(app)
-                Dim ImportMap As ImportMapModel = ImportMapModel.create(cp, importData)
+                Dim importConfig As ImportConfigModel = ImportConfigModel.create(app)
+                Dim ImportMap As ImportMapModel = ImportMapModel.create(cp, importConfig)
 
 
                 Dim useNewContentName As Boolean = cp.Doc.GetBoolean("useNewContentName")
@@ -34,11 +36,11 @@ Namespace Contensive.ImportWizard.Controllers
                     ImportMap.contentName = newContentName
                     ImportMap.importToNewContent = True
                     ImportMap.skipRowCnt = 1
-                    Call ImportMap.save(app)
+                    Call ImportMap.save(app, importConfig)
                     'Call WizardController.saveWizardRequestInteger(cp, RequestNameImportContentID)
                     Select Case Button
                         Case ButtonCancel
-                            ImportDataModel.clear(app)
+                            ImportConfigModel.clear(app)
                             Return viewIdReturnBlank
                         Case ButtonFinish
                             Return viewIdSelectSource
@@ -50,8 +52,38 @@ Namespace Contensive.ImportWizard.Controllers
                             Return viewIdSelectTable
                     End Select
                 Else
-                    importData.dstContentId = cp.Doc.GetInteger(RequestNameImportContentID)
-                    importData.save(app)
+                    If (importConfig.dstContentId = cp.Doc.GetInteger(RequestNameImportContentID)) Then
+                        '
+                        ' -- no change, use existing import map
+                    Else
+                        '
+                        ' -- content changed, reset import map
+
+                        importConfig.dstContentId = cp.Doc.GetInteger(RequestNameImportContentID)
+                        importConfig.save(app)
+                        ImportMap.contentName = cp.Content.GetName(importConfig.dstContentId)
+
+                        Dim dbFieldNames() As String = Split(GenericController.getDbFieldList(cp, ImportMap.contentName, False), ",")
+                        Dim dbFieldNameCnt As Integer = UBound(dbFieldNames) + 1
+                        ImportMap.mapPairCnt = dbFieldNameCnt
+                        ReDim ImportMap.mapPairs(dbFieldNameCnt - 1)
+                        For rowPtr As Integer = 0 To dbFieldNameCnt - 1
+                            '
+                            ' -- set to manual value
+                            Dim dbField As ContentFieldModel = Nothing
+                            Dim dbFieldList As List(Of ContentFieldModel) = DbBaseModel.createList(Of ContentFieldModel)(cp, "(name=" & cp.Db.EncodeSQLText(dbFieldNames(rowPtr)) & ")And(contentid=" & importConfig.dstContentId & ")")
+                            If dbFieldList.Count > 0 Then
+                                dbField = dbFieldList.First()
+                            End If
+                            ImportMap.mapPairs(rowPtr) = New ImportMapModel_MapPair With {
+                            .uploadFieldPtr = -1,
+                            .dbFieldName = dbFieldNames(rowPtr),
+                            .dbFieldType = dbField.type,
+                            .setValue = ""
+                        }
+                        Next
+                        ImportMap.save(app, importConfig)
+                    End If
                     '
                     Select Case Button
                         Case ButtonBack2
@@ -80,11 +112,11 @@ Namespace Contensive.ImportWizard.Controllers
                 Dim cp As CPBaseClass = app.cp
                 Dim headerCaption As String = "Import Wizard"
 
-                Dim importData As ImportDataModel = ImportDataModel.create(app)
-                Dim ImportMap As ImportMapModel = ImportMapModel.create(cp, importData)
-                Dim ImportContentID As Integer = importData.dstContentId
+                Dim importConfig As ImportConfigModel = ImportConfigModel.create(app)
+                Dim ImportMap As ImportMapModel = ImportMapModel.create(cp, importConfig)
+                Dim ImportContentID As Integer = importConfig.dstContentId
                 If ImportContentID = 0 Then
-                    ImportContentID = cp.Content.GetID("People")
+                    ImportContentID = app.peopleContentid
                 End If
                 Dim inputRadioNewContent As String
                 Dim inputRadioExistingContent As String

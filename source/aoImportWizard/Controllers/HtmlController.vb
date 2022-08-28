@@ -47,6 +47,29 @@ Namespace Contensive.ImportWizard.Controllers
                 Throw
             End Try
         End Function
-
+        '
+        '====================================================================================================
+        ''' <summary>
+        ''' Get an html select with teh current content's fields
+        ''' </summary>
+        ''' <param name="cp"></param>
+        ''' <param name="ContentName"></param>
+        ''' <param name="NoneCaption"></param>
+        ''' <param name="AllowID"></param>
+        ''' <returns></returns>
+        Public Shared Function getDbFieldSelect(cp As CPBaseClass, ContentName As String, NoneCaption As String, AllowID As Boolean) As String
+            Try
+                '
+                Dim result As String = "" _
+                & "<select class=""form-control"" name=xxxx><option value="""" style=""Background-color:#E0E0E0;"">" & NoneCaption & "</option>" _
+                & "<option>" & Replace(GenericController.getDbFieldList(cp, ContentName, AllowID), ",", "</option><option>") & "</option>" _
+                & "</select>"
+                '
+                Return result
+            Catch ex As Exception
+                cp.Site.ErrorReport(ex)
+                Throw
+            End Try
+        End Function
     End Class
 End Namespace

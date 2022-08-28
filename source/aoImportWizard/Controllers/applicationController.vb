@@ -15,9 +15,18 @@ Namespace Contensive.ImportWizard.Models
         '
         Public ReadOnly cp As CPBaseClass
         '
-        Public ReadOnly Property wizard As New WizardType
+        Public ReadOnly Property peopleContentid As Integer
+            Get
+                If peopleContentid_Local IsNot Nothing Then Return CInt(peopleContentid_Local)
+                peopleContentid_Local = cp.Content.GetID("people")
+                Return CInt(peopleContentid_Local)
+            End Get
+        End Property
+        Private peopleContentid_Local As Integer? = Nothing
+        '
+        'Public ReadOnly Property wizard As New WizardType
         Public Property sourceFieldCnt As Integer
-        Public Property sourceFields As String()
+        Public Property uploadFields As String()
         '
         '====================================================================================================
         ''' <summary>

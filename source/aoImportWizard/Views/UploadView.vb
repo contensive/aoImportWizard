@@ -18,7 +18,7 @@ Namespace Contensive.ImportWizard.Controllers
                 If Button = ButtonCancel Then
                     '
                     ' Cancel
-                    ImportDataModel.clear(app)
+                    ImportConfigModel.clear(app)
                     Return viewIdReturnBlank
                 End If
                 '
@@ -33,14 +33,14 @@ Namespace Contensive.ImportWizard.Controllers
                         Dim Filename As String = app.cp.Doc.GetText(RequestNameImportUpload)
                         If String.IsNullOrEmpty(Filename) Then Return viewIdSelectSource
                         '
-                        Dim importData As ImportDataModel = ImportDataModel.create(app)
-                        If Not app.cp.PrivateFiles.SaveUpload(RequestNameImportUpload, "importWizardUploads", importData.privateCsvPathFilename) Then
+                        Dim importConfig As ImportConfigModel = ImportConfigModel.create(app)
+                        If Not app.cp.PrivateFiles.SaveUpload(RequestNameImportUpload, privateFilesUploadPath, importConfig.privateUploadPathFilename) Then
                             '
                             ' -- upload failed, stay on this view
                             Return srcViewId
                         End If
-                        importData.privateCsvPathFilename = "importWizardUploads/" & importData.privateCsvPathFilename
-                        importData.save(app)
+                        importConfig.privateUploadPathFilename = privateFilesUploadPath & importConfig.privateUploadPathFilename
+                        importConfig.save(app)
                         '
                         Return viewIdSelectTable
                 End Select

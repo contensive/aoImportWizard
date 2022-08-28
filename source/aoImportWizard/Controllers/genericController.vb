@@ -27,10 +27,10 @@ Namespace Contensive.ImportWizard.Controllers
                 '
                 Dim result As String = ""
                 result = "<select name={{inputName}} class=""form-control js-import-select"" id=""js-import-select-{{fieldId}}"">"
-                result &= "<option value=-1>" & noneCaption & "</option>"
-                result &= "<option value=-2>Set Value</option>"
+                result &= "<option value=""-1"">" & noneCaption & "</option>"
+                result &= "<option value=""-2"">Set Value</option>"
                 For Ptr As Integer = 0 To app.sourceFieldCnt - 1
-                    result &= "<option value=""" & Ptr & """>column " & (Ptr + 1) & " (" & If(String.IsNullOrEmpty(app.sourceFields(Ptr)), "[blank]", app.sourceFields(Ptr)) & ")</option>"
+                    result &= "<option value=""" & Ptr & """>column " & (Ptr + 1) & " (" & If(String.IsNullOrEmpty(app.uploadFields(Ptr)), "[blank]", app.uploadFields(Ptr)) & ")</option>"
                 Next
                 result &= "</select>"
                 Return result
@@ -467,12 +467,12 @@ Namespace Contensive.ImportWizard.Controllers
                 '
                 If Not String.IsNullOrEmpty(Filename) Then
                     If app.sourceFieldCnt = 0 Then
-                        FileData = cp.CdnFiles.Read(Filename)
+                        FileData = cp.PrivateFiles.Read(Filename)
                         If Not String.IsNullOrEmpty(FileData) Then
                             '
                             ' Build FileColumns
                             '
-                            Call parseLine(FileData, 1, app.sourceFields, ignoreLong, ignoreBoolean)
+                            Call parseLine(FileData, 1, app.uploadFields, ignoreLong, ignoreBoolean)
                             '
                             ' todo - implement new fields to allow name/firstname/lastname population
                             'For Each field As String In sourceFields
@@ -495,7 +495,7 @@ Namespace Contensive.ImportWizard.Controllers
                             '    ' -- add firstname and lastname from name
                             '    sourceFields.Append("First-Name Last-Name")
                             'End If
-                            app.sourceFieldCnt = UBound(app.sourceFields) + 1
+                            app.sourceFieldCnt = UBound(app.uploadFields) + 1
                         End If
                     End If
                 End If

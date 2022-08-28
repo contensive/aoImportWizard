@@ -98,7 +98,7 @@
     <Compile Include="Controllers\HtmlController.vb" />
     <Compile Include="Controllers\WizardController.vb" />
     <Compile Include="Controllers\MapController.vb" />
-    <Compile Include="Models\ImportDataModel.vb" />
+    <Compile Include="Models\ImportConfigModel.vb" />
     <Compile Include="Models\ImportMapModel.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">

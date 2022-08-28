@@ -3,6 +3,7 @@ Imports Contensive.ImportWizard.Controllers
 Imports Contensive.BaseClasses
 Imports Contensive.Models.Db
 Imports Contensive.ImportWizard.Models
+Imports ImportMapModel
 
 Namespace Contensive.ImportWizard.Addons
     '
@@ -122,8 +123,8 @@ Namespace Contensive.ImportWizard.Addons
                 End If
 
                 hint = "020"
-                Dim importdata As ImportDataModel = ImportDataModel.create(app)
-                Dim importMap As ImportMapModel = ImportMapModel.create(cp, importdata)
+                Dim importConfig As ImportConfigModel = ImportConfigModel.create(app)
+                Dim importMap As ImportMapModel = ImportMapModel.create(cp, importConfig)
                 hint = "040"
                 Dim cells As String(,) = GenericController.parseFile(source)
                 Dim colCnt As Integer = UBound(cells, 1) + 1
@@ -161,10 +162,10 @@ Namespace Contensive.ImportWizard.Addons
                         If (String.IsNullOrEmpty(dBFieldName)) Then
                             dBFieldName = "field" & colPtr
                         End If
-                        importMap.mapPairs(colPtr).dbField = dBFieldName
+                        importMap.mapPairs(colPtr).dbFieldName = dBFieldName
                         importMap.mapPairs(colPtr).dbFieldType = 2
-                        importMap.mapPairs(colPtr).sourceFieldName = dBFieldName
-                        importMap.mapPairs(colPtr).sourceFieldPtr = colPtr
+                        importMap.mapPairs(colPtr).uploadFieldName = dBFieldName
+                        importMap.mapPairs(colPtr).uploadFieldPtr = colPtr
                         hint = "090"
                         cp.Content.AddContentField(importMap.contentName, dBFieldName, 2)
                     Next
@@ -269,7 +270,7 @@ Namespace Contensive.ImportWizard.Addons
                                 ' Build Update SQL
                                 For fieldPtr = 0 To importMap.mapPairCnt - 1
                                     hint = "500"
-                                    Dim sourcePtr As Integer = importMap.mapPairs(fieldPtr).sourceFieldPtr
+                                    Dim sourcePtr As Integer = importMap.mapPairs(fieldPtr).uploadFieldPtr
                                     If sourcePtr < 0 Then
                                         '
                                         ' Bad pointer
@@ -282,7 +283,7 @@ Namespace Contensive.ImportWizard.Addons
                                         sourcePtr = sourcePtr
                                     Else
                                         hint = "600"
-                                        dBFieldName = importMap.mapPairs(fieldPtr).dbField
+                                        dBFieldName = importMap.mapPairs(fieldPtr).dbFieldName
                                         Dim sourceData As String = cells(sourcePtr, rowPtr)
                                         rowWidth += Len(Trim(sourceData))
                                         ' there are no fieldtypes defined as 0, and I do not want the CS open now, so we can avoid the insert if rowwidth=0

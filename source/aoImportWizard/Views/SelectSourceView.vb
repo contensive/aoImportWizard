@@ -18,13 +18,13 @@ Namespace Contensive.ImportWizard.Controllers
                 If Button = ButtonCancel Then
                     '
                     ' Cancel
-                    ImportDataModel.clear(app)
+                    ImportConfigModel.clear(app)
                     Return viewIdReturnBlank
                 End If
                 '
-                Dim importData As ImportDataModel = ImportDataModel.create(app)
-                importData.importSource = CType(app.cp.Doc.GetInteger(RequestNameImportSource), ImportDataModel_ImportTypeEnum)
-                importData.save(app)
+                Dim importConfig As ImportConfigModel = ImportConfigModel.create(app)
+                importConfig.importSource = CType(app.cp.Doc.GetInteger(RequestNameImportSource), ImportDataModel_ImportTypeEnum)
+                importConfig.save(app)
                 '
                 Select Case Button
                     Case ButtonBack
@@ -32,7 +32,7 @@ Namespace Contensive.ImportWizard.Controllers
                         Return srcViewId
                     Case ButtonContinue2
                         '
-                        Select Case importData.importSource
+                        Select Case importConfig.importSource
                             Case ImportDataModel_ImportTypeEnum.UploadFile
                                 '
                                 ' -- upload a commad delimited file
@@ -74,9 +74,9 @@ Namespace Contensive.ImportWizard.Controllers
                 'Return layout.getHtml(app.cp)
 
                 Dim cp As CPBaseClass = app.cp
-                Dim importData As ImportDataModel = ImportDataModel.create(app)
+                Dim importConfig As ImportConfigModel = ImportConfigModel.create(app)
                 Dim headerCaption As String = "Import Wizard"
-                Dim importSource As Integer = Convert.ToInt32(importData.importSource)
+                Dim importSource As Integer = Convert.ToInt32(importConfig.importSource)
                 Dim description As String = cp.Html.h4("Select the import source") & cp.Html.p("There are several sources you can use for your data")
                 Dim content As String = "" _
                     & "<div>" _

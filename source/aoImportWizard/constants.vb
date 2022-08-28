@@ -4,6 +4,13 @@ Imports Contensive.BaseClasses
 Namespace Contensive.ImportWizard
     Public Module constants
         '
+        ' Upload paths ('path' always ha a trailing slash and no leading slash)
+        Public Const privateFilesUploadPath As String = "importwizard\uploads\"
+        ''' <summary>
+        ''' maps are stored in this path, in a folder with the word 'user' + user's id
+        ''' </summary>
+        Public Const privateFilesMapFolder As String = "importwizard\maps\"
+        '
         ' views
         '
         Public Const viewIdSelectSource As Integer = 1

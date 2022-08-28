@@ -61,8 +61,8 @@ Namespace Contensive.ImportWizard.Addons
                             '
                             ' Select Key Field
                             '
-                            Dim importData = ImportDataModel.create(app)
-                            Dim ImportMap As ImportMapModel = ImportMapModel.create(CP, importData)
+                            Dim importConfig = ImportConfigModel.create(app)
+                            Dim ImportMap As ImportMapModel = ImportMapModel.create(CP, importConfig)
                             ImportMap.keyMethodID = CP.Doc.GetInteger(RequestNameImportKeyMethodID)
                             ImportMap.sourceKeyField = CP.Doc.GetText(RequestNameImportSourceKeyFieldPtr)
                             ImportMap.dbKeyField = CP.Doc.GetText(RequestNameImportDbKeyField)
@@ -72,14 +72,23 @@ Namespace Contensive.ImportWizard.Addons
                                     ImportMap.dbKeyFieldType = fieldList.First().type
                                 End If
                             End If
-                            ImportMap.save(app)
+                            ImportMap.save(app, importConfig)
 
                             Dim Button As String = CP.Doc.GetText(RequestNameButton)
                             Select Case Button
                                 Case ButtonBack2
-                                    viewId = previousSubFormID(app, viewId)
+                                    '
+                                    ' -- back to mapping
+                                    viewId = viewIdNewMapping
                                 Case ButtonContinue2
-                                    viewId = nextSubFormID(app, viewId)
+                                    '
+                                    ' -- continue to Select Group or finish
+                                    If importConfig.dstContentId = app.peopleContentid Then
+                                        viewId = viewIdSelectGroup
+                                    Else
+                                        viewId = viewIdFinish
+                                    End If
+                                    'viewId = nextSubFormID(app, viewId)
                             End Select
                         Case viewIdSelectGroup
                             '
@@ -103,22 +112,26 @@ Namespace Contensive.ImportWizard.Addons
                                 End If
 
                             End If
-                            Dim importData = ImportDataModel.create(app)
-                            Dim ImportMap As ImportMapModel = ImportMapModel.create(CP, importData)
+                            Dim importConfig = ImportConfigModel.create(app)
+                            Dim ImportMap As ImportMapModel = ImportMapModel.create(CP, importConfig)
                             If newGroupID <> 0 Then
                                 ImportMap.groupID = newGroupID
                             Else
                                 ImportMap.groupID = CP.Doc.GetInteger(RequestNameImportGroupID)
                             End If
                             ImportMap.groupOptionID = CP.Doc.GetInteger(RequestNameImportGroupOptionID)
-                            ImportMap.save(app)
+                            ImportMap.save(app, importConfig)
 
                             Dim Button As String = CP.Doc.GetText(RequestNameButton)
                             Select Case Button
                                 Case ButtonBack2
-                                    viewId = previousSubFormID(app, viewId)
+                                    '
+                                    ' -- back to select key
+                                    viewId = viewIdSelectKey
                                 Case ButtonContinue2
-                                    viewId = nextSubFormID(app, viewId)
+                                    '
+                                    ' -- continue to finish
+                                    viewId = viewIdFinish
                             End Select
                         Case viewIdFinish
                             '
@@ -127,20 +140,22 @@ Namespace Contensive.ImportWizard.Addons
                             Dim Button As String = CP.Doc.GetText(RequestNameButton)
                             Select Case Button
                                 Case ButtonBack2
-                                    viewId = previousSubFormID(app, viewId)
+                                    '
+                                    ' -- back to select key
+                                    viewId = viewIdSelectKey
                                 Case ButtonFinish
-                                    Dim importData As ImportDataModel = ImportDataModel.create(app)
+                                    Dim importConfig As ImportConfigModel = ImportConfigModel.create(app)
                                     Dim ImportWizardTasks = DbBaseModel.addDefault(Of ImportWizardTaskModel)(CP)
                                     If (ImportWizardTasks IsNot Nothing) Then
                                         ImportWizardTasks.name = Now() & " CSV Import" 'Call Main.SetCS(CS, "Name", Now() & " CSV Import")
-                                        ImportWizardTasks.uploadFilename = importData.privateCsvPathFilename
-                                        ImportWizardTasks.notifyEmail = importData.notifyEmail
-                                        ImportWizardTasks.importMapFilename = importData.importMapPathFilename
+                                        ImportWizardTasks.uploadFilename = importConfig.privateUploadPathFilename
+                                        ImportWizardTasks.notifyEmail = importConfig.notifyEmail
+                                        ImportWizardTasks.importMapFilename = importConfig.importMapPathFilename
                                         ImportWizardTasks.save(CP)
                                     End If
                                     CP.Addon.ExecuteAsProcess(guidAddonImportTask)
                                     '
-                                    viewId = nextSubFormID(app, viewId)
+                                    viewId = viewIdReturnBlank
                             End Select
                         Case viewIdDone
                             '
@@ -186,8 +201,8 @@ Namespace Contensive.ImportWizard.Addons
                             Dim headerCaption As String = "Import Wizard"
                             Dim SourceKeyFieldPtr As Integer
                             Dim DbKeyField As String = ""
-                            Dim importData As ImportDataModel = ImportDataModel.create(app)
-                            Dim ImportMap As ImportMapModel = ImportMapModel.create(CP, importData)
+                            Dim importConfig As ImportConfigModel = ImportConfigModel.create(app)
+                            Dim ImportMap As ImportMapModel = ImportMapModel.create(CP, importConfig)
 
                             Dim KeyMethodID As Integer = CP.Utils.EncodeInteger(ImportMap.keyMethodID)
                             If KeyMethodID = 0 Then
@@ -199,12 +214,12 @@ Namespace Contensive.ImportWizard.Addons
                             Else
                                 SourceKeyFieldPtr = -1
                             End If
-                            Dim Filename As String = importData.privateCsvPathFilename
+                            Dim Filename As String = importConfig.privateUploadPathFilename
                             SourceFieldSelect = Replace(getSourceFieldSelect(app, Filename, "Select One"), "xxxx", RequestNameImportSourceKeyFieldPtr)
                             SourceFieldSelect = Replace(SourceFieldSelect, "value=" & SourceKeyFieldPtr, "value=" & SourceKeyFieldPtr & " selected", , , vbTextCompare)
                             '
-                            Dim PeopleContentID As Integer = CP.Content.GetID("people")
-                            Dim ImportContentID As Integer = importData.dstContentId
+                            'Dim PeopleContentID As Integer = CP.Content.GetID("people")
+                            Dim ImportContentID As Integer = importConfig.dstContentId
                             ImportContentName = CP.Content.GetRecordName("content", ImportContentID)
                             Dim note As String
 
@@ -214,8 +229,8 @@ Namespace Contensive.ImportWizard.Addons
                             '
                             DbKeyField = ImportMap.dbKeyField
                             Dim LookupContentName As String
-                            LookupContentName = CP.Content.GetRecordName("content", importData.dstContentId)
-                            DBFieldSelect = Replace(getDbFieldSelect(CP, LookupContentName, "Select One", True), "xxxx", RequestNameImportDbKeyField)
+                            LookupContentName = CP.Content.GetRecordName("content", importConfig.dstContentId)
+                            DBFieldSelect = Replace(HtmlController.getDbFieldSelect(CP, LookupContentName, "Select One", True), "xxxx", RequestNameImportDbKeyField)
                             DBFieldSelect = Replace(DBFieldSelect, ">" & DbKeyField & "<", " selected>" & DbKeyField & "<", , , vbTextCompare)
                             note = ""
                             '
@@ -247,8 +262,8 @@ Namespace Contensive.ImportWizard.Addons
 
                             Dim headerCaption As String = "Import Wizard"
 
-                            Dim importData As ImportDataModel = ImportDataModel.create(app)
-                            Dim ImportMap As ImportMapModel = ImportMapModel.create(CP, importData)
+                            Dim importConfig As ImportConfigModel = ImportConfigModel.create(app)
+                            Dim ImportMap As ImportMapModel = ImportMapModel.create(CP, importConfig)
 
 
                             Dim GroupOptionID = ImportMap.groupOptionID
@@ -309,92 +324,69 @@ Namespace Contensive.ImportWizard.Addons
                 Throw
             End Try
         End Function
-        '
-        '=====================================================================================
-        ''' <summary>
-        ''' Wrap the wizard content in a form
-        ''' </summary>
-        ''' <param name="cp"></param>
-        ''' <param name="wizardContent"></param>
-        ''' <returns></returns>
-        Private ReadOnly Property getAdminFormBody(cp As CPBaseClass, wizardContent As String) As String
-            Get
-                Try
-                    Return cp.Html.Form(cp.Html.div(wizardContent))
-                Catch ex As Exception
-                    cp.Site.ErrorReport(ex)
-                    Throw
-                End Try
-            End Get
-        End Property
-        '
-        '=====================================================================================
-        ''' <summary>
-        ''' Get next wizard form
-        ''' </summary>
-        ''' <param name="SubformID"></param>
-        ''' <returns></returns>
-        Private Function nextSubFormID(app As ApplicationModel, SubformID As Integer) As Integer
-            Try
-                Dim Ptr As Integer = 0
-                Do While Ptr < viewIdMax
-                    If SubformID = app.wizard.Path(Ptr) Then
-                        nextSubFormID = app.wizard.Path(Ptr + 1)
-                        Exit Do
-                    End If
-                    Ptr += 1
-                Loop
-            Catch ex As Exception
-                Throw
-            End Try
-        End Function
-        '
-        '=====================================================================================
-        ''' <summary>
-        ''' get previous wizard form
-        ''' </summary>
-        ''' <param name="SubformID"></param>
-        ''' <returns></returns>
-        Private Function previousSubFormID(app As ApplicationModel, SubformID As Integer) As Integer
-            Try
-                Dim Ptr As Integer
-                '
-                Ptr = 1
-                Do While Ptr < viewIdMax
-                    If SubformID = app.wizard.Path(Ptr) Then
-                        previousSubFormID = app.wizard.Path(Ptr - 1)
-                        Exit Do
-                    End If
-                    Ptr += 1
-                Loop
-            Catch ex As Exception
-                Throw
-            End Try
-        End Function
-        '
-        '====================================================================================================
-        ''' <summary>
-        ''' Get an html select with teh current content's fields
-        ''' </summary>
-        ''' <param name="cp"></param>
-        ''' <param name="ContentName"></param>
-        ''' <param name="NoneCaption"></param>
-        ''' <param name="AllowID"></param>
-        ''' <returns></returns>
-        Private Function getDbFieldSelect(cp As CPBaseClass, ContentName As String, NoneCaption As String, AllowID As Boolean) As String
-            Try
-                '
-                Dim result As String = "" _
-                & "<select class=""form-control"" name=xxxx><option value="""" style=""Background-color:#E0E0E0;"">" & NoneCaption & "</option>" _
-                & "<option>" & Replace(getDbFieldList(cp, ContentName, AllowID), ",", "</option><option>") & "</option>" _
-                & "</select>"
-                '
-                Return result
-            Catch ex As Exception
-                cp.Site.ErrorReport(ex)
-                Throw
-            End Try
-        End Function
+        ''
+        ''=====================================================================================
+        '''' <summary>
+        '''' Wrap the wizard content in a form
+        '''' </summary>
+        '''' <param name="cp"></param>
+        '''' <param name="wizardContent"></param>
+        '''' <returns></returns>
+        'Private ReadOnly Property getAdminFormBody(cp As CPBaseClass, wizardContent As String) As String
+        '    Get
+        '        Try
+        '            Return cp.Html.Form(cp.Html.div(wizardContent))
+        '        Catch ex As Exception
+        '            cp.Site.ErrorReport(ex)
+        '            Throw
+        '        End Try
+        '    End Get
+        'End Property
+        ''
+        ''=====================================================================================
+        '''' <summary>
+        '''' Get next wizard form
+        '''' </summary>
+        '''' <param name="SubformID"></param>
+        '''' <returns></returns>
+        'Private Function nextSubFormID(app As ApplicationModel, SubformID As Integer) As Integer
+        '    Try
+        '        Dim Ptr As Integer = 0
+        '        Do While Ptr < viewIdMax
+        '            If SubformID = app.wizard.Path(Ptr) Then
+        '                nextSubFormID = app.wizard.Path(Ptr + 1)
+        '                Exit Do
+        '            End If
+        '            Ptr += 1
+        '        Loop
+        '    Catch ex As Exception
+        '        Throw
+        '    End Try
+        'End Function
+        ''
+        ''=====================================================================================
+        '''' <summary>
+        '''' get previous wizard form
+        '''' </summary>
+        '''' <param name="SubformID"></param>
+        '''' <returns></returns>
+        'Private Function previousSubFormID(app As ApplicationModel, SubformID As Integer) As Integer
+        '    Try
+        '        Dim Ptr As Integer
+        '        '
+        '        Ptr = 1
+        '        Do While Ptr < viewIdMax
+        '            If SubformID = app.wizard.Path(Ptr) Then
+        '                previousSubFormID = app.wizard.Path(Ptr - 1)
+        '                Exit Do
+        '            End If
+        '            Ptr += 1
+        '        Loop
+        '    Catch ex As Exception
+        '        Throw
+        '    End Try
+        'End Function
+
 
     End Class
 End Namespace
