@@ -1,7 +1,6 @@
 ﻿
 Imports Contensive.BaseClasses
-Imports Contensive.Addons.PortalFramework
-Imports System.Text
+Imports Contensive.ImportWizard.Models
 
 Namespace Contensive.ImportWizard.Controllers
     Public Class SelectSourceView
@@ -11,37 +10,39 @@ Namespace Contensive.ImportWizard.Controllers
         ''' </summary>
         ''' <param name="app"></param>
         ''' <returns></returns>
-        Public Shared Function processView(app As ApplicationController) As Integer
+        Public Shared Function processView(app As ApplicationModel, srcViewId As Integer) As Integer
             Try
-                Call WizardController.saveWizardRequestInteger(app.cp, RequestNameImportSource)
-                Call WizardController.loadWizardPath(app)
-
+                Dim cp As CPBaseClass = app.cp
                 Dim Button As String = app.cp.Doc.GetText(RequestNameButton)
+                If String.IsNullOrEmpty(Button) Then Return srcViewId
+                If Button = ButtonCancel Then
+                    '
+                    ' Cancel
+                    ImportDataModel.clear(app)
+                    Return viewIdReturnBlank
+                End If
+                '
+                Dim importData As ImportDataModel = ImportDataModel.create(app)
+                importData.importSource = CType(app.cp.Doc.GetInteger(RequestNameImportSource), ImportDataModel_ImportTypeEnum)
+                importData.save(app)
+                '
                 Select Case Button
-                    Case ButtonCancel
+                    Case ButtonBack
                         '
-                        ' Cancel
-                        '
-                        Call WizardController.clearWizardValues(app.cp)
-                        Return viewIdReturnBlank
+                        Return srcViewId
                     Case ButtonContinue2
                         '
-                        Select Case app.cp.Doc.GetInteger("ImportWizardSource")
-                            Case 1
+                        Select Case importData.importSource
+                            Case ImportDataModel_ImportTypeEnum.UploadFile
                                 '
                                 ' -- upload a commad delimited file
                                 Return viewIdUpload
-                            Case 2
+                            Case Else
                                 '
                                 ' -- use a file uploaded previously
                                 Return viewIdSelectFile
-                            Case Else
-                                '
-                                ' -- resource library (not implemented)
-                                Return viewIdResourceLibrary
                         End Select
                 End Select
-                Return viewIdSelectSource
             Catch ex As Exception
                 app.cp.Site.ErrorReport(ex)
                 Throw
@@ -53,7 +54,7 @@ Namespace Contensive.ImportWizard.Controllers
         ''' </summary>
         ''' <param name="app"></param>
         ''' <returns></returns>
-        Public Shared Function getView(app As ApplicationController) As String
+        Public Shared Function getView(app As ApplicationModel) As String
             Try
                 'Dim body As New StringBuilder()
                 'Dim selectedValue As Integer = app.cp.Doc.GetInteger(RequestNameImportSource, ImportSourceUpload)
@@ -73,8 +74,9 @@ Namespace Contensive.ImportWizard.Controllers
                 'Return layout.getHtml(app.cp)
 
                 Dim cp As CPBaseClass = app.cp
+                Dim importData As ImportDataModel = ImportDataModel.create(app)
                 Dim headerCaption As String = "Import Wizard"
-                Dim importSource As Integer = cp.Utils.EncodeInteger(WizardController.getWizardValue(cp, RequestNameImportSource, cp.Utils.EncodeText(ImportSourceUpload)))
+                Dim importSource As Integer = Convert.ToInt32(importData.importSource)
                 Dim description As String = cp.Html.h4("Select the import source") & cp.Html.p("There are several sources you can use for your data")
                 Dim content As String = "" _
                     & "<div>" _
@@ -86,7 +88,8 @@ Namespace Contensive.ImportWizard.Controllers
                     & "</div>" _
                     & "</div>" _
                     & ""
-                Return WizardController.getWizardContent(cp, headerCaption, ButtonCancel, "", ButtonContinue2, description, content)
+                content &= cp.Html5.Hidden(rnSrcViewId, viewIdSelectSource)
+                Return HtmlController.getWizardContent(cp, headerCaption, ButtonCancel, "", ButtonContinue2, description, content)
             Catch ex As Exception
                 app.cp.Site.ErrorReport(ex)
                 Throw

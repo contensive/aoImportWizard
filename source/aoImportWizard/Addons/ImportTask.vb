@@ -2,6 +2,7 @@
 Imports Contensive.ImportWizard.Controllers
 Imports Contensive.BaseClasses
 Imports Contensive.Models.Db
+Imports Contensive.ImportWizard.Models
 
 Namespace Contensive.ImportWizard.Addons
     '
@@ -58,37 +59,39 @@ Namespace Contensive.ImportWizard.Addons
             Try
                 '
                 '   Check this server for anything in the tasks queue
-                Dim taskList As List(Of ImportWizardTaskModel) = DbBaseModel.createList(Of ImportWizardTaskModel)(CP, "DateCompleted is null")
-                For Each task As ImportWizardTaskModel In taskList
-                    task.dateCompleted = Now
-                    Dim previousProcessAborted As Boolean = (task.dateStarted <> Date.MinValue)
-                    If previousProcessAborted Then
-                        task.resultMessage = "This task failed to complete."
-                    Else
-                        '
-                        ' -- Import a CSV file
-                        Dim cvsFilename As String = Replace(task.uploadFilename, "/", "\")
-                        Dim importMapFilename As String = Replace(task.importMapFilename, "/", "\")
-                        Dim resultMessage As String = processCSV(CP, cvsFilename, importMapFilename)
-                        Dim notifyBody As String
-                        If Not String.IsNullOrEmpty(resultMessage) Then
-                            notifyBody = "This email is to notify you that your data import is complete for [" & CP.Site.Name & "]" & vbCrLf & "The following errors occurred during import" & vbCrLf & resultMessage
+                Using app As New ApplicationModel(CP)
+                    Dim taskList As List(Of ImportWizardTaskModel) = DbBaseModel.createList(Of ImportWizardTaskModel)(CP, "DateCompleted is null")
+                    For Each task As ImportWizardTaskModel In taskList
+                        task.dateCompleted = Now
+                        Dim previousProcessAborted As Boolean = (task.dateStarted <> Date.MinValue)
+                        If previousProcessAborted Then
+                            task.resultMessage = "This task failed to complete."
                         Else
-                            notifyBody = "This email is to notify you that your data import is complete for [" & CP.Site.Name & "]"
+                            '
+                            ' -- Import a CSV file
+                            Dim cvsFilename As String = Replace(task.uploadFilename, "/", "\")
+                            Dim importMapFilename As String = Replace(task.importMapFilename, "/", "\")
+                            Dim resultMessage As String = processCSV(app, cvsFilename, importMapFilename)
+                            Dim notifyBody As String
+                            If Not String.IsNullOrEmpty(resultMessage) Then
+                                notifyBody = "This email is to notify you that your data import is complete for [" & CP.Site.Name & "]" & vbCrLf & "The following errors occurred during import" & vbCrLf & resultMessage
+                            Else
+                                notifyBody = "This email is to notify you that your data import is complete for [" & CP.Site.Name & "]"
+                            End If
+                            Dim notifySubject As String = "Import Completed"
+                            If String.IsNullOrEmpty(resultMessage) Then
+                                resultMessage = "OK"
+                            End If
+                            task.resultMessage = If(resultMessage.Length > 255, resultMessage.Substring(0, 254), resultMessage)
+                            If Not String.IsNullOrEmpty(task.notifyEmail) And Not String.IsNullOrEmpty(notifyBody) Then
+                                Dim notifyFromAddress As String = CP.Site.GetText("EmailFromAddress", "")
+                                Call CP.Email.send(task.notifyEmail, notifyFromAddress, "Task Completion Notification", notifyBody)
+                            End If
                         End If
-                        Dim notifySubject As String = "Import Completed"
-                        If String.IsNullOrEmpty(resultMessage) Then
-                            resultMessage = "OK"
-                        End If
-                        task.resultMessage = If(resultMessage.Length > 255, resultMessage.Substring(0, 254), resultMessage)
-                        If Not String.IsNullOrEmpty(task.notifyEmail) And Not String.IsNullOrEmpty(notifyBody) Then
-                            Dim notifyFromAddress As String = CP.Site.GetText("EmailFromAddress", "")
-                            Call CP.Email.send(task.notifyEmail, notifyFromAddress, "Task Completion Notification", notifyBody)
-                        End If
-                    End If
-                    task.save(CP)
-                Next
-                Return Nothing
+                        task.save(CP)
+                    Next
+                    Return Nothing
+                End Using
             Catch ex As Exception
                 CP.Site.ErrorReport(ex)
                 Throw
@@ -99,12 +102,13 @@ Namespace Contensive.ImportWizard.Addons
         ''' <summary>
         ''' process the input csv file
         ''' </summary>
-        ''' <param name="cp"></param>
+        ''' <param name="app"></param>
         ''' <param name="CSVFilename"></param>
         ''' <param name="ImportMapFilename"></param>
         ''' <returns></returns>
-        Private Function processCSV(cp As CPBaseClass, CSVFilename As String, ImportMapFilename As String) As String
+        Private Function processCSV(app As ApplicationModel, CSVFilename As String, ImportMapFilename As String) As String
             Try
+                Dim cp As CPBaseClass = app.cp
                 Dim result As String = ""
                 If Left(CSVFilename, 1) = "\" Then
                     CSVFilename = Mid(CSVFilename, 2)
@@ -118,7 +122,8 @@ Namespace Contensive.ImportWizard.Addons
                 End If
 
                 hint = "020"
-                Dim importMap As ImportMapType = GenericController.loadImportMap(cp, cp.CdnFiles.Read(ImportMapFilename))
+                Dim importdata As ImportDataModel = ImportDataModel.create(app)
+                Dim importMap As ImportMapModel = ImportMapModel.create(cp, importdata)
                 hint = "040"
                 Dim cells As String(,) = GenericController.parseFile(source)
                 Dim colCnt As Integer = UBound(cells, 1) + 1
@@ -129,53 +134,53 @@ Namespace Contensive.ImportWizard.Addons
                 If Not importMap.importToNewContent Then
                     '
                     ' -- set default table to people
-                    If (String.IsNullOrEmpty(importMap.ContentName)) Then
-                        importMap.ContentName = "People"
+                    If (String.IsNullOrEmpty(importMap.contentName)) Then
+                        importMap.contentName = "People"
                     End If
-                    ImportTableName = cp.Content.GetTable(importMap.ContentName)
+                    ImportTableName = cp.Content.GetTable(importMap.contentName)
                 Else
                     '
                     ' create the destination table and import map
-                    importMap.SkipRowCnt = 1
-                    importMap.MapPairCnt = colCnt
-                    ReDim importMap.MapPairs(colCnt - 1)
-                    importMap.MapPairs(colCnt - 1) = New MapPairType
-                    ImportTableName = importMap.ContentName
+                    importMap.skipRowCnt = 1
+                    importMap.mapPairCnt = colCnt
+                    ReDim importMap.mapPairs(colCnt - 1)
+                    importMap.mapPairs(colCnt - 1) = New ImportMapModel_MapPair
+                    ImportTableName = importMap.contentName
                     ImportTableName = Replace(ImportTableName, " ", "_")
                     ImportTableName = Replace(ImportTableName, "-", "_")
                     ImportTableName = Replace(ImportTableName, ",", "_")
                     hint = "060"
-                    cp.Content.AddContent(importMap.ContentName, ImportTableName)
+                    cp.Content.AddContent(importMap.contentName, ImportTableName)
                     hint = "070"
                     Dim colPtr As Integer
                     For colPtr = 0 To colCnt - 1
-                        importMap.MapPairs(colPtr) = New MapPairType
+                        importMap.mapPairs(colPtr) = New ImportMapModel_MapPair
                         hint = "080"
                         dBFieldName = cells(colPtr, 0)
                         dBFieldName = encodeFieldName(cp, dBFieldName)
                         If (String.IsNullOrEmpty(dBFieldName)) Then
                             dBFieldName = "field" & colPtr
                         End If
-                        importMap.MapPairs(colPtr).DbField = dBFieldName
-                        importMap.MapPairs(colPtr).DbFieldType = 2
-                        importMap.MapPairs(colPtr).SourceFieldName = dBFieldName
-                        importMap.MapPairs(colPtr).SourceFieldPtr = colPtr
+                        importMap.mapPairs(colPtr).dbField = dBFieldName
+                        importMap.mapPairs(colPtr).dbFieldType = 2
+                        importMap.mapPairs(colPtr).sourceFieldName = dBFieldName
+                        importMap.mapPairs(colPtr).sourceFieldPtr = colPtr
                         hint = "090"
-                        cp.Content.AddContentField(importMap.ContentName, dBFieldName, 2)
+                        cp.Content.AddContentField(importMap.contentName, dBFieldName, 2)
                     Next
                 End If
 
-                If importMap.MapPairCnt > 0 Then
+                If importMap.mapPairCnt > 0 Then
                     hint = "200"
-                    Dim SourceKeyPtr As Integer = cp.Utils.EncodeInteger(importMap.SourceKeyField)
-                    If (String.IsNullOrEmpty(importMap.DbKeyField)) Or (SourceKeyPtr < 0) Then
-                        importMap.KeyMethodID = KeyMethodInsertAll
+                    Dim SourceKeyPtr As Integer = cp.Utils.EncodeInteger(importMap.sourceKeyField)
+                    If (String.IsNullOrEmpty(importMap.dbKeyField)) Or (SourceKeyPtr < 0) Then
+                        importMap.keyMethodID = KeyMethodInsertAll
                     End If
                     '
                     Dim KeyCriteria As String = "(1=0)"
                     Dim rowPtr As Integer
                     Dim rowCnt As Integer = UBound(cells, 2) + 1
-                    For rowPtr = importMap.SkipRowCnt To rowCnt - 1
+                    For rowPtr = importMap.skipRowCnt To rowCnt - 1
                         hint = "300"
                         Dim updateRecord As Boolean = False
                         Dim insertRecord As Boolean = False
@@ -185,7 +190,7 @@ Namespace Contensive.ImportWizard.Addons
                         End If
                         If True Then
                             hint = "310"
-                            If importMap.KeyMethodID = KeyMethodInsertAll Then
+                            If importMap.keyMethodID = KeyMethodInsertAll Then
                                 hint = "320"
                                 insertRecord = True
                             Else
@@ -200,7 +205,7 @@ Namespace Contensive.ImportWizard.Addons
                                     '
                                     ' Source had no data in key field, insert if allowed
                                     '
-                                    If importMap.KeyMethodID = KeyMethodUpdateOnMatchInsertOthers Then
+                                    If importMap.keyMethodID = KeyMethodUpdateOnMatchInsertOthers Then
                                         insertRecord = True
                                     End If
                                 Else
@@ -208,43 +213,43 @@ Namespace Contensive.ImportWizard.Addons
                                     '
                                     ' Source has good key field data
                                     '
-                                    Select Case importMap.DbKeyFieldType
+                                    Select Case importMap.dbKeyFieldType
                                         Case FieldTypeAutoIncrement, FieldTypeCurrency, FieldTypeFloat, FieldTypeInteger, FieldTypeLookup, FieldTypeManyToMany, FieldTypeMemberSelect
                                             '
                                             ' number
                                             '
                                             updateRecord = True
-                                            KeyCriteria = "(" & importMap.DbKeyField & "=" & cp.Db.EncodeSQLNumber(cp.Utils.EncodeNumber(sourceKeyData)) & ")"
+                                            KeyCriteria = "(" & importMap.dbKeyField & "=" & cp.Db.EncodeSQLNumber(cp.Utils.EncodeNumber(sourceKeyData)) & ")"
                                         Case FieldTypeBoolean
                                             '
                                             ' Boolean
                                             '
                                             updateRecord = True
-                                            KeyCriteria = "(" & importMap.DbKeyField & "=" & cp.Db.EncodeSQLBoolean(cp.Utils.EncodeBoolean(sourceKeyData)) & ")"
+                                            KeyCriteria = "(" & importMap.dbKeyField & "=" & cp.Db.EncodeSQLBoolean(cp.Utils.EncodeBoolean(sourceKeyData)) & ")"
                                         Case FieldTypeDate
                                             '
                                             ' date
                                             '
                                             updateRecord = True
-                                            KeyCriteria = "(" & importMap.DbKeyField & "=" & cp.Db.EncodeSQLDate(cp.Utils.EncodeDate(sourceKeyData)) & ")"
+                                            KeyCriteria = "(" & importMap.dbKeyField & "=" & cp.Db.EncodeSQLDate(cp.Utils.EncodeDate(sourceKeyData)) & ")"
                                         Case FieldTypeText, FieldTypeResourceLink, FieldTypeLink
                                             '
                                             ' text
                                             '
                                             updateRecord = True
-                                            KeyCriteria = "(" & importMap.DbKeyField & "=" & cp.Db.EncodeSQLText(Left(sourceKeyData, 255)) & ")"
+                                            KeyCriteria = "(" & importMap.dbKeyField & "=" & cp.Db.EncodeSQLText(Left(sourceKeyData, 255)) & ")"
                                         Case FieldTypeLongText, FieldTypeHTML
                                             '
                                             ' long text
                                             '
                                             updateRecord = True
-                                            KeyCriteria = "(" & importMap.DbKeyField & "=" & cp.Db.EncodeSQLText(sourceKeyData) & ")"
+                                            KeyCriteria = "(" & importMap.dbKeyField & "=" & cp.Db.EncodeSQLText(sourceKeyData) & ")"
                                         Case Else
                                             '
                                             ' unknown field type
                                             '
                                             updateRecord = True
-                                            If importMap.KeyMethodID = KeyMethodUpdateOnMatchInsertOthers Then
+                                            If importMap.keyMethodID = KeyMethodUpdateOnMatchInsertOthers Then
                                                 insertRecord = True
                                             End If
                                     End Select
@@ -262,9 +267,9 @@ Namespace Contensive.ImportWizard.Addons
                                 Dim fieldPtr As Integer
                                 '
                                 ' Build Update SQL
-                                For fieldPtr = 0 To importMap.MapPairCnt - 1
+                                For fieldPtr = 0 To importMap.mapPairCnt - 1
                                     hint = "500"
-                                    Dim sourcePtr As Integer = importMap.MapPairs(fieldPtr).SourceFieldPtr
+                                    Dim sourcePtr As Integer = importMap.mapPairs(fieldPtr).sourceFieldPtr
                                     If sourcePtr < 0 Then
                                         '
                                         ' Bad pointer
@@ -277,12 +282,12 @@ Namespace Contensive.ImportWizard.Addons
                                         sourcePtr = sourcePtr
                                     Else
                                         hint = "600"
-                                        dBFieldName = importMap.MapPairs(fieldPtr).DbField
+                                        dBFieldName = importMap.mapPairs(fieldPtr).dbField
                                         Dim sourceData As String = cells(sourcePtr, rowPtr)
                                         rowWidth += Len(Trim(sourceData))
                                         ' there are no fieldtypes defined as 0, and I do not want the CS open now, so we can avoid the insert if rowwidth=0
 
-                                        Select Case importMap.MapPairs(fieldPtr).DbFieldType
+                                        Select Case importMap.mapPairs(fieldPtr).dbFieldType
                                             Case FieldTypeAutoIncrement, FieldTypeCurrency, FieldTypeFloat, FieldTypeInteger, FieldTypeLookup, FieldTypeManyToMany, FieldTypeMemberSelect
                                                 '
                                                 ' number, nullable
@@ -347,13 +352,13 @@ Namespace Contensive.ImportWizard.Addons
                                     ' Update requested
                                     matchFound = False
                                     insertRecord = False
-                                    matchFound = cs.Open(importMap.ContentName, KeyCriteria, "ID", False)
+                                    matchFound = cs.Open(importMap.contentName, KeyCriteria, "ID", False)
                                     Call cs.Close()
                                     If matchFound Then
                                         '
                                         ' match was found, update all records found
                                         updateRecord = True
-                                    ElseIf (importMap.KeyMethodID = KeyMethodUpdateOnMatchInsertOthers) Then
+                                    ElseIf (importMap.keyMethodID = KeyMethodUpdateOnMatchInsertOthers) Then
                                         '
                                         ' no match, convert to insert if that was requested
                                         insertRecord = True
@@ -363,7 +368,7 @@ Namespace Contensive.ImportWizard.Addons
                                     '
                                     ' Insert a new record and convert to an update
                                     updateRecord = False
-                                    If cs.Insert(importMap.ContentName) Then
+                                    If cs.Insert(importMap.contentName) Then
                                         If Err.Number <> 0 Then
                                             Err.Clear()
                                             result &= vbCrLf & "Row " & (rowPtr + 1) & " could not be imported. [" & Err.Description & "]"
@@ -386,7 +391,7 @@ Namespace Contensive.ImportWizard.Addons
                                     '
                                     ' Update all records in the current recordset
                                     Dim UpdateSQL As String = "update " & ImportTableName & " set " & Mid(updateSQLFieldSet, 2) & " where " & KeyCriteria
-                                    Call cs.OpenSQL(UpdateSQL, cp.Content.GetDataSource(importMap.ContentName))
+                                    Call cs.OpenSQL(UpdateSQL, cp.Content.GetDataSource(importMap.contentName))
                                     If Err.Number <> 0 Then
                                         Err.Clear()
                                         result &= vbCrLf & "Row " & (rowPtr + 1) & " could not be imported. [" & Err.Description & "]"
@@ -396,7 +401,7 @@ Namespace Contensive.ImportWizard.Addons
                                 ' -- if there are manual update fields (textfile) then update them now
                                 If textFileManualUpdate.Count > 0 Then
                                     Using manualUpdateCs As CPCSBaseClass = cp.CSNew()
-                                        If manualUpdateCs.Open(importMap.ContentName, KeyCriteria) Then
+                                        If manualUpdateCs.Open(importMap.contentName, KeyCriteria) Then
                                             For Each textfile As textFileModel In textFileManualUpdate
                                                 manualUpdateCs.SetField(textfile.fieldName, textfile.fieldValue)
                                             Next
@@ -405,16 +410,16 @@ Namespace Contensive.ImportWizard.Addons
                                 End If
                                 '
                                 '
-                                If importMap.GroupOptionID <> GroupOptionNone Then
+                                If importMap.groupOptionID <> GroupOptionNone Then
                                     '
                                     ' update/insert OK and records are People
-                                    Dim group As GroupModel = DbBaseModel.create(Of GroupModel)(cp, importMap.GroupID)
+                                    Dim group As GroupModel = DbBaseModel.create(Of GroupModel)(cp, importMap.groupID)
                                     If (group IsNot Nothing) Then
-                                        For Each user In DbBaseModel.createList(Of PersonModel)(cp, KeyCriteria)
+                                        For Each user As PersonModel In DbBaseModel.createList(Of PersonModel)(cp, KeyCriteria)
                                             If (user IsNot Nothing) Then
                                                 '
                                                 ' Add Groups
-                                                Select Case importMap.GroupOptionID
+                                                Select Case importMap.groupOptionID
                                                     Case GroupOptionAll
                                                         '
                                                         cp.Group.AddUser(group.id, user.id)
@@ -443,7 +448,7 @@ Namespace Contensive.ImportWizard.Addons
                 End If
                 Return result
             Catch ex As Exception
-                cp.Site.ErrorReport(ex)
+                app.cp.Site.ErrorReport(ex)
                 Throw
             End Try
         End Function

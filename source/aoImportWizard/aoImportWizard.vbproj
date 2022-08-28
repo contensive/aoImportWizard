@@ -98,6 +98,8 @@
     <Compile Include="Controllers\HtmlController.vb" />
     <Compile Include="Controllers\WizardController.vb" />
     <Compile Include="Controllers\MapController.vb" />
+    <Compile Include="Models\ImportDataModel.vb" />
+    <Compile Include="Models\ImportMapModel.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
       <AutoGen>True</AutoGen>
@@ -116,6 +118,9 @@
     </Compile>
     <Compile Include="Views\SelectSourceView.vb" />
     <Compile Include="Views\UploadView.vb" />
+    <Compile Include="Views\SelectFileView.vb" />
+    <Compile Include="Views\SelectTableView.vb" />
+    <Compile Include="Views\MappingView.vb" />
     <Compile Include="Views\_blankView.vb" />
   </ItemGroup>
   <ItemGroup>
@@ -149,9 +154,7 @@
     <Content Include="Resources\importWizardSelectLayout.txt" />
     <Content Include="Resources\sampleSql.txt" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Models\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildBinPath)\Microsoft.VisualBasic.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

@@ -9,12 +9,11 @@ Namespace Contensive.ImportWizard
         Public Const viewIdSelectSource As Integer = 1
         Public Const viewIdUpload As Integer = 2
         Public Const viewIdSelectFile As Integer = 3
-        Public Const viewIdResourceLibrary As Integer = 4
         Public Const viewIdNewMapping As Integer = 5
         Public Const viewIdSelectGroup As Integer = 6
         Public Const viewIdSelectKey As Integer = 7
         Public Const viewIdFinish As Integer = 8
-        Public Const viewIdSelectDestination As Integer = 9
+        Public Const viewIdSelectTable As Integer = 9
         Public Const viewIdDone As Integer = 10
         ''' <summary>
         ''' return this view and the addon returns blank -- this is a signal to the calling program this this application is exiting and to handle the view
@@ -24,7 +23,7 @@ Namespace Contensive.ImportWizard
         '
         '
         '
-        Public Const RequestNameSubForm = "SubForm"
+        Public Const rnSrcViewId = "SubForm"
         Public Const RequestNameImportWizardID = "ImportWizardID"
         Public Const RequestNameImportSource = "ImportWizardSource"
         Public Const RequestNameImportContentID = "ImportWizardDestination"
@@ -210,7 +209,6 @@ Namespace Contensive.ImportWizard
         '
         Public Const ImportSourceUpload As Integer = 1
         Public Const ImportSourceUploadFolder As Integer = 2
-        Public Const ImportSourceResourceLibrary As Integer = 3
         '
         Public Const KeyMethodInsertAll As Integer = 1
         Public Const KeyMethodUpdateOnMatch As Integer = 2
@@ -326,28 +324,4 @@ Namespace Contensive.ImportWizard
         Public PathCnt As Integer
     End Class
     '
-    Public Class MapPairType
-        Public SourceFieldPtr As Integer
-        Public SourceFieldName As String
-        Public DbField As String
-        Public DbFieldType As Integer
-    End Class
-    '
-    Public Class ImportMapType
-        Public importToNewContent As Boolean
-        Public ContentName As String
-        Public KeyMethodID As Integer
-        Public SourceKeyField As String
-        Public DbKeyField As String
-        Public DbKeyFieldType As Integer
-        Public GroupOptionID As Integer
-        Public GroupID As Integer
-        Public SkipRowCnt As Integer
-        Public MapPairCnt As Integer
-        Public MapPairs() As MapPairType
-
-        'Public Shared Widening Operator CType(v As String) As ImportMapType
-        '    Throw New NotImplementedException()
-        'End Operator
-    End Class
 End Namespace

@@ -1,5 +1,6 @@
 ﻿
 Imports Contensive.BaseClasses
+Imports Contensive.ImportWizard.Models
 
 Namespace Contensive.ImportWizard.Controllers
     Public Class UploadView
@@ -9,15 +10,18 @@ Namespace Contensive.ImportWizard.Controllers
         ''' </summary>
         ''' <param name="app"></param>
         ''' <returns></returns>
-        Public Shared Function processView(app As ApplicationController) As Integer
+        Public Shared Function processView(app As ApplicationModel, srcViewId As Integer) As Integer
             Try
-
-                app.cp.Html.ProcessInputFile(RequestNameImportUpload, "upload")
-                Dim Filename As String = app.cp.Doc.GetText(RequestNameImportUpload)
-                Call WizardController.saveWizardValue(app.cp, RequestNameImportUpload, "upload/" & Filename)
-                WizardController.loadWizardPath(app)
-
+                Dim cp As CPBaseClass = app.cp
                 Dim Button As String = app.cp.Doc.GetText(RequestNameButton)
+                If String.IsNullOrEmpty(Button) Then Return srcViewId
+                If Button = ButtonCancel Then
+                    '
+                    ' Cancel
+                    ImportDataModel.clear(app)
+                    Return viewIdReturnBlank
+                End If
+                '
                 Select Case Button
                     Case ButtonBack2
                         '
@@ -25,26 +29,22 @@ Namespace Contensive.ImportWizard.Controllers
                         Return viewIdSelectSource
                     Case ButtonContinue2
                         '
-                        ' -- comntinue to select destination
-                        Return viewIdSelectDestination
+                        ' -- upload the file and continue
+                        Dim Filename As String = app.cp.Doc.GetText(RequestNameImportUpload)
+                        If String.IsNullOrEmpty(Filename) Then Return viewIdSelectSource
+                        '
+                        Dim importData As ImportDataModel = ImportDataModel.create(app)
+                        If Not app.cp.PrivateFiles.SaveUpload(RequestNameImportUpload, "importWizardUploads", importData.privateCsvPathFilename) Then
+                            '
+                            ' -- upload failed, stay on this view
+                            Return srcViewId
+                        End If
+                        importData.privateCsvPathFilename = "importWizardUploads/" & importData.privateCsvPathFilename
+                        importData.save(app)
+                        '
+                        Return viewIdSelectTable
                 End Select
                 Return viewIdUpload
-                '
-                'Call WizardController.saveWizardRequestInteger(app.cp, RequestNameImportSource)
-                'Call WizardController.loadWizardPath(app)
-
-                'Dim Button As String = app.cp.Doc.GetText(RequestNameButton)
-                'Select Case Button
-                '    Case ButtonCancel
-                '        '
-                '        ' Cancel
-                '        '
-                '        Call WizardController.clearWizardValues(app.cp)
-                '        Return viewIdReturnBlank
-                '    Case ButtonContinue2
-                '        '
-                'End Select
-                'Return viewIdSelectSource
             Catch ex As Exception
                 app.cp.Site.ErrorReport(ex)
                 Throw
@@ -56,7 +56,7 @@ Namespace Contensive.ImportWizard.Controllers
         ''' </summary>
         ''' <param name="app"></param>
         ''' <returns></returns>
-        Public Shared Function getView(app As ApplicationController) As String
+        Public Shared Function getView(app As ApplicationModel) As String
             Try
                 Dim cp As CPBaseClass = app.cp
                 Dim headerCaption As String = "Import Wizard"
@@ -68,7 +68,8 @@ Namespace Contensive.ImportWizard.Controllers
                     & "</table>" _
                     & "</div>" _
                     & ""
-                Return WizardController.getWizardContent(cp, headerCaption, ButtonCancel, ButtonBack2, ButtonContinue2, description, content)
+                content &= cp.Html5.Hidden(rnSrcViewId, viewIdUpload)
+                Return HtmlController.getWizardContent(cp, headerCaption, ButtonCancel, ButtonBack2, ButtonContinue2, description, content)
             Catch ex As Exception
                 app.cp.Site.ErrorReport(ex)
                 Throw

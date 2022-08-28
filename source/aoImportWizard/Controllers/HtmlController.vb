@@ -21,6 +21,32 @@ Namespace Contensive.ImportWizard.Controllers
             ' -- return
             Return cp.Html5.Div(cp.Html5.Form(result.ToString()), "import-wizard")
         End Function
+        '
+        '
+        '
+        Public Shared Function getWizardContent(cp As CPBaseClass, headerCaption As String, buttonCancel As String, buttonback2 As String, buttonContinue2 As String, description As String, WizardContent As String) As String
+            Try
+                Dim body As String = ""
+                If String.IsNullOrEmpty(buttonback2) Then
+                    body = "<div Class=""bg-white p-4"">" _
+                            & cp.Html.h2(headerCaption) _
+                            & cp.Html.div(description) _
+                            & cp.Html.div(WizardContent) _
+                            & cp.Html.div(cp.Html.Button("button", buttonCancel) & cp.Html.Button("button", buttonContinue2), "", "p-2 bg-secondary")
+
+                Else
+                    body = "<div Class=""bg-white p-4"">" _
+                            & cp.Html.h2(headerCaption) _
+                            & cp.Html.div(description) _
+                            & cp.Html.div(WizardContent) _
+                            & cp.Html.div(cp.Html.Button("button", buttonCancel) & cp.Html.Button("button", buttonback2) & cp.Html.Button("button", buttonContinue2), "", "p-2 bg-secondary")
+                End If
+                Return body
+            Catch ex As Exception
+                cp.Site.ErrorReport(ex)
+                Throw
+            End Try
+        End Function
 
     End Class
 End Namespace

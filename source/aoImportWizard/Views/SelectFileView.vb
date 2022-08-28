@@ -1,9 +1,10 @@
 ﻿
+Imports System.Text
 Imports Contensive.BaseClasses
 Imports Contensive.ImportWizard.Models
 
 Namespace Contensive.ImportWizard.Controllers
-    Public Class _blankView
+    Public Class SelectFileView
         '
         ''' <summary>
         ''' return the next view. 0 goes to the first form (start over)
@@ -22,6 +23,14 @@ Namespace Contensive.ImportWizard.Controllers
                     Return viewIdReturnBlank
                 End If
                 '
+                '
+                Dim importData As ImportDataModel = ImportDataModel.create(app)
+                importData.privateCsvPathFilename = app.cp.Doc.GetText("SelectFile")
+                If String.IsNullOrEmpty(importData.privateCsvPathFilename) Then Return viewIdSelectSource
+                '
+                If Left(importData.privateCsvPathFilename, 1) = "\" Then importData.privateCsvPathFilename = Mid(importData.privateCsvPathFilename, 2)
+                importData.save(app)
+                '
                 Select Case Button
                     Case ButtonBack2
                         '
@@ -29,17 +38,9 @@ Namespace Contensive.ImportWizard.Controllers
                         Return viewIdSelectSource
                     Case ButtonContinue2
                         '
-                        ' -- upload the file and continue
-                        Dim Filename As String = app.cp.Doc.GetText(RequestNameImportUpload)
-                        If String.IsNullOrEmpty(Filename) Then Return viewIdSelectSource
-                        '
-                        Dim importData As ImportDataModel = ImportDataModel.create(app)
-                        app.cp.TempFiles.SaveUpload(RequestNameImportUpload, "upload", importData.privateCsvPathFilename)
-                        importData.save(app)
-                        '
+                        ' -- continue to selet destionation
                         Return viewIdSelectTable
                 End Select
-                Return viewIdUpload
             Catch ex As Exception
                 app.cp.Site.ErrorReport(ex)
                 Throw
@@ -55,15 +56,21 @@ Namespace Contensive.ImportWizard.Controllers
             Try
                 Dim cp As CPBaseClass = app.cp
                 Dim headerCaption As String = "Import Wizard"
-                Dim importData As ImportDataModel = ImportDataModel.create(app)
-
-
-
-
-
-
-
-
+                Dim Description As String = cp.Html.h4("Select a file from your Upload folder") & cp.Html.p("Select the upload file you wish to import")
+                Call cp.Doc.AddRefreshQueryString(rnSrcViewId, viewIdSelectFile.ToString)
+                Dim fileList2 As New StringBuilder()
+                Dim uploadPtr As Integer = 0
+                For Each file In cp.PrivateFiles.FileList("importWizardUploads")
+                    Dim uploadId As String = "upload" & uploadPtr
+                    Dim input As String = "<label for=""" & uploadId & """>" & cp.Html.RadioBox("selectfile", "upload\" & file.Name, "", "mr-2", uploadId) & file.Name & "</label>"
+                    fileList2.Append(cp.Html.div(input, "", "pb-2"))
+                    uploadPtr += 1
+                Next
+                Dim Content As String = fileList2.ToString()
+                Content &= cp.Html.Hidden(rnSrcViewId, viewIdSelectFile.ToString)
+                '
+                Call cp.Doc.AddRefreshQueryString(rnSrcViewId, CType("", String))
+                Return HtmlController.getWizardContent(cp, headerCaption, ButtonCancel, ButtonBack2, ButtonContinue2, Description, Content)
             Catch ex As Exception
                 app.cp.Site.ErrorReport(ex)
                 Throw

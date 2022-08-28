@@ -1,10 +1,75 @@
 ﻿
+Imports Contensive.ImportWizard.Models
 Imports Contensive.BaseClasses
 
 Namespace Contensive.ImportWizard.Controllers
     Public NotInheritable Class GenericController
         Private Sub New()
         End Sub
+
+        '
+        '====================================================================================================
+        ''' <summary>
+        ''' get an html select with all the fields from the uploaded source data
+        ''' </summary>
+        ''' <param name="app"></param>
+        ''' <param name="filename"></param>
+        ''' <param name="noneCaption"></param>
+        ''' <returns></returns>
+        Public Shared Function getSourceFieldSelect(app As ApplicationModel, filename As String, noneCaption As String) As String
+            Try
+                Dim cp As CPBaseClass = app.cp
+                If String.IsNullOrEmpty(filename) Then Return String.Empty
+                Call loadSourceFields(app, filename)
+                If app.sourceFieldCnt.Equals(0) Then Return String.Empty
+                '
+                ' Build FileColumns
+                '
+                Dim result As String = ""
+                result = "<select name={{inputName}} class=""form-control js-import-select"" id=""js-import-select-{{fieldId}}"">"
+                result &= "<option value=-1>" & noneCaption & "</option>"
+                result &= "<option value=-2>Set Value</option>"
+                For Ptr As Integer = 0 To app.sourceFieldCnt - 1
+                    result &= "<option value=""" & Ptr & """>column " & (Ptr + 1) & " (" & If(String.IsNullOrEmpty(app.sourceFields(Ptr)), "[blank]", app.sourceFields(Ptr)) & ")</option>"
+                Next
+                result &= "</select>"
+                Return result
+            Catch ex As Exception
+                app.cp.Site.ErrorReport(ex)
+                Throw
+            End Try
+        End Function
+
+        '
+        '====================================================================================================
+        ''' <summary>
+        ''' Get the database field list for this content
+        ''' </summary>
+        ''' <param name="cp"></param>
+        ''' <param name="ContentName"></param>
+        ''' <param name="AllowID"></param>
+        ''' <returns></returns>
+        Public Shared Function getDbFieldList(cp As CPBaseClass, ContentName As String, AllowID As Boolean) As String
+            Try
+                Dim result As String = "," & cp.Content.GetProperty(ContentName, "SELECTFIELDLIST") & ","
+                If Not AllowID Then
+                    result = Replace(result, ",ID,", ",", , , vbTextCompare)
+                End If
+                result = Replace(result, ",CONTENTCONTROLID,", ",", , , vbTextCompare)
+                result = Replace(result, ",EDITSOURCEID,", ",", , , vbTextCompare)
+                result = Replace(result, ",EDITBLANK,", ",", , , vbTextCompare)
+                result = Replace(result, ",EDITARCHIVE,", ",", , , vbTextCompare)
+                result = Replace(result, ",DEVELOPER,", ",", , , vbTextCompare)
+                result = Mid(result, 2, Len(result) - 2)
+                '
+                Return result
+            Catch ex As Exception
+                cp.Site.ErrorReport(ex)
+                Throw
+            End Try
+        End Function
+
+
         '
         '====================================================================================================
         ''' <summary>
@@ -62,76 +127,6 @@ Namespace Contensive.ImportWizard.Controllers
         '====================================================================================================
         Public Shared Function convertToUnixPath(sourcePath As String) As String
             Return sourcePath.Replace("\", "/")
-        End Function
-        '
-        '====================================================================================================
-        '
-        Public Shared Function loadImportMap(cp As CPBaseClass, importMapData As String) As ImportMapType
-            Try
-                Dim result As New ImportMapType
-                Dim Rows() As String
-                Dim Pair() As String
-                Dim Ptr As Integer
-                Dim SourceSplit() As String
-                Dim MapPtr As Integer
-                '
-                If String.IsNullOrEmpty(importMapData) Then
-                    '
-                    ' Defaults
-                    '
-                    result.ContentName = "People"
-                    result.GroupID = 0
-                    result.MapPairCnt = 0
-                    result.SkipRowCnt = 1
-                Else
-                    '
-                    ' read in what must be saved
-                    '
-                    Rows = Split(importMapData, vbCrLf)
-                    If UBound(Rows) <= 7 Then
-                        '
-                        ' Map file is bad
-                        '
-                        'Call HandleLocalError(KmaErrorInternal, App.EXEName, "ImportWizard.Result failed because there was a problem with the format of the data", "Result", False, True)
-                    Else
-                        result.KeyMethodID = cp.Utils.EncodeInteger(Rows(0))
-                        result.SourceKeyField = Rows(1)
-                        result.DbKeyField = Rows(2)
-                        result.ContentName = Rows(3)
-                        result.GroupOptionID = cp.Utils.EncodeInteger(Rows(4))
-                        result.GroupID = cp.Utils.EncodeInteger(Rows(5))
-                        result.SkipRowCnt = cp.Utils.EncodeInteger(Rows(6))
-                        result.DbKeyFieldType = cp.Utils.EncodeInteger(Rows(7))
-                        result.importToNewContent = cp.Utils.EncodeBoolean(Rows(8))
-                        result.MapPairCnt = 0
-                        '
-                        If UBound(Rows) > 8 Then
-                            If String.IsNullOrEmpty(Trim(Rows(9))) Then
-                                For Ptr = 10 To UBound(Rows)
-                                    Pair = Split(Rows(Ptr), "=")
-                                    If UBound(Pair) > 0 Then
-                                        MapPtr = result.MapPairCnt
-                                        result.MapPairCnt = MapPtr + 1
-                                        ReDim Preserve result.MapPairs(MapPtr)
-                                        result.MapPairs(MapPtr) = New MapPairType With {
-                                            .DbField = Pair(0)
-                                        }
-                                        SourceSplit = Split(Pair(1), ",")
-                                        If UBound(SourceSplit) > 0 Then
-                                            result.MapPairs(MapPtr).SourceFieldPtr = cp.Utils.EncodeInteger(SourceSplit(0))
-                                            result.MapPairs(MapPtr).DbFieldType = cp.Utils.EncodeInteger(SourceSplit(1))
-                                        End If
-                                    End If
-                                Next
-                            End If
-                        End If
-                    End If
-                End If
-                Return result
-            Catch ex As Exception
-                cp.Site.ErrorReport(ex)
-                Throw
-            End Try
         End Function
         '
         '   returns true if after removing this field, it is end of line
@@ -453,6 +448,62 @@ Namespace Contensive.ImportWizard.Controllers
                 Throw
             End Try
         End Function
+        '
+        '====================================================================================================
+        ''' <summary>
+        ''' Load the sourceField and sourceFieldCnt from a wizard file
+        ''' </summary>
+        ''' <param name="app"></param>
+        ''' <param name="Filename"></param>
+        Private Shared Sub loadSourceFields(app As ApplicationModel, Filename As String)
+            Try
+                Dim cp As CPBaseClass = app.cp
+                Dim FileData As String
+                Dim ignoreLong As Integer
+                Dim ignoreBoolean As Boolean
+                Dim foundFirstName As Boolean = False
+                Dim foundLastName As Boolean = False
+                Dim foundName As Boolean = False
+                '
+                If Not String.IsNullOrEmpty(Filename) Then
+                    If app.sourceFieldCnt = 0 Then
+                        FileData = cp.CdnFiles.Read(Filename)
+                        If Not String.IsNullOrEmpty(FileData) Then
+                            '
+                            ' Build FileColumns
+                            '
+                            Call parseLine(FileData, 1, app.sourceFields, ignoreLong, ignoreBoolean)
+                            '
+                            ' todo - implement new fields to allow name/firstname/lastname population
+                            'For Each field As String In sourceFields
+                            '    foundFirstName = foundFirstName Or field.ToLowerInvariant().Equals("firstname") Or field.ToLowerInvariant().Equals("first name")
+                            '    foundLastName = foundLastName Or field.ToLowerInvariant().Equals("lastname") Or field.ToLowerInvariant().Equals("last name")
+                            '    foundName = foundName Or field.ToLowerInvariant().Equals("name")
+                            'Next
+                            'If (foundName And Not foundFirstName) Then
+                            '    '
+                            '    ' -- add firstname and lastname from name
+                            '    sourceFields.Append("Name-first-half]")
+                            'End If
+                            'If (foundName And Not foundLastName) Then
+                            '    '
+                            '    ' -- add firstname and lastname from name
+                            '    sourceFields.Append("Name-last-half")
+                            'End If
+                            'If (Not foundName And foundFirstName And foundLastName) Then
+                            '    '
+                            '    ' -- add firstname and lastname from name
+                            '    sourceFields.Append("First-Name Last-Name")
+                            'End If
+                            app.sourceFieldCnt = UBound(app.sourceFields) + 1
+                        End If
+                    End If
+                End If
+            Catch ex As Exception
+                app.cp.Site.ErrorReport(ex)
+                Throw
+            End Try
+        End Sub
 
         '
         '

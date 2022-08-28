@@ -1,14 +1,14 @@
 ﻿
 Imports Contensive.BaseClasses
 
-Namespace Contensive.ImportWizard.Controllers
+Namespace Contensive.ImportWizard.Models
     '
     '====================================================================================================
     ''' <summary>
     ''' Use for access to global non-shared methods and aside caching
     ''' </summary>
     ''' <remarks></remarks>
-    Public Class ApplicationController
+    Public Class ApplicationModel
         Implements IDisposable
         '
         ' privates passed in, do not dispose
@@ -16,21 +16,8 @@ Namespace Contensive.ImportWizard.Controllers
         Public ReadOnly cp As CPBaseClass
         '
         Public ReadOnly Property wizard As New WizardType
-        '
-        '====================================================================================================
-        ''' <summary>
-        ''' return the content from the import map file
-        ''' </summary>
-        ''' <param name="cp"></param>
-        ''' <returns></returns>
-        Public ReadOnly Property getDefaultImportMapFile(cp As CPBaseClass) As String
-            Get
-                If Not String.IsNullOrEmpty(defaultImportMapFile) Then Return defaultImportMapFile
-                defaultImportMapFile = "ImportWizard\ImportMap" & cp.Utils.GetRandomInteger & ".txt"
-                Return defaultImportMapFile
-            End Get
-        End Property
-        Private defaultImportMapFile As String = Nothing
+        Public Property sourceFieldCnt As Integer
+        Public Property sourceFields As String()
         '
         '====================================================================================================
         ''' <summary>
