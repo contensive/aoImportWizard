@@ -61,35 +61,7 @@ Namespace Contensive.ImportWizard.Addons
                             '
                             ' Select Key Field
                             '
-                            Dim importConfig = ImportConfigModel.create(app)
-                            Dim ImportMap As ImportMapModel = ImportMapModel.create(CP, importConfig)
-                            ImportMap.keyMethodID = CP.Doc.GetInteger(RequestNameImportKeyMethodID)
-                            ImportMap.sourceKeyField = CP.Doc.GetText(RequestNameImportSourceKeyFieldPtr)
-                            ImportMap.dbKeyField = CP.Doc.GetText(RequestNameImportDbKeyField)
-                            If Not String.IsNullOrEmpty(ImportMap.dbKeyField) Then
-                                Dim fieldList As List(Of ContentFieldModel) = DbBaseModel.createList(Of ContentFieldModel)(CP, "(name=" & CP.Db.EncodeSQLText(ImportMap.dbKeyField) & ")and(contentid=" & CP.Content.GetID(ImportMap.contentName) & ")")
-                                If (fieldList.Count > 0) Then
-                                    ImportMap.dbKeyFieldType = fieldList.First().type
-                                End If
-                            End If
-                            ImportMap.save(app, importConfig)
-
-                            Dim Button As String = CP.Doc.GetText(RequestNameButton)
-                            Select Case Button
-                                Case ButtonBack2
-                                    '
-                                    ' -- back to mapping
-                                    viewId = viewIdNewMapping
-                                Case ButtonContinue2
-                                    '
-                                    ' -- continue to Select Group or finish
-                                    If importConfig.dstContentId = app.peopleContentid Then
-                                        viewId = viewIdSelectGroup
-                                    Else
-                                        viewId = viewIdFinish
-                                    End If
-                                    'viewId = nextSubFormID(app, viewId)
-                            End Select
+                            viewId = SelectKeyView.processView(app, viewId)
                         Case viewIdSelectGroup
                             '
                             ' Add to group
@@ -165,10 +137,9 @@ Namespace Contensive.ImportWizard.Addons
                     '
                     ' Get Next Form
                     '
-                    Dim SourceFieldSelect As String
                     Dim Description As String
                     Dim body As String = ""
-                    Dim ImportContentName As String
+                    'Dim ImportContentName As String
                     Select Case viewId
                         Case viewIdUpload
                             '
@@ -198,62 +169,7 @@ Namespace Contensive.ImportWizard.Addons
                             '
                             ' Select Key
                             '
-                            Dim headerCaption As String = "Import Wizard"
-                            Dim SourceKeyFieldPtr As Integer
-                            Dim DbKeyField As String = ""
-                            Dim importConfig As ImportConfigModel = ImportConfigModel.create(app)
-                            Dim ImportMap As ImportMapModel = ImportMapModel.create(CP, importConfig)
-
-                            Dim KeyMethodID As Integer = CP.Utils.EncodeInteger(ImportMap.keyMethodID)
-                            If KeyMethodID = 0 Then
-                                KeyMethodID = KeyMethodUpdateOnMatchInsertOthers
-                            End If
-                            '
-                            If Not String.IsNullOrEmpty(ImportMap.sourceKeyField) Then
-                                SourceKeyFieldPtr = CP.Utils.EncodeInteger(ImportMap.sourceKeyField)
-                            Else
-                                SourceKeyFieldPtr = -1
-                            End If
-                            Dim Filename As String = importConfig.privateUploadPathFilename
-                            SourceFieldSelect = Replace(getSourceFieldSelect(app, Filename, "Select One"), "xxxx", RequestNameImportSourceKeyFieldPtr)
-                            SourceFieldSelect = Replace(SourceFieldSelect, "value=" & SourceKeyFieldPtr, "value=" & SourceKeyFieldPtr & " selected", , , vbTextCompare)
-                            '
-                            'Dim PeopleContentID As Integer = CP.Content.GetID("people")
-                            Dim ImportContentID As Integer = importConfig.dstContentId
-                            ImportContentName = CP.Content.GetRecordName("content", ImportContentID)
-                            Dim note As String
-
-                            Dim DBFieldSelect As String
-                            '
-                            ' Pick any field for key if developer or not the ccMembers table
-                            '
-                            DbKeyField = ImportMap.dbKeyField
-                            Dim LookupContentName As String
-                            LookupContentName = CP.Content.GetRecordName("content", importConfig.dstContentId)
-                            DBFieldSelect = Replace(HtmlController.getDbFieldSelect(CP, LookupContentName, "Select One", True), "xxxx", RequestNameImportDbKeyField)
-                            DBFieldSelect = Replace(DBFieldSelect, ">" & DbKeyField & "<", " selected>" & DbKeyField & "<", , , vbTextCompare)
-                            note = ""
-                            '
-                            Description = CP.Html.h4("Update Control") & CP.Html.p("When your data is imported, it can either update your current database, or insert new records into your database. Use this form to control which records will be updated, and which will be inserted.")
-                            Dim Content As String = "" _
-                                    & "<div>" _
-                                    & "<TABLE border=0 cellpadding=4 cellspacing=0 width=100%>" _
-                                    & "<TR><TD colspan=2>Key Fields</td></tr>" _
-                                    & "<TR><TD width=10>&nbsp;</td><td width=99% align=left>" _
-                                        & "<TABLE border=0 cellpadding=2 cellspacing=0 width=100%>" _
-                                        & "<tr><td>Imported&nbsp;Key&nbsp;</td><td>" & SourceFieldSelect & "</td></tr>" _
-                                        & "<tr><td>Database&nbsp;Key&nbsp;</td><td>" & DBFieldSelect & "</td></tr>" _
-                                        & "</table>" _
-                                        & "</td></tr>" _
-                                    & "<TR><TD colspan=2>Update Options</td></tr>" _
-                                    & "<TR><TD width=10>" & CP.Html.RadioBox(RequestNameImportKeyMethodID, KeyMethodInsertAll.ToString, KeyMethodID.ToString) & "</td><td width=99% align=left>Insert all imported data, regardless of key field.</td></tr>" _
-                                    & "<TR><TD width=10>" & CP.Html.RadioBox(RequestNameImportKeyMethodID, KeyMethodUpdateOnMatchInsertOthers.ToString, KeyMethodID.ToString) & "</td><td width=99% align=left>Update database records when the data in the key fields match. Insert all other imported data.</td></tr>" _
-                                    & "<TR><TD width=10>" & CP.Html.RadioBox(RequestNameImportKeyMethodID, KeyMethodUpdateOnMatch.ToString, KeyMethodID.ToString) & "</td><td width=99% align=left>Update database records when the data in the key fields match. Ignore all other imported data.</td></tr>" _
-                                    & "</table>" _
-                                    & "</div>" _
-                                    & ""
-                            Content &= CP.Html.Hidden(rnSrcViewId, viewId.ToString)
-                            body = HtmlController.getWizardContent(CP, headerCaption, ButtonCancel, ButtonBack2, ButtonContinue2, Description, Content)
+                            body = SelectKeyView.getView(app)
                             Return CP.Html.Form(body)
                         Case viewIdSelectGroup
                             '

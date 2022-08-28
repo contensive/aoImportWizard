@@ -10,39 +10,6 @@ Namespace Contensive.ImportWizard.Controllers
         '
         '====================================================================================================
         ''' <summary>
-        ''' get an html select with all the fields from the uploaded source data
-        ''' </summary>
-        ''' <param name="app"></param>
-        ''' <param name="filename"></param>
-        ''' <param name="noneCaption"></param>
-        ''' <returns></returns>
-        Public Shared Function getSourceFieldSelect(app As ApplicationModel, filename As String, noneCaption As String) As String
-            Try
-                Dim cp As CPBaseClass = app.cp
-                If String.IsNullOrEmpty(filename) Then Return String.Empty
-                Call loadSourceFields(app, filename)
-                If app.sourceFieldCnt.Equals(0) Then Return String.Empty
-                '
-                ' Build FileColumns
-                '
-                Dim result As String = ""
-                result = "<select name={{inputName}} class=""form-control js-import-select"" id=""js-import-select-{{fieldId}}"">"
-                result &= "<option value=""-1"">" & noneCaption & "</option>"
-                result &= "<option value=""-2"">Set Value</option>"
-                For Ptr As Integer = 0 To app.sourceFieldCnt - 1
-                    result &= "<option value=""" & Ptr & """>column " & (Ptr + 1) & " (" & If(String.IsNullOrEmpty(app.uploadFields(Ptr)), "[blank]", app.uploadFields(Ptr)) & ")</option>"
-                Next
-                result &= "</select>"
-                Return result
-            Catch ex As Exception
-                app.cp.Site.ErrorReport(ex)
-                Throw
-            End Try
-        End Function
-
-        '
-        '====================================================================================================
-        ''' <summary>
         ''' Get the database field list for this content
         ''' </summary>
         ''' <param name="cp"></param>
@@ -448,63 +415,6 @@ Namespace Contensive.ImportWizard.Controllers
                 Throw
             End Try
         End Function
-        '
-        '====================================================================================================
-        ''' <summary>
-        ''' Load the sourceField and sourceFieldCnt from a wizard file
-        ''' </summary>
-        ''' <param name="app"></param>
-        ''' <param name="Filename"></param>
-        Private Shared Sub loadSourceFields(app As ApplicationModel, Filename As String)
-            Try
-                Dim cp As CPBaseClass = app.cp
-                Dim FileData As String
-                Dim ignoreLong As Integer
-                Dim ignoreBoolean As Boolean
-                Dim foundFirstName As Boolean = False
-                Dim foundLastName As Boolean = False
-                Dim foundName As Boolean = False
-                '
-                If Not String.IsNullOrEmpty(Filename) Then
-                    If app.sourceFieldCnt = 0 Then
-                        FileData = cp.PrivateFiles.Read(Filename)
-                        If Not String.IsNullOrEmpty(FileData) Then
-                            '
-                            ' Build FileColumns
-                            '
-                            Call parseLine(FileData, 1, app.uploadFields, ignoreLong, ignoreBoolean)
-                            '
-                            ' todo - implement new fields to allow name/firstname/lastname population
-                            'For Each field As String In sourceFields
-                            '    foundFirstName = foundFirstName Or field.ToLowerInvariant().Equals("firstname") Or field.ToLowerInvariant().Equals("first name")
-                            '    foundLastName = foundLastName Or field.ToLowerInvariant().Equals("lastname") Or field.ToLowerInvariant().Equals("last name")
-                            '    foundName = foundName Or field.ToLowerInvariant().Equals("name")
-                            'Next
-                            'If (foundName And Not foundFirstName) Then
-                            '    '
-                            '    ' -- add firstname and lastname from name
-                            '    sourceFields.Append("Name-first-half]")
-                            'End If
-                            'If (foundName And Not foundLastName) Then
-                            '    '
-                            '    ' -- add firstname and lastname from name
-                            '    sourceFields.Append("Name-last-half")
-                            'End If
-                            'If (Not foundName And foundFirstName And foundLastName) Then
-                            '    '
-                            '    ' -- add firstname and lastname from name
-                            '    sourceFields.Append("First-Name Last-Name")
-                            'End If
-                            app.sourceFieldCnt = UBound(app.uploadFields) + 1
-                        End If
-                    End If
-                End If
-            Catch ex As Exception
-                app.cp.Site.ErrorReport(ex)
-                Throw
-            End Try
-        End Sub
-
         '
         '
         '

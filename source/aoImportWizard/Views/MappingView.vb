@@ -102,7 +102,7 @@ Namespace Contensive.ImportWizard.Controllers
                 '
                 ' Build FileColumns
                 '
-                Dim uploadFieldSelectTemplate As String = GenericController.getSourceFieldSelect(app, importConfig.privateUploadPathFilename, "Ignore")
+                Dim uploadFieldSelectTemplate As String = HtmlController.getSourceFieldSelect(app, importConfig.privateUploadPathFilename, "Ignore")
                 '
                 ' Build the Database field list
                 '

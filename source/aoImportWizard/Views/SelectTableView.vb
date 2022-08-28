@@ -75,6 +75,11 @@ Namespace Contensive.ImportWizard.Controllers
                             If dbFieldList.Count > 0 Then
                                 dbField = dbFieldList.First()
                             End If
+                            '
+                            ' -- search uploadFields for matches to dbFields
+                            '
+                            '
+                            ' -- created a 
                             ImportMap.mapPairs(rowPtr) = New ImportMapModel_MapPair With {
                             .uploadFieldPtr = -1,
                             .dbFieldName = dbFieldNames(rowPtr),

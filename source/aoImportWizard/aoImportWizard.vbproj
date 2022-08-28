@@ -92,7 +92,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="constants.vb" />
-    <Compile Include="Controllers\ApplicationController.vb" />
+    <Compile Include="Models\ApplicationModel.vb" />
     <Compile Include="Addons\ImportTask.vb" />
     <Compile Include="Addons\ImportWizardAddon.vb" />
     <Compile Include="Controllers\HtmlController.vb" />
@@ -121,6 +121,7 @@
     <Compile Include="Views\SelectFileView.vb" />
     <Compile Include="Views\SelectTableView.vb" />
     <Compile Include="Views\MappingView.vb" />
+    <Compile Include="Views\SelectKeyView.vb" />
     <Compile Include="Views\_blankView.vb" />
   </ItemGroup>
   <ItemGroup>

@@ -1,5 +1,6 @@
 ﻿
 Imports Contensive.BaseClasses
+Imports Contensive.ImportWizard.Controllers
 
 Namespace Contensive.ImportWizard.Models
     '
@@ -93,6 +94,66 @@ Namespace Contensive.ImportWizard.Models
                 Throw
             End Try
         End Function
+
+
+        '
+        '====================================================================================================
+        ''' <summary>
+        ''' Load the sourceField and sourceFieldCnt from a wizard file
+        ''' </summary>
+        ''' <param name="Filename"></param>
+        Public Sub loadSourceFields(Filename As String)
+            Try
+                Dim FileData As String
+                Dim ignoreLong As Integer
+                Dim ignoreBoolean As Boolean
+                Dim foundFirstName As Boolean = False
+                Dim foundLastName As Boolean = False
+                Dim foundName As Boolean = False
+                '
+                If Not String.IsNullOrEmpty(Filename) Then
+                    If sourceFieldCnt = 0 Then
+                        FileData = cp.PrivateFiles.Read(Filename)
+                        If Not String.IsNullOrEmpty(FileData) Then
+                            '
+                            ' Build FileColumns
+                            '
+                            Call GenericController.parseLine(FileData, 1, uploadFields, ignoreLong, ignoreBoolean)
+                            '
+                            ' todo - implement new fields to allow name/firstname/lastname population
+                            'For Each field As String In sourceFields
+                            '    foundFirstName = foundFirstName Or field.ToLowerInvariant().Equals("firstname") Or field.ToLowerInvariant().Equals("first name")
+                            '    foundLastName = foundLastName Or field.ToLowerInvariant().Equals("lastname") Or field.ToLowerInvariant().Equals("last name")
+                            '    foundName = foundName Or field.ToLowerInvariant().Equals("name")
+                            'Next
+                            'If (foundName And Not foundFirstName) Then
+                            '    '
+                            '    ' -- add firstname and lastname from name
+                            '    sourceFields.Append("Name-first-half]")
+                            'End If
+                            'If (foundName And Not foundLastName) Then
+                            '    '
+                            '    ' -- add firstname and lastname from name
+                            '    sourceFields.Append("Name-last-half")
+                            'End If
+                            'If (Not foundName And foundFirstName And foundLastName) Then
+                            '    '
+                            '    ' -- add firstname and lastname from name
+                            '    sourceFields.Append("First-Name Last-Name")
+                            'End If
+                            sourceFieldCnt = UBound(uploadFields) + 1
+                        End If
+                    End If
+                End If
+            Catch ex As Exception
+                cp.Site.ErrorReport(ex)
+                Throw
+            End Try
+        End Sub
+
+
+
+
 #Region " IDisposable Support "
         Protected disposed As Boolean = False
         '

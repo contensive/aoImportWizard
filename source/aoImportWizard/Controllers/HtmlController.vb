@@ -1,9 +1,43 @@
 ﻿
 Imports System.Text
 Imports Contensive.BaseClasses
+Imports Contensive.ImportWizard.Models
 
 Namespace Contensive.ImportWizard.Controllers
     Public Class HtmlController
+
+        '
+        '====================================================================================================
+        ''' <summary>
+        ''' get an html select with all the fields from the uploaded source data
+        ''' </summary>
+        ''' <param name="app"></param>
+        ''' <param name="filename"></param>
+        ''' <param name="noneCaption"></param>
+        ''' <returns></returns>
+        Public Shared Function getSourceFieldSelect(app As ApplicationModel, filename As String, noneCaption As String) As String
+            Try
+                Dim cp As CPBaseClass = app.cp
+                If String.IsNullOrEmpty(filename) Then Return String.Empty
+                Call app.loadSourceFields(filename)
+                If app.sourceFieldCnt.Equals(0) Then Return String.Empty
+                '
+                ' Build FileColumns
+                '
+                Dim result As String = ""
+                result = "<select name={{inputName}} class=""form-control js-import-select"" id=""js-import-select-{{fieldId}}"">"
+                result &= "<option value=""-1"">" & noneCaption & "</option>"
+                result &= "<option value=""-2"">Set Value</option>"
+                For Ptr As Integer = 0 To app.sourceFieldCnt - 1
+                    result &= "<option value=""" & Ptr & """>column " & (Ptr + 1) & " (" & If(String.IsNullOrEmpty(app.uploadFields(Ptr)), "[blank]", app.uploadFields(Ptr)) & ")</option>"
+                Next
+                result &= "</select>"
+                Return result
+            Catch ex As Exception
+                app.cp.Site.ErrorReport(ex)
+                Throw
+            End Try
+        End Function
         '
         Public Shared Function getRadio(cp As CPBaseClass, radioName As String, radioValue As Integer, selectedValue As Integer, radioLabel As String) As String
             Dim uniqueId As String = "id" & cp.Utils.GetRandomInteger
