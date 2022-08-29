@@ -36,11 +36,11 @@ Namespace Contensive.ImportWizard.Models
         ''' Load Import Map
         ''' </summary>
         ''' <param name="cp"></param>
-        ''' <param name="importConfig"></param>
+        ''' <param name="importMapPathFilename"></param>
         ''' <returns></returns>
-        Public Shared Function create(cp As CPBaseClass, importConfig As ImportConfigModel) As ImportMapModel
+        Public Shared Function create(cp As CPBaseClass, importMapPathFilename As String) As ImportMapModel
             Try
-                Dim result As ImportMapModel = cp.JSON.Deserialize(Of ImportMapModel)(cp.PrivateFiles.Read(importConfig.importMapPathFilename))
+                Dim result As ImportMapModel = cp.JSON.Deserialize(Of ImportMapModel)(cp.PrivateFiles.Read(importMapPathFilename))
                 If result IsNot Nothing Then Return result
                 '
                 result = New ImportMapModel() With {

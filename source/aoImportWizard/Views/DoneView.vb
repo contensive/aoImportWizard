@@ -3,7 +3,7 @@ Imports Contensive.BaseClasses
 Imports Contensive.ImportWizard.Models
 
 Namespace Contensive.ImportWizard.Controllers
-    Public Class _blankView
+    Public Class DoneView
         '
         ''' <summary>
         ''' return the next view. 0 goes to the first form (start over)
@@ -27,25 +27,7 @@ Namespace Contensive.ImportWizard.Controllers
                     ImportConfigModel.clear(app)
                     Return viewIdSelectSource
                 End If
-                '
-                Select Case Button
-                    Case ButtonBack
-                        '
-                        ' -- back to select source
-                        Return viewIdSelectSource
-                    Case ButtonContinue
-                        '
-                        ' -- upload the file and continue
-                        Dim Filename As String = app.cp.Doc.GetText(RequestNameImportUpload)
-                        If String.IsNullOrEmpty(Filename) Then Return viewIdSelectSource
-                        '
-                        Dim importConfig As ImportConfigModel = ImportConfigModel.create(app)
-                        app.cp.TempFiles.SaveUpload(RequestNameImportUpload, "upload", importConfig.privateUploadPathFilename)
-                        importConfig.save(app)
-                        '
-                        Return viewIdSelectTable
-                End Select
-                Return viewIdUpload
+                Return viewIdDone
             Catch ex As Exception
                 app.cp.Site.ErrorReport(ex)
                 Throw
@@ -67,11 +49,10 @@ Namespace Contensive.ImportWizard.Controllers
 
 
 
-
-
-
-
-                Return HtmlController.createLayout(cp, headerCaption, description, content, True, True, True, True)
+                headerCaption = "Import Wizard"
+                description = cp.Html.h4("Import Requested") & cp.Html.p("Your import is underway and should only take a moment.")
+                content = cp.Html.Hidden(rnSrcViewId, viewIdDone.ToString)
+                Return HtmlController.createLayout(cp, headerCaption, description, content, True, True, False, False)
 
             Catch ex As Exception
                 app.cp.Site.ErrorReport(ex)

@@ -19,13 +19,13 @@ Namespace Contensive.ImportWizard.Controllers
             Try
                 Dim cp As CPBaseClass = app.cp
                 If String.IsNullOrEmpty(filename) Then Return String.Empty
-                Call app.loadSourceFields(filename)
+                Call app.loadUploadFields(filename)
                 If app.sourceFieldCnt.Equals(0) Then Return String.Empty
                 '
                 ' Build FileColumns
                 '
                 Dim result As String = ""
-                result = "<select name={{inputName}} class=""form-control js-import-select"" id=""js-import-select-{{fieldId}}"">"
+                result = "<select name={{inputName}} class=""form-control js-import-select"" id=""js-import-select-{{fieldPtr}}"">"
                 result &= "<option value=""-1"">" & noneCaption & "</option>"
                 result &= "<option value=""-2"">Set Value</option>"
                 For Ptr As Integer = 0 To app.sourceFieldCnt - 1
@@ -55,27 +55,46 @@ Namespace Contensive.ImportWizard.Controllers
             ' -- return
             Return cp.Html5.Div(cp.Html5.Form(result.ToString()), "import-wizard")
         End Function
-        '
-        '
-        '
-        Public Shared Function getWizardContent(cp As CPBaseClass, headerCaption As String, buttonCancel As String, buttonback2 As String, buttonContinue2 As String, description As String, WizardContent As String) As String
-            Try
-                Dim body As String = ""
-                If String.IsNullOrEmpty(buttonback2) Then
-                    body = "<div Class=""bg-white p-4"">" _
-                            & cp.Html.h2(headerCaption) _
-                            & cp.Html.div(description) _
-                            & cp.Html.div(WizardContent) _
-                            & cp.Html.div(cp.Html.Button("button", buttonCancel) & cp.Html.Button("button", buttonContinue2), "", "p-2 bg-secondary")
+        ''
+        ''
+        ''
+        'Public Shared Function createLayout(cp As CPBaseClass, headerCaption As String, buttonCancel As String, buttonback2 As String, buttonContinue2 As String, description As String, WizardContent As String) As String
+        '    Try
+        '        Dim body As String = ""
+        '        If String.IsNullOrEmpty(buttonback2) Then
+        '            body = "<div Class=""bg-white p-4"">" _
+        '                    & cp.Html.h2(headerCaption) _
+        '                    & cp.Html.div(description) _
+        '                    & cp.Html.div(WizardContent) _
+        '                    & cp.Html.div(cp.Html.Button("button", buttonCancel) & cp.Html.Button("button", ButtonReset) & cp.Html.Button("button", buttonContinue2), "", "p-2 bg-secondary")
 
-                Else
-                    body = "<div Class=""bg-white p-4"">" _
-                            & cp.Html.h2(headerCaption) _
-                            & cp.Html.div(description) _
-                            & cp.Html.div(WizardContent) _
-                            & cp.Html.div(cp.Html.Button("button", buttonCancel) & cp.Html.Button("button", buttonback2) & cp.Html.Button("button", buttonContinue2), "", "p-2 bg-secondary")
-                End If
-                Return body
+        '        Else
+        '            body = "<div Class=""bg-white p-4"">" _
+        '                    & cp.Html.h2(headerCaption) _
+        '                    & cp.Html.div(description) _
+        '                    & cp.Html.div(WizardContent) _
+        '                    & cp.Html.div(cp.Html.Button("button", buttonCancel) & cp.Html.Button("button", ButtonReset) & cp.Html.Button("button", buttonback2) & cp.Html.Button("button", buttonContinue2), "", "p-2 bg-secondary")
+        '        End If
+        '        Return body
+        '    Catch ex As Exception
+        '        cp.Site.ErrorReport(ex)
+        '        Throw
+        '    End Try
+        'End Function
+        '
+        Public Shared Function createLayout(cp As CPBaseClass, header As String, description As String, body As String, allowCancel As Boolean, allowReset As Boolean, allowBack As Boolean, allowContinue As Boolean) As String
+            Try
+                Return "" _
+                    & cp.Html.div("" _
+                        & cp.Html.h2(header) _
+                        & cp.Html.div(description) _
+                        & cp.Html.div(body) _
+                        & cp.Html.div("" _
+                            & If(allowCancel, cp.Html.Button("button", ButtonCancel), "") _
+                            & If(allowReset, cp.Html.Button("button", ButtonReset), "") _
+                            & If(allowBack, cp.Html.Button("button", ButtonBack), "") _
+                            & If(allowContinue, cp.Html.Button("button", ButtonContinue), ""), "", "p-2 bg-secondary") _
+                        & "", "", "bg-white p-4")
             Catch ex As Exception
                 cp.Site.ErrorReport(ex)
                 Throw
@@ -96,7 +115,7 @@ Namespace Contensive.ImportWizard.Controllers
                 '
                 Dim result As String = "" _
                 & "<select class=""form-control"" name=xxxx><option value="""" style=""Background-color:#E0E0E0;"">" & NoneCaption & "</option>" _
-                & "<option>" & Replace(GenericController.getDbFieldList(cp, ContentName, AllowID), ",", "</option><option>") & "</option>" _
+                & "<option>" & Replace(ContentFieldModel.getDbFieldList(cp, ContentName, AllowID), ",", "</option><option>") & "</option>" _
                 & "</select>"
                 '
                 Return result

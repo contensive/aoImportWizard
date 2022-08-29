@@ -66,73 +66,16 @@ Namespace Contensive.ImportWizard.Addons
                             '
                             ' Add to group
                             '
-                            Dim newGroupName As String
-                            Dim newGroupID As Integer
-                            newGroupName = CP.Doc.GetText(RequestNameImportGroupNew)
-                            If Not String.IsNullOrEmpty(newGroupName) Then
-                                Dim groupmodellist As List(Of GroupModel) = DbBaseModel.createList(Of GroupModel)(CP, "(name=" & CP.Db.EncodeSQLText(newGroupName) & ")")
-                                If (groupmodellist.Count <> 0) Then
-                                    Dim newGroup As GroupModel = groupmodellist.First
-                                    newGroupID = newGroup.id
-                                End If
-                                If newGroupID = 0 Then
-                                    Dim newGroup = DbBaseModel.addDefault(Of GroupModel)(CP)
-                                    newGroup.name = newGroupName
-                                    newGroup.caption = newGroupName
-                                    newGroupID = newGroup.id
-                                    newGroup.save(CP)
-                                End If
-
-                            End If
-                            Dim importConfig = ImportConfigModel.create(app)
-                            Dim ImportMap As ImportMapModel = ImportMapModel.create(CP, importConfig)
-                            If newGroupID <> 0 Then
-                                ImportMap.groupID = newGroupID
-                            Else
-                                ImportMap.groupID = CP.Doc.GetInteger(RequestNameImportGroupID)
-                            End If
-                            ImportMap.groupOptionID = CP.Doc.GetInteger(RequestNameImportGroupOptionID)
-                            ImportMap.save(app, importConfig)
-
-                            Dim Button As String = CP.Doc.GetText(RequestNameButton)
-                            Select Case Button
-                                Case ButtonBack2
-                                    '
-                                    ' -- back to select key
-                                    viewId = viewIdSelectKey
-                                Case ButtonContinue2
-                                    '
-                                    ' -- continue to finish
-                                    viewId = viewIdFinish
-                            End Select
+                            viewId = SelectgroupView.processView(app, viewId)
                         Case viewIdFinish
                             '
                             ' Determine next or previous form
                             '
-                            Dim Button As String = CP.Doc.GetText(RequestNameButton)
-                            Select Case Button
-                                Case ButtonBack2
-                                    '
-                                    ' -- back to select key
-                                    viewId = viewIdSelectKey
-                                Case ButtonFinish
-                                    Dim importConfig As ImportConfigModel = ImportConfigModel.create(app)
-                                    Dim ImportWizardTasks = DbBaseModel.addDefault(Of ImportWizardTaskModel)(CP)
-                                    If (ImportWizardTasks IsNot Nothing) Then
-                                        ImportWizardTasks.name = Now() & " CSV Import" 'Call Main.SetCS(CS, "Name", Now() & " CSV Import")
-                                        ImportWizardTasks.uploadFilename = importConfig.privateUploadPathFilename
-                                        ImportWizardTasks.notifyEmail = importConfig.notifyEmail
-                                        ImportWizardTasks.importMapFilename = importConfig.importMapPathFilename
-                                        ImportWizardTasks.save(CP)
-                                    End If
-                                    CP.Addon.ExecuteAsProcess(guidAddonImportTask)
-                                    '
-                                    viewId = viewIdReturnBlank
-                            End Select
+                            viewId = FinishView.processView(app, viewId)
                         Case viewIdDone
                             '
                             ' nothing to do, keep same form
-                            viewId = viewId
+                            viewId = DoneView.processView(app, viewId)
                     End Select
                     '
                     ' Get Next Form
@@ -175,60 +118,25 @@ Namespace Contensive.ImportWizard.Addons
                             '
                             ' Select a group to add
                             '
-
-                            Dim headerCaption As String = "Import Wizard"
-
-                            Dim importConfig As ImportConfigModel = ImportConfigModel.create(app)
-                            Dim ImportMap As ImportMapModel = ImportMapModel.create(CP, importConfig)
-
-
-                            Dim GroupOptionID = ImportMap.groupOptionID
-                            If GroupOptionID = 0 Then
-                                GroupOptionID = GroupOptionNone
-                            End If
-                            Description = CP.Html.h4("Group Membership") & CP.Html.p("When your data is imported, people can be added to a group automatically. Select the option below, and a group.")
-                            Dim Content As String = "" _
-                                    & "<div>" _
-                                    & "<TABLE border=0 cellpadding=4 cellspacing=0 width=100%>" _
-                                    & "<TR><TD colspan=2>Add to Existing Group</td></tr>" _
-                                    & "<TR><TD width=10>&nbsp;</td><td width=99% align=left>" & CP.Html.SelectContent(RequestNameImportGroupID, ImportMap.groupID.ToString, "Groups", "", "", "form-control") & "</td></tr>" _
-                                    & "<TR><TD colspan=2>Create New Group</td></tr>" _
-                                    & "<TR><TD width=10>&nbsp;</td><td width=99% align=left>" & CP.Html.InputText(RequestNameImportGroupNew, "", 100, "form-control") & "</td></tr>" _
-                                    & "<TR><TD colspan=2>Group Options</td></tr>" _
-                                    & "<TR><TD width=10>" & CP.Html.RadioBox(RequestNameImportGroupOptionID, GroupOptionNone.ToString, GroupOptionID.ToString) & "</td><td width=99% align=left>Do not add to a group.</td></tr>" _
-                                    & "<TR><TD width=10>" & CP.Html.RadioBox(RequestNameImportGroupOptionID, GroupOptionAll.ToString, GroupOptionID.ToString) & "</td><td width=99% align=left>Add everyone to the the group.</td></tr>" _
-                                    & "<TR><TD width=10>" & CP.Html.RadioBox(RequestNameImportGroupOptionID, GroupOptionOnMatch.ToString, GroupOptionID.ToString) & "</td><td width=99% align=left>Add to the group if keys match.</td></tr>" _
-                                    & "<TR><TD width=10>" & CP.Html.RadioBox(RequestNameImportGroupOptionID, GroupOptionOnNoMatch.ToString, GroupOptionID.ToString) & "</td><td width=99% align=left>Add to the group if keys do NOT match.</td></tr>" _
-                                    & "</table>" _
-                                    & "</div>" _
-                                    & ""
-                            Content &= CP.Html.Hidden(rnSrcViewId, viewId.ToString)
-                            body = HtmlController.getWizardContent(CP, headerCaption, ButtonCancel, ButtonBack2, ButtonContinue2, Description, Content)
+                            body = SelectGroupView.getView(app)
                             Return CP.Html.Form(body)
                         Case viewIdFinish
                             '
                             ' Ask for an email address to notify when the list is complete
                             '
-                            Dim headerCaption As String = "Import Wizard"
-                            Description = CP.Html.h4("Finish") & CP.Html.p("Your list will be submitted for import when you hit the finish button. Processing may take several minutes, depending on the size and complexity of your import. If you supply an email address, you will be notified with the import is complete.")
-                            Dim Content As String = "<div Class=""p-2""><label for=""name381"">Email</label><div class=""ml-5"">" & CP.Html5.InputText(RequestNameImportEmail, 255, CP.User.Email) & "</div><div class=""ml-5""><small class=""form-text text-muted""></small></div></div>"
-                            Content &= CP.Html.Hidden(rnSrcViewId, viewId.ToString)
-                            body = HtmlController.getWizardContent(CP, headerCaption, ButtonCancel, ButtonBack2, ButtonFinish, Description, Content)
+                            body = FinishView.getView(app)
                             Return CP.Html.Form(body)
                         Case viewIdDone
                             '
                             ' Thank you
                             '
-                            Dim headerCaption As String = "Import Wizard"
-                            Description = CP.Html.h4("Import Requested") & CP.Html.p("Your import is underway and should only take a moment.")
-                            Dim Content As String = CP.Html.Hidden(rnSrcViewId, viewId.ToString)
-                            body = HtmlController.getWizardContent(CP, headerCaption, ButtonCancel, ButtonBack2, ButtonFinish, Description, Content)
+                            body = DoneView.getView(app)
                             Return CP.Html.Form(body)
                         Case viewIdReturnBlank
                             '
                             ' -- 
                             Return ""
-                        Case viewIdSelectSource, 0
+                        Case Else
                             '
                             ' -- data source
                             body = SelectSourceView.getView(app)

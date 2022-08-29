@@ -99,6 +99,7 @@
     <Compile Include="Controllers\WizardController.vb" />
     <Compile Include="Controllers\MapController.vb" />
     <Compile Include="Models\ImportConfigModel.vb" />
+    <Compile Include="Models\ContentFieldModel.vb" />
     <Compile Include="Models\ImportMapModel.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
@@ -122,6 +123,9 @@
     <Compile Include="Views\SelectTableView.vb" />
     <Compile Include="Views\MappingView.vb" />
     <Compile Include="Views\SelectKeyView.vb" />
+    <Compile Include="Views\SelectGroupView.vb" />
+    <Compile Include="Views\FinishView.vb" />
+    <Compile Include="Views\DoneView.vb" />
     <Compile Include="Views\_blankView.vb" />
   </ItemGroup>
   <ItemGroup>

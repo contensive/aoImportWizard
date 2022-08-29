@@ -6,37 +6,6 @@ Namespace Contensive.ImportWizard.Controllers
     Public NotInheritable Class GenericController
         Private Sub New()
         End Sub
-
-        '
-        '====================================================================================================
-        ''' <summary>
-        ''' Get the database field list for this content
-        ''' </summary>
-        ''' <param name="cp"></param>
-        ''' <param name="ContentName"></param>
-        ''' <param name="AllowID"></param>
-        ''' <returns></returns>
-        Public Shared Function getDbFieldList(cp As CPBaseClass, ContentName As String, AllowID As Boolean) As String
-            Try
-                Dim result As String = "," & cp.Content.GetProperty(ContentName, "SELECTFIELDLIST") & ","
-                If Not AllowID Then
-                    result = Replace(result, ",ID,", ",", , , vbTextCompare)
-                End If
-                result = Replace(result, ",CONTENTCONTROLID,", ",", , , vbTextCompare)
-                result = Replace(result, ",EDITSOURCEID,", ",", , , vbTextCompare)
-                result = Replace(result, ",EDITBLANK,", ",", , , vbTextCompare)
-                result = Replace(result, ",EDITARCHIVE,", ",", , , vbTextCompare)
-                result = Replace(result, ",DEVELOPER,", ",", , , vbTextCompare)
-                result = Mid(result, 2, Len(result) - 2)
-                '
-                Return result
-            Catch ex As Exception
-                cp.Site.ErrorReport(ex)
-                Throw
-            End Try
-        End Function
-
-
         '
         '====================================================================================================
         ''' <summary>

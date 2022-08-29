@@ -2,7 +2,7 @@
 Imports System.Linq
 Imports Contensive.BaseClasses
 Imports Contensive.ImportWizard.Models
-Imports Contensive.Models.Db
+'Imports Contensive.Models.Db
 
 Namespace Contensive.ImportWizard.Controllers
     Public Class SelectTableView
@@ -23,84 +23,143 @@ Namespace Contensive.ImportWizard.Controllers
                     ImportConfigModel.clear(app)
                     Return viewIdReturnBlank
                 End If
+                If Button = ButtonRestart Then
+                    '
+                    ' Restart
+                    ImportConfigModel.clear(app)
+                    Return viewIdSelectSource
+                End If
                 '
                 ' Load the importmap with what we have so far
                 '
                 Dim importConfig As ImportConfigModel = ImportConfigModel.create(app)
-                Dim ImportMap As ImportMapModel = ImportMapModel.create(cp, importConfig)
-
-
-                Dim useNewContentName As Boolean = cp.Doc.GetBoolean("useNewContentName")
-                If useNewContentName Then
-                    Dim newContentName As String = cp.Doc.GetText("newContentName")
-                    ImportMap.contentName = newContentName
+                Dim ImportMap As ImportMapModel = ImportMapModel.create(cp, importConfig.importMapPathFilename)
+                '
+                If cp.Doc.GetBoolean("useNewContentName") Then
+                    '
+                    ' -- new table. Save table and return
+                    ImportMap.contentName = cp.Doc.GetText("newContentName")
                     ImportMap.importToNewContent = True
                     ImportMap.skipRowCnt = 1
                     Call ImportMap.save(app, importConfig)
-                    'Call WizardController.saveWizardRequestInteger(cp, RequestNameImportContentID)
+                    '
                     Select Case Button
-                        Case ButtonCancel
-                            ImportConfigModel.clear(app)
-                            Return viewIdReturnBlank
                         Case ButtonFinish
                             Return viewIdSelectSource
-                        Case ButtonBack2
+                        Case ButtonBack
                             Return viewIdUpload
-                        Case ButtonContinue2
+                        Case ButtonContinue
                             Return viewIdFinish
                         Case Else
                             Return viewIdSelectTable
                     End Select
-                Else
-                    If (importConfig.dstContentId = cp.Doc.GetInteger(RequestNameImportContentID)) Then
-                        '
-                        ' -- no change, use existing import map
-                    Else
-                        '
-                        ' -- content changed, reset import map
-
-                        importConfig.dstContentId = cp.Doc.GetInteger(RequestNameImportContentID)
-                        importConfig.save(app)
-                        ImportMap.contentName = cp.Content.GetName(importConfig.dstContentId)
-
-                        Dim dbFieldNames() As String = Split(GenericController.getDbFieldList(cp, ImportMap.contentName, False), ",")
-                        Dim dbFieldNameCnt As Integer = UBound(dbFieldNames) + 1
-                        ImportMap.mapPairCnt = dbFieldNameCnt
-                        ReDim ImportMap.mapPairs(dbFieldNameCnt - 1)
-                        For rowPtr As Integer = 0 To dbFieldNameCnt - 1
-                            '
-                            ' -- set to manual value
-                            Dim dbField As ContentFieldModel = Nothing
-                            Dim dbFieldList As List(Of ContentFieldModel) = DbBaseModel.createList(Of ContentFieldModel)(cp, "(name=" & cp.Db.EncodeSQLText(dbFieldNames(rowPtr)) & ")And(contentid=" & importConfig.dstContentId & ")")
-                            If dbFieldList.Count > 0 Then
-                                dbField = dbFieldList.First()
-                            End If
-                            '
-                            ' -- search uploadFields for matches to dbFields
-                            '
-                            '
-                            ' -- created a 
-                            ImportMap.mapPairs(rowPtr) = New ImportMapModel_MapPair With {
-                            .uploadFieldPtr = -1,
-                            .dbFieldName = dbFieldNames(rowPtr),
-                            .dbFieldType = dbField.type,
-                            .setValue = ""
-                        }
-                        Next
-                        ImportMap.save(app, importConfig)
-                    End If
-                    '
-                    Select Case Button
-                        Case ButtonBack2
-                            '
-                            ' -- back
-                            Return viewIdUpload
-                        Case ButtonContinue2
-                            '
-                            ' -- continue
-                            Return viewIdNewMapping
-                    End Select
                 End If
+                '
+                ' -- Match to existing table
+                If (importConfig.dstContentId <> cp.Doc.GetInteger(RequestNameImportContentID)) Then
+                    '
+                    ' -- content changed, reset import map
+                    importConfig.dstContentId = cp.Doc.GetInteger(RequestNameImportContentID)
+                    importConfig.save(app)
+                    '
+                    ' -- build a new map
+                    ImportMap.contentName = cp.Content.GetName(importConfig.dstContentId)
+                    Dim dbFieldNames() As String = Split(ContentFieldModel.getDbFieldList(cp, ImportMap.contentName, False), ",")
+                    Dim dbFieldNameCnt As Integer = UBound(dbFieldNames) + 1
+                    ' todo di-hack
+                    app.loadUploadFields(importConfig.privateUploadPathFilename)
+                    Dim uploadFields() As String = app.uploadFields
+                    ImportMap.mapPairCnt = dbFieldNameCnt
+                    ReDim ImportMap.mapPairs(dbFieldNameCnt - 1)
+                    Dim rowPtr As Integer = 0
+                    For Each dbFieldName In dbFieldNames
+                        '
+                        ' -- setup mapPair
+                        Dim mapRow = New ImportMapModel_MapPair()
+                        ImportMap.mapPairs(rowPtr) = mapRow
+                        mapRow.dbFieldName = dbFieldName
+                        mapRow.setValue = Nothing
+                        mapRow.dbFieldType = ContentFieldModel.getFieldType(cp, dbFieldName, importConfig.dstContentId)
+                        mapRow.uploadFieldPtr = -1
+                        mapRow.uploadFieldName = ""
+                        '
+                        ' -- search uploadFields for matches to dbFields
+                        Dim dBFieldName_lower As String = LCase(dbFieldName)
+                        Dim uploadFieldPtr As Integer = 0
+                        For Each uploadField As String In uploadFields
+                            Dim uploadField_lower As String = uploadField.ToLowerInvariant()
+                            If uploadField_lower = dBFieldName_lower Then
+                                mapRow.uploadFieldPtr = uploadFieldPtr
+                                mapRow.uploadFieldName = uploadField
+                                Exit For
+                            End If
+                            Select Case dBFieldName_lower
+                                Case "company"
+                                    If (uploadField_lower = "companyname") OrElse (uploadField_lower = "company name") Then
+                                        mapRow.uploadFieldPtr = uploadFieldPtr
+                                        mapRow.uploadFieldName = uploadField
+                                        Exit For
+                                    End If
+                                Case "zip"
+                                    If (uploadField_lower = "zip code") OrElse (uploadField_lower = "zipcode") OrElse (uploadField_lower = "postal code") OrElse (uploadField_lower = "postalcode") OrElse (uploadField_lower = "zip/postalcode") Then
+                                        mapRow.uploadFieldPtr = uploadFieldPtr
+                                        mapRow.uploadFieldName = uploadField
+                                        Exit For
+                                    End If
+                                Case "firstname"
+                                    If uploadField_lower = "first" Then
+                                        mapRow.uploadFieldPtr = uploadFieldPtr
+                                        mapRow.uploadFieldName = uploadField
+                                        Exit For
+                                    End If
+                                Case "lastname"
+                                    If uploadField_lower = "last" Then
+                                        mapRow.uploadFieldPtr = uploadFieldPtr
+                                        mapRow.uploadFieldName = uploadField
+                                        Exit For
+                                    End If
+                                Case "email"
+                                    If (uploadField_lower = "e-mail") OrElse (uploadField_lower = "emailaddress") OrElse (uploadField_lower = "e-mailaddress") Then
+                                        mapRow.uploadFieldPtr = uploadFieldPtr
+                                        mapRow.uploadFieldName = uploadField
+                                        Exit For
+                                    End If
+                                Case "address"
+                                    If (uploadField_lower = "address1") OrElse (uploadField_lower = "addressline1") Then
+                                        mapRow.uploadFieldPtr = uploadFieldPtr
+                                        mapRow.uploadFieldName = uploadField
+                                        Exit For
+                                    End If
+                                Case "address2"
+                                    If (uploadField_lower = "addressline2") Then
+                                        mapRow.uploadFieldPtr = uploadFieldPtr
+                                        mapRow.uploadFieldName = uploadField
+                                        Exit For
+                                    End If
+                                Case "phone"
+                                    If (uploadField_lower = "phone number") OrElse (uploadField_lower = "phonenumber") Then
+                                        mapRow.uploadFieldPtr = uploadFieldPtr
+                                        mapRow.uploadFieldName = uploadField
+                                        Exit For
+                                    End If
+                            End Select
+                            uploadFieldPtr += 1
+                        Next
+                        rowPtr += 1
+                    Next
+                    ImportMap.save(app, importConfig)
+                End If
+                '
+                Select Case Button
+                    Case ButtonBack
+                        '
+                        ' -- back
+                        Return viewIdUpload
+                    Case ButtonContinue
+                        '
+                        ' -- continue
+                        Return viewIdNewMapping
+                End Select
             Catch ex As Exception
                 app.cp.Site.ErrorReport(ex)
                 Throw
@@ -118,7 +177,7 @@ Namespace Contensive.ImportWizard.Controllers
                 Dim headerCaption As String = "Import Wizard"
 
                 Dim importConfig As ImportConfigModel = ImportConfigModel.create(app)
-                Dim ImportMap As ImportMapModel = ImportMapModel.create(cp, importConfig)
+                Dim ImportMap As ImportMapModel = ImportMapModel.create(cp, importConfig.importMapPathFilename)
                 Dim ImportContentID As Integer = importConfig.dstContentId
                 If ImportContentID = 0 Then
                     ImportContentID = app.peopleContentid
@@ -147,7 +206,8 @@ Namespace Contensive.ImportWizard.Controllers
                     & "</div>" _
                     & ""
                 Content &= cp.Html.Hidden(rnSrcViewId, viewIdSelectTable.ToString)
-                Return HtmlController.getWizardContent(cp, headerCaption, ButtonCancel, ButtonBack2, ButtonContinue2, Description, Content)
+                Return HtmlController.createLayout(cp, headerCaption, Description, Content, True, True, True, True)
+                'Return HtmlController.createLayout(cp, headerCaption, ButtonCancel, ButtonBack2, ButtonContinue2, Description, Content)
             Catch ex As Exception
                 app.cp.Site.ErrorReport(ex)
                 Throw

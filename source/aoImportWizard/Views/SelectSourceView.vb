@@ -21,6 +21,12 @@ Namespace Contensive.ImportWizard.Controllers
                     ImportConfigModel.clear(app)
                     Return viewIdReturnBlank
                 End If
+                If Button = ButtonRestart Then
+                    '
+                    ' Restart
+                    ImportConfigModel.clear(app)
+                    Return viewIdSelectSource
+                End If
                 '
                 Dim importConfig As ImportConfigModel = ImportConfigModel.create(app)
                 importConfig.importSource = CType(app.cp.Doc.GetInteger(RequestNameImportSource), ImportDataModel_ImportTypeEnum)
@@ -30,7 +36,7 @@ Namespace Contensive.ImportWizard.Controllers
                     Case ButtonBack
                         '
                         Return srcViewId
-                    Case ButtonContinue2
+                    Case ButtonContinue
                         '
                         Select Case importConfig.importSource
                             Case ImportDataModel_ImportTypeEnum.UploadFile
@@ -89,7 +95,8 @@ Namespace Contensive.ImportWizard.Controllers
                     & "</div>" _
                     & ""
                 content &= cp.Html5.Hidden(rnSrcViewId, viewIdSelectSource)
-                Return HtmlController.getWizardContent(cp, headerCaption, ButtonCancel, "", ButtonContinue2, description, content)
+                Return HtmlController.createLayout(cp, headerCaption, description, content, True, True, True, True)
+                'Return HtmlController.createLayout(cp, headerCaption, ButtonCancel, "", ButtonContinue2, description, content)
             Catch ex As Exception
                 app.cp.Site.ErrorReport(ex)
                 Throw

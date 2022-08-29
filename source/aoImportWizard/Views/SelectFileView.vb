@@ -22,13 +22,19 @@ Namespace Contensive.ImportWizard.Controllers
                     ImportConfigModel.clear(app)
                     Return viewIdReturnBlank
                 End If
+                If Button = ButtonRestart Then
+                    '
+                    ' Restart
+                    ImportConfigModel.clear(app)
+                    Return viewIdSelectSource
+                End If
                 '
                 Select Case Button
-                    Case ButtonBack2
+                    Case ButtonBack
                         '
                         ' -- back to select source
                         Return viewIdSelectSource
-                    Case ButtonContinue2
+                    Case ButtonContinue
                         '
                         ' -- continue to select source file
                         Dim importConfig As ImportConfigModel = ImportConfigModel.create(app)
@@ -73,7 +79,8 @@ Namespace Contensive.ImportWizard.Controllers
                 Content &= cp.Html.Hidden(rnSrcViewId, viewIdSelectFile.ToString)
                 '
                 Call cp.Doc.AddRefreshQueryString(rnSrcViewId, CType("", String))
-                Return HtmlController.getWizardContent(cp, headerCaption, ButtonCancel, ButtonBack2, ButtonContinue2, Description, Content)
+                Return HtmlController.createLayout(cp, headerCaption, Description, Content, True, True, True, True)
+                'Return HtmlController.createLayout(cp, headerCaption, ButtonCancel, ButtonBack2, ButtonContinue2, Description, Content)
             Catch ex As Exception
                 app.cp.Site.ErrorReport(ex)
                 Throw

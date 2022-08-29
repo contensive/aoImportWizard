@@ -45,8 +45,8 @@ Namespace Contensive.ImportWizard
         Public Const RequestNameImportEmail = "ImportEmailNotify"
         Public Const RequestNameImportMapFile = "ImportMapFile"
         '
-        Public Const ButtonContinue2 = " Continue "
-        Public Const ButtonBack2 = " Back "
+        Public Const ButtonContinue = " Continue "
+        Public Const ButtonBack = " Back "
         Public Const ButtonApply = "  Apply "
         Public Const ButtonLogin = "  Login  "
         Public Const ButtonLogout = "  Logout  "
@@ -72,8 +72,6 @@ Namespace Contensive.ImportWizard
         Public Const ButtonAdd = "   Add    "
         Public Const ButtonAddChildPage = " Add Child "
         Public Const ButtonAddSiblingPage = " Add Sibling "
-        Public Const ButtonContinue = " Continue >> "
-        Public Const ButtonBack = "  << Back  "
         Public Const ButtonNext = "   Next   "
         Public Const ButtonPrevious = " Previous "
         Public Const ButtonFirst = "  First   "
@@ -112,6 +110,8 @@ Namespace Contensive.ImportWizard
         Public Const ButtonEnable = " Enable "
         Public Const ButtonDisable = " Disable "
         Public Const ButtonMarkReviewed = " Mark Reviewed "
+        Public Const ButtonRestart = "Restart"
+        '
         Public Const RequestNameRunAddon = "addonid"
         Public Const RequestNameEditReferer = "EditReferer"
         Public Const RequestNameRefreshBlock = "ccFormRefreshBlockSN"

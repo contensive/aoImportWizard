@@ -21,13 +21,19 @@ Namespace Contensive.ImportWizard.Controllers
                     ImportConfigModel.clear(app)
                     Return viewIdReturnBlank
                 End If
+                If Button = ButtonRestart Then
+                    '
+                    ' Restart
+                    ImportConfigModel.clear(app)
+                    Return viewIdSelectSource
+                End If
                 '
                 Select Case Button
-                    Case ButtonBack2
+                    Case ButtonBack
                         '
                         ' -- back to select source
                         Return viewIdSelectSource
-                    Case ButtonContinue2
+                    Case ButtonContinue
                         '
                         ' -- upload the file and continue
                         Dim Filename As String = app.cp.Doc.GetText(RequestNameImportUpload)
@@ -69,7 +75,8 @@ Namespace Contensive.ImportWizard.Controllers
                     & "</div>" _
                     & ""
                 content &= cp.Html5.Hidden(rnSrcViewId, viewIdUpload)
-                Return HtmlController.getWizardContent(cp, headerCaption, ButtonCancel, ButtonBack2, ButtonContinue2, description, content)
+                Return HtmlController.createLayout(cp, headerCaption, description, content, True, True, True, True)
+                'Return HtmlController.createLayout(cp, headerCaption, ButtonCancel, ButtonBack2, ButtonContinue2, description, content)
             Catch ex As Exception
                 app.cp.Site.ErrorReport(ex)
                 Throw

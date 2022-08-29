@@ -2,7 +2,7 @@
 Imports System.Linq
 Imports Contensive.BaseClasses
 Imports Contensive.ImportWizard.Models
-Imports Contensive.Models.Db
+Imports C5BaseModel = Contensive.Models.Db.DbBaseModel
 
 Namespace Contensive.ImportWizard.Controllers
     Public Class SelectKeyView
@@ -23,15 +23,20 @@ Namespace Contensive.ImportWizard.Controllers
                     ImportConfigModel.clear(app)
                     Return viewIdReturnBlank
                 End If
-
-
+                If Button = ButtonRestart Then
+                    '
+                    ' Restart
+                    ImportConfigModel.clear(app)
+                    Return viewIdSelectSource
+                End If
+                '
                 Dim importConfig = ImportConfigModel.create(app)
-                Dim ImportMap As ImportMapModel = ImportMapModel.create(cp, importConfig)
+                Dim ImportMap As ImportMapModel = ImportMapModel.create(cp, importConfig.importMapPathFilename)
                 ImportMap.keyMethodID = cp.Doc.GetInteger(RequestNameImportKeyMethodID)
                 ImportMap.sourceKeyField = cp.Doc.GetText(RequestNameImportSourceKeyFieldPtr)
                 ImportMap.dbKeyField = cp.Doc.GetText(RequestNameImportDbKeyField)
                 If Not String.IsNullOrEmpty(ImportMap.dbKeyField) Then
-                    Dim fieldList As List(Of ContentFieldModel) = DbBaseModel.createList(Of ContentFieldModel)(cp, "(name=" & cp.Db.EncodeSQLText(ImportMap.dbKeyField) & ")and(contentid=" & cp.Content.GetID(ImportMap.contentName) & ")")
+                    Dim fieldList As List(Of ContentFieldModel) = C5BaseModel.createList(Of ContentFieldModel)(cp, "(name=" & cp.Db.EncodeSQLText(ImportMap.dbKeyField) & ")and(contentid=" & cp.Content.GetID(ImportMap.contentName) & ")")
                     If (fieldList.Count > 0) Then
                         ImportMap.dbKeyFieldType = fieldList.First().type
                     End If
@@ -39,11 +44,11 @@ Namespace Contensive.ImportWizard.Controllers
                 ImportMap.save(app, importConfig)
 
                 Select Case Button
-                    Case ButtonBack2
+                    Case ButtonBack
                         '
                         ' -- back to mapping
                         Return viewIdNewMapping
-                    Case ButtonContinue2
+                    Case ButtonContinue
                         '
                         ' -- continue to Select Group or finish
                         If importConfig.dstContentId = app.peopleContentid Then
@@ -87,7 +92,7 @@ Namespace Contensive.ImportWizard.Controllers
                 Dim cp As CPBaseClass = app.cp
                 Dim headerCaption As String = "Import Wizard"
                 Dim importConfig As ImportConfigModel = ImportConfigModel.create(app)
-                Dim ImportMap As ImportMapModel = ImportMapModel.create(cp, importConfig)
+                Dim ImportMap As ImportMapModel = ImportMapModel.create(cp, importConfig.importMapPathFilename)
 
                 Dim KeyMethodID As Integer = cp.Utils.EncodeInteger(ImportMap.keyMethodID)
                 If KeyMethodID = 0 Then
@@ -145,8 +150,8 @@ Namespace Contensive.ImportWizard.Controllers
                     & "</div>" _
                     & ""
                 Content &= cp.Html.Hidden(rnSrcViewId, viewIdSelectKey.ToString)
-                Dim body As String = HtmlController.getWizardContent(cp, headerCaption, ButtonCancel, ButtonBack2, ButtonContinue2, Description, Content)
-                Return cp.Html.Form(body)
+                Return HtmlController.createLayout(cp, headerCaption, Description, Content, True, True, True, True)
+                'Return HtmlController.createLayout(cp, headerCaption, ButtonCancel, ButtonBack2, ButtonContinue2, Description, Content)
             Catch ex As Exception
                 app.cp.Site.ErrorReport(ex)
                 Throw

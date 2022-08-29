@@ -105,9 +105,9 @@ Namespace Contensive.ImportWizard.Addons
         ''' </summary>
         ''' <param name="app"></param>
         ''' <param name="CSVFilename"></param>
-        ''' <param name="ImportMapFilename"></param>
+        ''' <param name="ImportMapPathFilename"></param>
         ''' <returns></returns>
-        Private Function processCSV(app As ApplicationModel, CSVFilename As String, ImportMapFilename As String) As String
+        Private Function processCSV(app As ApplicationModel, CSVFilename As String, ImportMapPathFilename As String) As String
             Try
                 Dim cp As CPBaseClass = app.cp
                 Dim result As String = ""
@@ -115,19 +115,19 @@ Namespace Contensive.ImportWizard.Addons
                     CSVFilename = Mid(CSVFilename, 2)
                 End If
                 Dim hint As String = "010"
-                Dim source As String = cp.CdnFiles.Read(CSVFilename)
-                If String.IsNullOrEmpty(source) Then
+                Dim importData As String = cp.PrivateFiles.Read(CSVFilename)
+                If String.IsNullOrEmpty(importData) Then
                     '
                     ' -- if source is empty, return empty
                     Return String.Empty
                 End If
 
                 hint = "020"
-                Dim importConfig As ImportConfigModel = ImportConfigModel.create(app)
-                Dim importMap As ImportMapModel = ImportMapModel.create(cp, importConfig)
+                'Dim importConfig As ImportConfigModel = ImportConfigModel.create(app)
+                Dim importMap As ImportMapModel = ImportMapModel.create(cp, ImportMapPathFilename)
                 hint = "040"
-                Dim cells As String(,) = GenericController.parseFile(source)
-                Dim colCnt As Integer = UBound(cells, 1) + 1
+                Dim importDataCells As String(,) = GenericController.parseFile(importData)
+                Dim importDataColumnCnt As Integer = UBound(importDataCells, 1) + 1
                 Dim ImportTableName As String = ""
                 Dim dBFieldName As String
                 '
@@ -143,9 +143,9 @@ Namespace Contensive.ImportWizard.Addons
                     '
                     ' create the destination table and import map
                     importMap.skipRowCnt = 1
-                    importMap.mapPairCnt = colCnt
-                    ReDim importMap.mapPairs(colCnt - 1)
-                    importMap.mapPairs(colCnt - 1) = New ImportMapModel_MapPair
+                    importMap.mapPairCnt = importDataColumnCnt
+                    ReDim importMap.mapPairs(importDataColumnCnt - 1)
+                    importMap.mapPairs(importDataColumnCnt - 1) = New ImportMapModel_MapPair
                     ImportTableName = importMap.contentName
                     ImportTableName = Replace(ImportTableName, " ", "_")
                     ImportTableName = Replace(ImportTableName, "-", "_")
@@ -154,10 +154,10 @@ Namespace Contensive.ImportWizard.Addons
                     cp.Content.AddContent(importMap.contentName, ImportTableName)
                     hint = "070"
                     Dim colPtr As Integer
-                    For colPtr = 0 To colCnt - 1
+                    For colPtr = 0 To importDataColumnCnt - 1
                         importMap.mapPairs(colPtr) = New ImportMapModel_MapPair
                         hint = "080"
-                        dBFieldName = cells(colPtr, 0)
+                        dBFieldName = importDataCells(colPtr, 0)
                         dBFieldName = encodeFieldName(cp, dBFieldName)
                         If (String.IsNullOrEmpty(dBFieldName)) Then
                             dBFieldName = "field" & colPtr
@@ -180,7 +180,7 @@ Namespace Contensive.ImportWizard.Addons
                     '
                     Dim KeyCriteria As String = "(1=0)"
                     Dim rowPtr As Integer
-                    Dim rowCnt As Integer = UBound(cells, 2) + 1
+                    Dim rowCnt As Integer = UBound(importDataCells, 2) + 1
                     For rowPtr = importMap.skipRowCnt To rowCnt - 1
                         hint = "300"
                         Dim updateRecord As Boolean = False
@@ -198,7 +198,7 @@ Namespace Contensive.ImportWizard.Addons
                                 hint = "330"
                                 '
                                 ' Update or Update-And-Insert, Build Key Criteria
-                                Dim sourceKeyData As String = cells(SourceKeyPtr, rowPtr)
+                                Dim sourceKeyData As String = importDataCells(SourceKeyPtr, rowPtr)
                                 If Len(sourceKeyData) > 2 And Left(sourceKeyData, 1) = """" And Right(sourceKeyData, 1) = """" Then
                                     sourceKeyData = Trim(Mid(sourceKeyData, 2, Len(sourceKeyData) - 2))
                                 End If
@@ -270,57 +270,57 @@ Namespace Contensive.ImportWizard.Addons
                                 ' Build Update SQL
                                 For fieldPtr = 0 To importMap.mapPairCnt - 1
                                     hint = "500"
-                                    Dim sourcePtr As Integer = importMap.mapPairs(fieldPtr).uploadFieldPtr
-                                    If sourcePtr < 0 Then
+                                    Dim uploadFieldPtr As Integer = importMap.mapPairs(fieldPtr).uploadFieldPtr
+                                    If (uploadFieldPtr = -1) OrElse (uploadFieldPtr < -2) OrElse (uploadFieldPtr >= importDataColumnCnt) Then
                                         '
-                                        ' Bad pointer
-                                        '
-                                        sourcePtr = sourcePtr
-                                    ElseIf sourcePtr >= colCnt Then
-                                        '
-                                        ' This data row was not as Integer as the header row - skip it
-                                        '
-                                        sourcePtr = sourcePtr
+                                        ' --  ignore thie field
                                     Else
+                                        '
+                                        ' -- uploadFieldPtr=-2 (setvalue), or it is the importData column 0-based ptr
                                         hint = "600"
                                         dBFieldName = importMap.mapPairs(fieldPtr).dbFieldName
-                                        Dim sourceData As String = cells(sourcePtr, rowPtr)
-                                        rowWidth += Len(Trim(sourceData))
+                                        Dim importDataCellValue As String = ""
+                                        If uploadFieldPtr = -2 Then
+                                            importDataCellValue = importMap.mapPairs(fieldPtr).setValue
+                                        Else
+                                            importDataCellValue = importDataCells(uploadFieldPtr, rowPtr)
+                                        End If
+                                        rowWidth += Len(Trim(importDataCellValue))
                                         ' there are no fieldtypes defined as 0, and I do not want the CS open now, so we can avoid the insert if rowwidth=0
 
                                         Select Case importMap.mapPairs(fieldPtr).dbFieldType
                                             Case FieldTypeAutoIncrement, FieldTypeCurrency, FieldTypeFloat, FieldTypeInteger, FieldTypeLookup, FieldTypeManyToMany, FieldTypeMemberSelect
                                                 '
                                                 ' number, nullable
-                                                If (String.IsNullOrEmpty(sourceData)) Then
+                                                If (String.IsNullOrEmpty(importDataCellValue)) Then
                                                     updateSQLFieldSet &= "," & dBFieldName & "=null"
                                                 Else
-                                                    Dim sourceConverted As Double = cp.Utils.EncodeNumber(sourceData)
+                                                    Dim sourceConverted As Double = cp.Utils.EncodeNumber(importDataCellValue)
                                                     updateSQLFieldSet &= "," & dBFieldName & "=" & cp.Db.EncodeSQLNumber(sourceConverted)
                                                 End If
                                             Case FieldTypeBoolean
                                                 '
                                                 ' Boolean, null is false
-                                                Dim sourceConverted As Boolean = cp.Utils.EncodeBoolean(sourceData)
+                                                Dim sourceConverted As Boolean = cp.Utils.EncodeBoolean(importDataCellValue)
                                                 updateSQLFieldSet &= "," & dBFieldName & "=" & cp.Db.EncodeSQLBoolean(sourceConverted)
                                             Case FieldTypeDate
                                                 '
                                                 ' date, nullable
-                                                If (String.IsNullOrEmpty(sourceData)) Then
+                                                If (String.IsNullOrEmpty(importDataCellValue)) Then
                                                     updateSQLFieldSet &= "," & dBFieldName & "=null"
                                                 Else
-                                                    Dim sourceConverted As Date = cp.Utils.EncodeDate(sourceData)
+                                                    Dim sourceConverted As Date = cp.Utils.EncodeDate(importDataCellValue)
                                                     updateSQLFieldSet &= "," & dBFieldName & "=" & cp.Db.EncodeSQLDate(sourceConverted)
                                                 End If
                                             Case FieldTypeText, FieldTypeLink, FieldTypeResourceLink
                                                 '
                                                 ' text, null is empty
-                                                Dim sourceConverted As String = If(String.IsNullOrEmpty(sourceData), "", If(sourceData.Length < 256, sourceData, Left(sourceData, 255)))
+                                                Dim sourceConverted As String = If(String.IsNullOrEmpty(importDataCellValue), "", If(importDataCellValue.Length < 256, importDataCellValue, Left(importDataCellValue, 255)))
                                                 updateSQLFieldSet &= "," & dBFieldName & "=" & cp.Db.EncodeSQLText(sourceConverted)
                                             Case FieldTypeLongText, FieldTypeHTML
                                                 '
                                                 ' long text, null is empty
-                                                updateSQLFieldSet &= "," & dBFieldName & "=" & cp.Db.EncodeSQLText(sourceData)
+                                                updateSQLFieldSet &= "," & dBFieldName & "=" & cp.Db.EncodeSQLText(importDataCellValue)
                                             'Case FieldTypeFile, FieldTypeImage, FieldTypeTextFile, FieldTypeCSSFile, FieldTypeXMLFile, FieldTypeJavascriptFile, FieldTypeHTMLFile
                                             '    '
                                             '    ' filenames, can not import these, but at least update the filename
@@ -331,7 +331,7 @@ Namespace Contensive.ImportWizard.Addons
                                                 ' -- text files, like notes
                                                 textFileManualUpdate.Add(New textFileModel With {
                                                     .fieldName = dBFieldName,
-                                                    .fieldValue = sourceData
+                                                    .fieldValue = importDataCellValue
                                                 })
                                         End Select
                                     End If

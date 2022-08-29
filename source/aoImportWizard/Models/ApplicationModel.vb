@@ -102,7 +102,7 @@ Namespace Contensive.ImportWizard.Models
         ''' Load the sourceField and sourceFieldCnt from a wizard file
         ''' </summary>
         ''' <param name="Filename"></param>
-        Public Sub loadSourceFields(Filename As String)
+        Public Sub loadUploadFields(Filename As String)
             Try
                 Dim FileData As String
                 Dim ignoreLong As Integer
