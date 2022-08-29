@@ -18,6 +18,12 @@ Namespace Contensive.ImportWizard.Models
         ''' <returns></returns>
         Public Property dstContentId As Integer
         '
+        Public Sub newImportMap(app As ApplicationModel)
+            Dim rightNow As DateTime = Now
+            importMapPathFilename = constants.privateFilesMapFolder & "user" & app.cp.User.Id & "\map" & "-" & rightNow.Year & "-" & rightNow.Month & "-" & rightNow.Day & "-" & rightNow.Hour & "-" & rightNow.Minute & "-" & rightNow.Second & ".txt"
+            save(app)
+        End Sub
+        '
         ''' <summary>
         ''' create the current instance of the visits importdataobject
         ''' </summary>
@@ -29,12 +35,16 @@ Namespace Contensive.ImportWizard.Models
             ' -- return data
             If result IsNot Nothing Then Return result
             '
-            ' -- return default
-            Dim rightNow As DateTime = Now
-            result = New ImportConfigModel()
-            result.importSource = ImportDataModel_ImportTypeEnum.UploadFile
-            result.importMapPathFilename = constants.privateFilesMapFolder & "user" & app.cp.User.Id & "\map" & "-" & rightNow.Year & "-" & rightNow.Month & "-" & rightNow.Day & "-" & rightNow.Hour & "-" & rightNow.Minute & "-" & rightNow.Second & ".txt"
+            ' -- setup default values
+            result = New ImportConfigModel With {
+                .importSource = ImportDataModel_ImportTypeEnum.UploadFile,
+                .notifyEmail = app.cp.User.Email,
+                .dstContentId = 0
+            }
             result.save(app)
+            '
+            ' -- setup a new import map
+            result.newImportMap(app)
             Return result
         End Function
         '

@@ -33,11 +33,16 @@ Namespace Contensive.ImportWizard.Controllers
                 ' Load the importmap with what we have so far
                 '
                 Dim importConfig As ImportConfigModel = ImportConfigModel.create(app)
-                Dim ImportMap As ImportMapModel = ImportMapModel.create(cp, importConfig.importMapPathFilename)
                 '
                 If cp.Doc.GetBoolean("useNewContentName") Then
                     '
+                    ' -- reset import map
+                    importConfig.newImportMap(app)
+                    importConfig.dstContentId = cp.Doc.GetInteger(RequestNameImportContentID)
+                    importConfig.save(app)
+                    '
                     ' -- new table. Save table and return
+                    Dim ImportMap As ImportMapModel = ImportMapModel.create(cp, importConfig.importMapPathFilename)
                     ImportMap.contentName = cp.Doc.GetText("newContentName")
                     ImportMap.importToNewContent = True
                     ImportMap.skipRowCnt = 1
@@ -59,10 +64,12 @@ Namespace Contensive.ImportWizard.Controllers
                 If (importConfig.dstContentId <> cp.Doc.GetInteger(RequestNameImportContentID)) Then
                     '
                     ' -- content changed, reset import map
+                    importConfig.newImportMap(app)
                     importConfig.dstContentId = cp.Doc.GetInteger(RequestNameImportContentID)
                     importConfig.save(app)
                     '
                     ' -- build a new map
+                    Dim ImportMap As ImportMapModel = ImportMapModel.create(cp, importConfig.importMapPathFilename)
                     ImportMap.contentName = cp.Content.GetName(importConfig.dstContentId)
                     Dim dbFieldNames() As String = Split(ContentFieldModel.getDbFieldList(cp, ImportMap.contentName, False), ",")
                     Dim dbFieldNameCnt As Integer = UBound(dbFieldNames) + 1
@@ -107,13 +114,13 @@ Namespace Contensive.ImportWizard.Controllers
                                         Exit For
                                     End If
                                 Case "firstname"
-                                    If uploadField_lower = "first" Then
+                                    If (uploadField_lower = "first") OrElse (uploadField_lower = "first name") Then
                                         mapRow.uploadFieldPtr = uploadFieldPtr
                                         mapRow.uploadFieldName = uploadField
                                         Exit For
                                     End If
                                 Case "lastname"
-                                    If uploadField_lower = "last" Then
+                                    If (uploadField_lower = "last") OrElse (uploadField_lower = "last name") Then
                                         mapRow.uploadFieldPtr = uploadFieldPtr
                                         mapRow.uploadFieldName = uploadField
                                         Exit For

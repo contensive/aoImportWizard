@@ -111,7 +111,7 @@ Namespace Contensive.ImportWizard.Controllers
                     & "<TD align=left width=200>Save Data To</TD>" _
                     & "<TD align=left width=200>Type</TD>" _
                     & "</TR>"
-                Dim uploadFieldSelectTemplate As String = HtmlController.getSourceFieldSelect(app, importConfig.privateUploadPathFilename, "Ignore")
+                Dim uploadFieldSelectTemplate As String = HtmlController.getSourceFieldSelect(app, importConfig.privateUploadPathFilename, "Ignore", importConfig.dstContentId, True)
                 Dim rowPtr As Integer = 0
                 For Each mapPair As ImportMapModel_MapPair In ImportMap.mapPairs
                     '
@@ -149,13 +149,15 @@ Namespace Contensive.ImportWizard.Controllers
                             valueEditor = "<input type=""text"" name=""" & valueEditorHtmlName & """ value=""" & setValueValue & """ class=""form-control js-import-manual-data"" style=""{{styles}}"">"
                         Case FieldTypeLookup
                             dbFieldTypeCaption = "Integer ID"
-                            valueEditor = "<select name=""" & valueEditorHtmlName & """ value=""" & setValueValue & """ class=""form-control js-import-manual-data"" style=""{{styles}}""><option name=""""></option></select>"
+                            valueEditor = "<input type=""number"" name=""" & valueEditorHtmlName & """ value=""" & setValueValue & """ class=""form-control js-import-manual-data"" style=""{{styles}}"">"
+                            'valueEditor = "<select name=""" & valueEditorHtmlName & """ value=""" & setValueValue & """ class=""form-control js-import-manual-data"" style=""{{styles}}""><option name=""""></option></select>"
                         Case FieldTypeManyToMany
                             dbFieldTypeCaption = "Integer ID"
                             valueEditor = ""
                         Case FieldTypeMemberSelect
                             dbFieldTypeCaption = "Integer ID"
-                            valueEditor = "<select name=""" & valueEditorHtmlName & """ value=""" & setValueValue & """ class=""form-control js-import-manual-data"" style=""{{styles}}""><option name=""""></option></select>"
+                            valueEditor = "<input type=""number"" name=""" & valueEditorHtmlName & """ value=""" & setValueValue & """ class=""form-control js-import-manual-data"" style=""{{styles}}"">"
+                            'valueEditor = "<select name=""" & valueEditorHtmlName & """ value=""" & setValueValue & """ class=""form-control js-import-manual-data"" style=""{{styles}}""><option name=""""></option></select>"
                         Case FieldTypeText, FieldTypeLink, FieldTypeResourceLink
                             dbFieldTypeCaption = "Text (255 char)"
                             valueEditor = "<input type=""text"" name=""" & valueEditorHtmlName & """ value=""" & setValueValue & """ class=""form-control js-import-manual-data"" style=""{{styles}}"">"
@@ -165,6 +167,21 @@ Namespace Contensive.ImportWizard.Controllers
                     End Select
                     Dim uploadFieldSelect As String = uploadFieldSelectTemplate.Replace("{{fieldPtr}}", rowPtr.ToString()).Replace("{{inputName}}", "SourceField" & rowPtr)
                     Select Case mapPair.uploadFieldPtr
+                        Case -5
+                            '
+                            ' -- for people only. set to lastname of name
+                            uploadFieldSelect = Replace(uploadFieldSelect, "value=""-1"">", "value=""-5"" selected>", , , vbTextCompare)
+                            valueEditor = valueEditor.Replace("{{styles}}", "display:none;")
+                        Case -4
+                            '
+                            ' -- for people only. set to firstname of name
+                            uploadFieldSelect = Replace(uploadFieldSelect, "value=""-1"">", "value=""-4"" selected>", , , vbTextCompare)
+                            valueEditor = valueEditor.Replace("{{styles}}", "display:none;")
+                        Case -3
+                            '
+                            ' -- for people only. set to 'firstname lastname'
+                            uploadFieldSelect = Replace(uploadFieldSelect, "value=""-1"">", "value=""-3"" selected>", , , vbTextCompare)
+                            valueEditor = valueEditor.Replace("{{styles}}", "display:none;")
                         Case -2
                             '
                             ' -- set value

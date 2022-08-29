@@ -38,11 +38,17 @@ Namespace Contensive.ImportWizard.Controllers
                         '
                         ' -- continue to select source file
                         Dim importConfig As ImportConfigModel = ImportConfigModel.create(app)
-                        importConfig.privateUploadPathFilename = app.cp.Doc.GetText("SelectFile")
+                        If (importConfig.privateUploadPathFilename <> app.cp.Doc.GetText("SelectFile")) Then
+                            '
+                            ' -- there was a change in the file, reset the map
+                            importConfig.newImportMap(app)
+                            importConfig.privateUploadPathFilename = app.cp.Doc.GetText("SelectFile")
+                            importConfig.save(app)
+                        End If
                         If String.IsNullOrEmpty(importConfig.privateUploadPathFilename) Then
                             '
                             ' -- no file selected
-                            app.cp.UserError.Add("You must select an upload to continue")
+                            app.cp.UserError.Add("You must select a file to continue")
                             Return srcViewId
                         End If
                         If Left(importConfig.privateUploadPathFilename, 1) = "\" Then importConfig.privateUploadPathFilename = Mid(importConfig.privateUploadPathFilename, 2)
@@ -65,8 +71,7 @@ Namespace Contensive.ImportWizard.Controllers
             Try
                 Dim cp As CPBaseClass = app.cp
                 Dim headerCaption As String = "Import Wizard"
-                Dim Description As String = cp.Html.h4("Select a file from your Upload folder") & cp.Html.p("Select the upload file you wish to import")
-                Call cp.Doc.AddRefreshQueryString(rnSrcViewId, viewIdSelectFile.ToString)
+                Dim Description As String = cp.Html.h4("Select a file to import.") & cp.Html.p("Select a file that will be imported. This is a list of files you have previously uploaded.")
                 Dim fileList2 As New StringBuilder()
                 Dim uploadPtr As Integer = 0
                 For Each file In cp.PrivateFiles.FileList(privateFilesUploadPath)
@@ -78,9 +83,7 @@ Namespace Contensive.ImportWizard.Controllers
                 Dim Content As String = fileList2.ToString()
                 Content &= cp.Html.Hidden(rnSrcViewId, viewIdSelectFile.ToString)
                 '
-                Call cp.Doc.AddRefreshQueryString(rnSrcViewId, CType("", String))
                 Return HtmlController.createLayout(cp, headerCaption, Description, Content, True, True, True, True)
-                'Return HtmlController.createLayout(cp, headerCaption, ButtonCancel, ButtonBack2, ButtonContinue2, Description, Content)
             Catch ex As Exception
                 app.cp.Site.ErrorReport(ex)
                 Throw

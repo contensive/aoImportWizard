@@ -99,11 +99,6 @@ Namespace Contensive.ImportWizard.Controllers
                     KeyMethodID = KeyMethodUpdateOnMatchInsertOthers
                 End If
 
-
-
-
-
-
                 Dim SourceKeyFieldPtr As Integer
                 '
                 If Not String.IsNullOrEmpty(ImportMap.sourceKeyField) Then
@@ -112,7 +107,7 @@ Namespace Contensive.ImportWizard.Controllers
                     SourceKeyFieldPtr = -1
                 End If
                 Dim Filename As String = importConfig.privateUploadPathFilename
-                Dim SourceFieldSelect As String = Replace(HtmlController.getSourceFieldSelect(app, Filename, "Select One"), "xxxx", RequestNameImportSourceKeyFieldPtr)
+                Dim SourceFieldSelect As String = Replace(HtmlController.getSourceFieldSelect(app, Filename, "Select One", importConfig.dstContentId, false), "xxxx", RequestNameImportSourceKeyFieldPtr)
                 SourceFieldSelect = Replace(SourceFieldSelect, "value=" & SourceKeyFieldPtr, "value=" & SourceKeyFieldPtr & " selected", , , vbTextCompare)
                 '
                 'Dim PeopleContentID As Integer = CP.Content.GetID("people")
@@ -134,19 +129,19 @@ Namespace Contensive.ImportWizard.Controllers
                 Dim Description As String = cp.Html.h4("Update Control") & cp.Html.p("When your data is imported, it can either update your current database, or insert new records into your database. Use this form to control which records will be updated, and which will be inserted.")
                 Dim Content As String = "" _
                     & "<div>" _
+                    & "<h4>Key Fields</h4>" _
                     & "<TABLE border=0 cellpadding=4 cellspacing=0 width=100%>" _
-                    & "<TR><TD colspan=2>Key Fields</td></tr>" _
                     & "<TR><TD width=10>&nbsp;</td><td width=99% align=left>" _
                         & "<TABLE border=0 cellpadding=2 cellspacing=0 width=100%>" _
                         & "<tr><td>Imported&nbsp;Key&nbsp;</td><td>" & SourceFieldSelect & "</td></tr>" _
                         & "<tr><td>Database&nbsp;Key&nbsp;</td><td>" & DBFieldSelect & "</td></tr>" _
                         & "</table>" _
                         & "</td></tr>" _
-                    & "<TR><TD colspan=2>Update Options</td></tr>" _
-                    & "<TR><TD width=10>" & cp.Html.RadioBox(RequestNameImportKeyMethodID, KeyMethodInsertAll.ToString, KeyMethodID.ToString) & "</td><td width=99% align=left>Insert all imported data, regardless of key field.</td></tr>" _
-                    & "<TR><TD width=10>" & cp.Html.RadioBox(RequestNameImportKeyMethodID, KeyMethodUpdateOnMatchInsertOthers.ToString, KeyMethodID.ToString) & "</td><td width=99% align=left>Update database records when the data in the key fields match. Insert all other imported data.</td></tr>" _
-                    & "<TR><TD width=10>" & cp.Html.RadioBox(RequestNameImportKeyMethodID, KeyMethodUpdateOnMatch.ToString, KeyMethodID.ToString) & "</td><td width=99% align=left>Update database records when the data in the key fields match. Ignore all other imported data.</td></tr>" _
                     & "</table>" _
+                    & "<h4>Update Options</h4>" _
+                    & HtmlController.getRadio(cp, RequestNameImportKeyMethodID, KeyMethodInsertAll, KeyMethodID, "Insert all imported data, regardless of key field.") _
+                    & HtmlController.getRadio(cp, RequestNameImportKeyMethodID, KeyMethodUpdateOnMatchInsertOthers, KeyMethodID, "Update database records when the data in the key fields match. Insert all other imported data.") _
+                    & HtmlController.getRadio(cp, RequestNameImportKeyMethodID, KeyMethodUpdateOnMatch, KeyMethodID, "Update database records when the data in the key fields match. Ignore all other imported data.") _
                     & "</div>" _
                     & ""
                 Content &= cp.Html.Hidden(rnSrcViewId, viewIdSelectKey.ToString)

@@ -96,8 +96,6 @@
     <Compile Include="Addons\ImportTask.vb" />
     <Compile Include="Addons\ImportWizardAddon.vb" />
     <Compile Include="Controllers\HtmlController.vb" />
-    <Compile Include="Controllers\WizardController.vb" />
-    <Compile Include="Controllers\MapController.vb" />
     <Compile Include="Models\ImportConfigModel.vb" />
     <Compile Include="Models\ContentFieldModel.vb" />
     <Compile Include="Models\ImportMapModel.vb" />

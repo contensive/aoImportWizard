@@ -273,10 +273,15 @@ Namespace Contensive.ImportWizard.Addons
                                     Dim uploadFieldPtr As Integer = importMap.mapPairs(fieldPtr).uploadFieldPtr
                                     If (uploadFieldPtr = -1) OrElse (uploadFieldPtr < -2) OrElse (uploadFieldPtr >= importDataColumnCnt) Then
                                         '
-                                        ' --  ignore thie field
+                                        ' --  ignore -1 = ignore
+                                        ' --  ignore -3 = firstname + lastname
+                                        ' --  ignore -4 = firstname from name field
+                                        ' --  ignore -5 = lastname from name field
                                     Else
                                         '
-                                        ' -- uploadFieldPtr=-2 (setvalue), or it is the importData column 0-based ptr
+                                        ' -- handle>=0 as pointer to upload field
+                                        ' -- handle -2 use setValue
+                                        '
                                         hint = "600"
                                         dBFieldName = importMap.mapPairs(fieldPtr).dbFieldName
                                         Dim importDataCellValue As String = ""
@@ -347,6 +352,7 @@ Namespace Contensive.ImportWizard.Addons
                                 ' insert or update the table
                                 '
                                 Dim cs As CPCSBaseClass = cp.CSNew()
+                                Dim recordId As Integer = 0
                                 Dim matchFound As Boolean
                                 If updateRecord Then
                                     '
@@ -377,7 +383,7 @@ Namespace Contensive.ImportWizard.Addons
                                             If Not cs.OK() Then
                                                 result &= vbCrLf & "Row " & (rowPtr + 1) & " could not be imported because a record count not be inserted."
                                             Else
-                                                Dim recordId As Integer = cs.GetInteger("ID")
+                                                recordId = cs.GetInteger("ID")
                                                 KeyCriteria = "(ID=" & cp.Utils.EncodeNumber(recordId) & ")"
                                                 updateRecord = True
                                             End If
@@ -409,6 +415,23 @@ Namespace Contensive.ImportWizard.Addons
                                         End If
                                     End Using
                                 End If
+                                '
+                                ' -- now handle the post-save fields like firstname+lastname
+                                For Each mapPair In importMap.mapPairs
+                                    If mapPair.uploadFieldPtr = -3 Then
+                                        '
+                                        ' -- set field = firstname + lastname
+                                        cp.Db.ExecuteNonQuery("update " & ImportTableName & " set " & mapPair.dbFieldName & "=[firstname] + ' ' + [lastname] where " & KeyCriteria)
+                                    ElseIf mapPair.uploadFieldPtr = -4 Then
+                                        '
+                                        ' -- set field = first word from name field
+                                        cp.Db.ExecuteNonQuery("update " & ImportTableName & " set " & mapPair.dbFieldName & "=SUBSTRING(name, 1, CHARINDEX(' ', name) - 1) where " & KeyCriteria)
+                                    ElseIf mapPair.uploadFieldPtr = -5 Then
+                                        '
+                                        ' -- set field = last word from name field
+                                        cp.Db.ExecuteNonQuery("update " & ImportTableName & " set " & mapPair.dbFieldName & "=SUBSTRING(name, CHARINDEX(' ', name) + 1, LEN(name) - CHARINDEX(' ', name)) where " & KeyCriteria)
+                                    End If
+                                Next
                                 '
                                 '
                                 If importMap.groupOptionID <> GroupOptionNone Then

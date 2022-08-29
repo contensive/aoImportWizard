@@ -14,7 +14,11 @@ Namespace Contensive.ImportWizard.Controllers
             Try
                 Dim cp As CPBaseClass = app.cp
                 Dim Button As String = app.cp.Doc.GetText(RequestNameButton)
-                If String.IsNullOrEmpty(Button) Then Return srcViewId
+                If String.IsNullOrEmpty(Button) Then
+                    '
+                    ' -- no button, stay here
+                    Return srcViewId
+                End If
                 If Button = ButtonCancel Then
                     '
                     ' Cancel
@@ -36,10 +40,19 @@ Namespace Contensive.ImportWizard.Controllers
                     Case ButtonContinue
                         '
                         ' -- upload the file and continue
-                        Dim Filename As String = app.cp.Doc.GetText(RequestNameImportUpload)
-                        If String.IsNullOrEmpty(Filename) Then Return viewIdSelectSource
+                        Dim privateUploadPathFilename As String = app.cp.Doc.GetText(RequestNameImportUpload)
+                        If String.IsNullOrEmpty(privateUploadPathFilename) Then
+                            '
+                            ' -- no file uploaded, stay here
+                            Return srcViewId
+                        End If
                         '
                         Dim importConfig As ImportConfigModel = ImportConfigModel.create(app)
+                        If (importConfig.privateUploadPathFilename <> privateUploadPathFilename) Then
+                            '
+                            ' -- upload changed, reset map
+                            importConfig.newImportMap(app)
+                        End If
                         If Not app.cp.PrivateFiles.SaveUpload(RequestNameImportUpload, privateFilesUploadPath, importConfig.privateUploadPathFilename) Then
                             '
                             ' -- upload failed, stay on this view

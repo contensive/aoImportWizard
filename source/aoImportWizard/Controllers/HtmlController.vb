@@ -15,7 +15,7 @@ Namespace Contensive.ImportWizard.Controllers
         ''' <param name="filename"></param>
         ''' <param name="noneCaption"></param>
         ''' <returns></returns>
-        Public Shared Function getSourceFieldSelect(app As ApplicationModel, filename As String, noneCaption As String) As String
+        Public Shared Function getSourceFieldSelect(app As ApplicationModel, filename As String, noneCaption As String, dstContentId As Integer, allowControlFields As Boolean) As String
             Try
                 Dim cp As CPBaseClass = app.cp
                 If String.IsNullOrEmpty(filename) Then Return String.Empty
@@ -27,10 +27,15 @@ Namespace Contensive.ImportWizard.Controllers
                 Dim result As String = ""
                 result = "<select name={{inputName}} class=""form-control js-import-select"" id=""js-import-select-{{fieldPtr}}"">"
                 result &= "<option value=""-1"">" & noneCaption & "</option>"
-                result &= "<option value=""-2"">Set Value</option>"
                 For Ptr As Integer = 0 To app.sourceFieldCnt - 1
                     result &= "<option value=""" & Ptr & """>column " & (Ptr + 1) & " (" & If(String.IsNullOrEmpty(app.uploadFields(Ptr)), "[blank]", app.uploadFields(Ptr)) & ")</option>"
                 Next
+                If allowControlFields Then
+                    result &= "<option value=""-2"">Set value manually</option>"
+                    If dstContentId = app.peopleContentid Then result &= "<option value=""-3"">Set to firstname + lastname</option>"
+                    If dstContentId = app.peopleContentid Then result &= "<option value=""-4"">Set to firstname from name field</option>"
+                    If dstContentId = app.peopleContentid Then result &= "<option value=""-5"">Set to lastname from name field</option>"
+                End If
                 result &= "</select>"
                 Return result
             Catch ex As Exception
@@ -42,7 +47,7 @@ Namespace Contensive.ImportWizard.Controllers
         Public Shared Function getRadio(cp As CPBaseClass, radioName As String, radioValue As Integer, selectedValue As Integer, radioLabel As String) As String
             Dim uniqueId As String = "id" & cp.Utils.GetRandomInteger
             Dim result As String = "<label class=""form-check-label"" for=""" & uniqueId & """>" & radioLabel & "</label>"
-            result = "<input class=""form-check-input"" type=""radio"" name=""" & radioName & """ id=""" & uniqueId & """ value=""" & radioValue & """ " & If(selectedValue = radioValue, " selected", "") & ">" & result
+            result = "<input class=""form-check-input"" type=""radio"" name=""" & radioName & """ id=""" & uniqueId & """ value=""" & radioValue & """ " & If(selectedValue = radioValue, " checked", "") & ">" & result
             result = "<div class=""ml-4 form-check"">" & result & "</div>"
             Return result
         End Function
@@ -82,18 +87,18 @@ Namespace Contensive.ImportWizard.Controllers
         '    End Try
         'End Function
         '
-        Public Shared Function createLayout(cp As CPBaseClass, header As String, description As String, body As String, allowCancel As Boolean, allowReset As Boolean, allowBack As Boolean, allowContinue As Boolean) As String
+        Public Shared Function createLayout(cp As CPBaseClass, header As String, description As String, body As String, allowCancel As Boolean, allowRestart As Boolean, allowBack As Boolean, allowContinue As Boolean) As String
             Try
                 Return "" _
                     & cp.Html.div("" _
                         & cp.Html.h2(header) _
                         & cp.Html.div(description) _
-                        & cp.Html.div(body) _
+                        & cp.Html.div(body, "", "mt-4") _
                         & cp.Html.div("" _
-                            & If(allowCancel, cp.Html.Button("button", ButtonCancel), "") _
-                            & If(allowReset, cp.Html.Button("button", ButtonReset), "") _
-                            & If(allowBack, cp.Html.Button("button", ButtonBack), "") _
-                            & If(allowContinue, cp.Html.Button("button", ButtonContinue), ""), "", "p-2 bg-secondary") _
+                            & If(allowCancel, cp.Html.Button("button", ButtonCancel, "mr-2"), "") _
+                            & If(allowRestart, cp.Html.Button("button", ButtonRestart, "mr-2"), "") _
+                            & If(allowBack, cp.Html.Button("button", ButtonBack, "mr-2"), "") _
+                            & If(allowContinue, cp.Html.Button("button", ButtonContinue, "mr-2"), ""), "", "mt-4 p-2 bg-secondary") _
                         & "", "", "bg-white p-4")
             Catch ex As Exception
                 cp.Site.ErrorReport(ex)

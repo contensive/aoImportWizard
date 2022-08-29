@@ -47,6 +47,7 @@ Namespace Contensive.ImportWizard.Models
                 .contentName = "People",
                 .groupID = 0,
                 .mapPairCnt = 0,
+                .mapPairs = {},
                 .skipRowCnt = 1
                 }
                 Return result
@@ -78,6 +79,9 @@ Namespace Contensive.ImportWizard.Models
         ''' 0-based index to the column of the uploaded data file
         ''' -1 = ignore this fields
         ''' -2 = set the value from the setValue field
+        ''' -3 = combine 'firstname lastname' (valid for people content only. All other tables will ignore this)
+        ''' -4 = firstname from name field (valid for people content only. All other tables will ignore this)
+        ''' -5 = lastname from name field (valid for people content only. All other tables will ignore this)
         ''' </summary>
         ''' <returns></returns>
         Public Property uploadFieldPtr As Integer
