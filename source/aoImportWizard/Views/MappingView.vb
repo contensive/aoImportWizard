@@ -106,14 +106,18 @@ Namespace Contensive.ImportWizard.Controllers
                 result &= "" _
                     & "<TR>" _
                     & "<TD align=left>Data From</TD>" _
-                    & "<TD align=left width=200>Set Value</TD>" _
+                    & "<TD align=left width=150>Set Value</TD>" _
                     & "<TD align=center width=10></TD>" _
-                    & "<TD align=left width=200>Save Data To</TD>" _
-                    & "<TD align=left width=200>Type</TD>" _
+                    & "<TD align=left width=300>Save Data To</TD>" _
+                    & "<TD align=left width=150>Type</TD>" _
                     & "</TR>"
                 Dim uploadFieldSelectTemplate As String = HtmlController.getSourceFieldSelect(app, importConfig.privateUploadPathFilename, "Ignore", importConfig.dstContentId, True)
                 Dim rowPtr As Integer = 0
+                Dim fieldList As List(Of ContentFieldModel) = C5BaseModel.createList(Of ContentFieldModel)(cp, "contentId=" & importConfig.dstContentId)
                 For Each mapPair As ImportMapModel_MapPair In ImportMap.mapPairs
+                    '
+                    ' -- 
+                    Dim mapField As ContentFieldModel = fieldList.Find(Function(x) x.name = mapPair.dbFieldName)
                     '
                     ' -- classes for each column
                     Dim cell0Style As String = ""
@@ -202,18 +206,15 @@ Namespace Contensive.ImportWizard.Controllers
                     ' Now customize the caption for the DBField a little
                     '
                     Dim dbFieldCaption As String = mapPair.dbFieldName
-                    If Not cp.User.IsDeveloper Then
-                        Select Case LCase(dbFieldCaption)
-                            Case "id"
-                                dbFieldCaption = "Contensive ID"
-                        End Select
+                    If mapField IsNot Nothing Then
+                        dbFieldCaption = mapField.caption
                     End If
                     Dim rowStyle As String
                     Dim cellClass As String = "text-align:center;vertical-align:middle;"
                     If rowPtr Mod 2 = 0 Then
-                        rowStyle = "border-top:1px solid #e0e0e0;border-right:1px solid white;background-color:white;"
+                        rowStyle = "border-top:1px solid #e0e0e0;border-right:1px solid white;background-color:white;vertical-align:middle;"
                     Else
-                        rowStyle = "border-top:1px solid #e0e0e0;border-right:1px solid white;background-color:#f0f0f0;"
+                        rowStyle = "border-top:1px solid #e0e0e0;border-right:1px solid white;background-color:#f0f0f0;vertical-align:middle;"
                     End If
                     result = result _
                         & vbCrLf _

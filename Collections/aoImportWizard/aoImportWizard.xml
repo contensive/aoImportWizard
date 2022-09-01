@@ -28,6 +28,14 @@
 						$(this).closest('tr').find('.js-import-manual-data').first().hide();
 					}
 				});
+				// -- prevent form submission on enter (block enter key)
+				$(window).keydown(function(event){
+					if(event.keyCode == 13) {
+						event.preventDefault();
+						return false;
+					}
+				});
+
 			});
 		]]></JavascriptInHead>
 		<javascriptForceHead>No</javascriptForceHead>

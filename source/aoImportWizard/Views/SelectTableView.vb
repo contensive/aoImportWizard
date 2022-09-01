@@ -2,7 +2,7 @@
 Imports System.Linq
 Imports Contensive.BaseClasses
 Imports Contensive.ImportWizard.Models
-'Imports Contensive.Models.Db
+Imports C5BaseModel = Contensive.Models.Db.DbBaseModel
 
 Namespace Contensive.ImportWizard.Controllers
     Public Class SelectTableView
@@ -71,6 +71,9 @@ Namespace Contensive.ImportWizard.Controllers
                     ' -- build a new map
                     Dim ImportMap As ImportMapModel = ImportMapModel.create(cp, importConfig.importMapPathFilename)
                     ImportMap.contentName = cp.Content.GetName(importConfig.dstContentId)
+
+                    Dim fieldList As List(Of ContentFieldModel) = C5BaseModel.createList(Of ContentFieldModel)(cp, "contentId=" & importConfig.dstContentId)
+
                     Dim dbFieldNames() As String = Split(ContentFieldModel.getDbFieldList(cp, ImportMap.contentName, False), ",")
                     Dim dbFieldNameCnt As Integer = UBound(dbFieldNames) + 1
                     ' todo di-hack
