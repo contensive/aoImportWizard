@@ -134,7 +134,7 @@ Namespace Contensive.ImportWizard.Controllers
                     Select Case mapPair.dbFieldType
                         Case FieldTypeBoolean
                             dbFieldTypeCaption = "true/false"
-                            valueEditor = "<input type=""checkbox"" name=""" & valueEditorHtmlName & """ value=""" & setValueValue & """ class=""js-import-manual-data"" style=""{{styles}}"">"
+                            valueEditor = "<input type=""checkbox"" name=""" & valueEditorHtmlName & """ value=""1"" class=""js-import-manual-data"" style=""{{styles}}""" & If(cp.Utils.EncodeBoolean(setValueValue), " checked", "") & ">"
                             cell1Style &= "vertical-align:middle;text-align:center;"
                         Case FieldTypeCurrency, FieldTypeFloat
                             dbFieldTypeCaption = "Number"

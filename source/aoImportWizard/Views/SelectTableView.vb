@@ -72,7 +72,7 @@ Namespace Contensive.ImportWizard.Controllers
                     Dim ImportMap As ImportMapModel = ImportMapModel.create(cp, importConfig.importMapPathFilename)
                     ImportMap.contentName = cp.Content.GetName(importConfig.dstContentId)
 
-                    Dim fieldList As List(Of ContentFieldModel) = C5BaseModel.createList(Of ContentFieldModel)(cp, "contentId=" & importConfig.dstContentId)
+                    Dim fieldList As List(Of ContentFieldModel) = C5BaseModel.createList(Of ContentFieldModel)(cp, "(contentId=" & importConfig.dstContentId & ")and(active>0)", "caption")
 
                     Dim dbFieldNames() As String = Split(ContentFieldModel.getDbFieldList(cp, ImportMap.contentName, False), ",")
                     Dim dbFieldNameCnt As Integer = UBound(dbFieldNames) + 1
