@@ -118,12 +118,13 @@
     <Compile Include="Views\SelectSourceView.vb" />
     <Compile Include="Views\UploadView.vb" />
     <Compile Include="Views\SelectFileView.vb" />
-    <Compile Include="Views\SelectTableView.vb" />
+    <Compile Include="Views\SelectContentView.vb" />
     <Compile Include="Views\MappingView.vb" />
     <Compile Include="Views\SelectKeyView.vb" />
     <Compile Include="Views\SelectGroupView.vb" />
     <Compile Include="Views\FinishView.vb" />
     <Compile Include="Views\DoneView.vb" />
+    <Compile Include="Views\SelectMapView.vb" />
     <Compile Include="Views\_blankView.vb" />
   </ItemGroup>
   <ItemGroup>

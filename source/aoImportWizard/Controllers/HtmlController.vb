@@ -44,11 +44,11 @@ Namespace Contensive.ImportWizard.Controllers
             End Try
         End Function
         '
-        Public Shared Function getRadio(cp As CPBaseClass, radioName As String, radioValue As Integer, selectedValue As Integer, radioLabel As String) As String
+        Public Shared Function getRadio(cp As CPBaseClass, radioName As String, radioValue As Integer, selectedValue As Integer, radioLabel As String, htmlId As String) As String
             Dim uniqueId As String = "id" & cp.Utils.GetRandomInteger
             Dim result As String = "<label class=""form-check-label"" for=""" & uniqueId & """>" & radioLabel & "</label>"
             result = "<input class=""form-check-input"" type=""radio"" name=""" & radioName & """ id=""" & uniqueId & """ value=""" & radioValue & """ " & If(selectedValue = radioValue, " checked", "") & ">" & result
-            result = "<div class=""ml-4 form-check"">" & result & "</div>"
+            result = "<div class=""ml-4 form-check"" id=""" & htmlId & """>" & result & "</div>"
             Return result
         End Function
         '

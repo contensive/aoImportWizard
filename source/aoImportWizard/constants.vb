@@ -16,11 +16,12 @@ Namespace Contensive.ImportWizard
         Public Const viewIdSelectSource As Integer = 1
         Public Const viewIdUpload As Integer = 2
         Public Const viewIdSelectFile As Integer = 3
-        Public Const viewIdNewMapping As Integer = 5
+        Public Const viewIdSelectContent As Integer = 9
+        Public Const viewIdSelectMap As Integer = 4
+        Public Const viewIdMapping As Integer = 5
         Public Const viewIdSelectGroup As Integer = 6
         Public Const viewIdSelectKey As Integer = 7
         Public Const viewIdFinish As Integer = 8
-        Public Const viewIdSelectTable As Integer = 9
         Public Const viewIdDone As Integer = 10
         ''' <summary>
         ''' return this view and the addon returns blank -- this is a signal to the calling program this this application is exiting and to handle the view
@@ -30,6 +31,7 @@ Namespace Contensive.ImportWizard
         '
         '
         '
+        Public Const rnRowCount As String = "rowCount"
         Public Const rnSrcViewId = "SubForm"
         Public Const RequestNameImportWizardID = "ImportWizardID"
         Public Const RequestNameImportSource = "ImportWizardSource"

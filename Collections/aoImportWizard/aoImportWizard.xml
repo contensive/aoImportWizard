@@ -35,8 +35,24 @@
 						return false;
 					}
 				});
-
+				//
+				// -- key select
+				showHideKey();				
+				$('body').on('click','input[name=ImportWizardKeyMethodID]',function(){showHideKey();});
 			});
+			function showHideKey() {
+				console.log('showHideKey');
+				switch($('input[name=ImportWizardKeyMethodID]:checked').val()) {
+					case '1':
+						console.log('showHideKey-1');
+						$('#js-key-fields').hide();
+						break;
+					default:
+						console.log('showHideKey-other');
+						$('#js-key-fields').show();
+				}
+
+			}
 		]]></JavascriptInHead>
 		<javascriptForceHead>No</javascriptForceHead>
 		<!-- deprecated --><JSBodyScriptSrc></JSBodyScriptSrc>

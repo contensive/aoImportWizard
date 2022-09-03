@@ -65,7 +65,7 @@ Namespace Contensive.ImportWizard.Controllers
                 '
                 Select Case Button
                     Case ButtonBack
-                        Return viewIdSelectTable
+                        Return viewIdSelectMap
                     Case ButtonContinue
                         Return viewIdSelectKey
                 End Select
@@ -152,8 +152,26 @@ Namespace Contensive.ImportWizard.Controllers
                             dbFieldTypeCaption = "Text (8000 char)"
                             valueEditor = "<input type=""text"" name=""" & valueEditorHtmlName & """ value=""" & setValueValue & """ class=""form-control js-import-manual-data"" style=""{{styles}}"">"
                         Case FieldTypeLookup
-                            dbFieldTypeCaption = "Integer ID"
-                            valueEditor = "<input type=""number"" name=""" & valueEditorHtmlName & """ value=""" & setValueValue & """ class=""form-control js-import-manual-data"" style=""{{styles}}"">"
+                            '
+                            ' -- lookup
+                            If mapField.lookupContentId > 0 Then
+                                '
+                                ' -- lookup from a table
+                                Dim mapContentName As String = cp.Content.GetName(mapField.lookupContentId)
+                                valueEditor = cp.Html5.SelectContent(valueEditorHtmlName, setValueValue, mapContentName, "", "", "form-control js-import-manual-data").Replace("<select ", "<select style=""{{styles}}""")
+                            ElseIf String.IsNullOrEmpty(mapField.lookupList) Then
+                                '
+                                ' -- lookup from a list
+                                valueEditor = cp.Html5.SelectList(valueEditorHtmlName, setValueValue, mapField.lookupList, "", "", "form-control js-import-manual-data").Replace("<select ", "<select style=""{{styles}}""")
+                            Else
+                                '
+                                ' -- invalid, just enter integer
+                                valueEditor = "<input type=""number"" name=""" & valueEditorHtmlName & """ value=""" & setValueValue & """ class=""form-control js-import-manual-data"" style=""{{styles}}"">"
+                            End If
+
+
+                            dbFieldTypeCaption = "Lookup"
+
                             'valueEditor = "<select name=""" & valueEditorHtmlName & """ value=""" & setValueValue & """ class=""form-control js-import-manual-data"" style=""{{styles}}""><option name=""""></option></select>"
                         Case FieldTypeManyToMany
                             dbFieldTypeCaption = "Integer ID"
@@ -230,7 +248,7 @@ Namespace Contensive.ImportWizard.Controllers
                 '
                 result &= "<input type=hidden name=Ccnt value=" & rowPtr & ">"
                 result &= "</TABLE>"
-                result &= cp.Html.Hidden(rnSrcViewId, viewIdNewMapping.ToString)
+                result &= cp.Html.Hidden(rnSrcViewId, viewIdMapping.ToString)
                 Return HtmlController.createLayout(cp, headerCaption, Description, result, True, True, True, True)
                 'Return HtmlController.createLayout(cp, headerCaption, ButtonCancel, ButtonBack2, ButtonContinue2, Description, result)
             Catch ex As Exception

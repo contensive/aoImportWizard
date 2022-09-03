@@ -18,9 +18,8 @@ Namespace Contensive.ImportWizard.Models
         ''' <returns></returns>
         Public Property dstContentId As Integer
         '
-        Public Sub newImportMap(app As ApplicationModel)
-            Dim rightNow As DateTime = Now
-            importMapPathFilename = constants.privateFilesMapFolder & "user" & app.cp.User.Id & "\map" & "-" & rightNow.Year & "-" & rightNow.Month & "-" & rightNow.Day & "-" & rightNow.Hour & "-" & rightNow.Minute & "-" & rightNow.Second & ".txt"
+        Public Sub newEmptyImportMap(app As ApplicationModel)
+            importMapPathFilename = ImportMapModel.getNewMapFilename(app)
             save(app)
         End Sub
         '
@@ -44,7 +43,7 @@ Namespace Contensive.ImportWizard.Models
             result.save(app)
             '
             ' -- setup a new import map
-            result.newImportMap(app)
+            'result.newEmptyImportMap(app)
             Return result
         End Function
         '

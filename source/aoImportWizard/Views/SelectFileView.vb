@@ -41,7 +41,7 @@ Namespace Contensive.ImportWizard.Controllers
                         If (importConfig.privateUploadPathFilename <> app.cp.Doc.GetText("SelectFile")) Then
                             '
                             ' -- there was a change in the file, reset the map
-                            importConfig.newImportMap(app)
+                            importConfig.newEmptyImportMap(app)
                             importConfig.privateUploadPathFilename = app.cp.Doc.GetText("SelectFile")
                             importConfig.save(app)
                         End If
@@ -54,7 +54,7 @@ Namespace Contensive.ImportWizard.Controllers
                         If Left(importConfig.privateUploadPathFilename, 1) = "\" Then importConfig.privateUploadPathFilename = Mid(importConfig.privateUploadPathFilename, 2)
                         importConfig.save(app)
                         '
-                        Return viewIdSelectTable
+                        Return viewIdSelectContent
                 End Select
             Catch ex As Exception
                 app.cp.Site.ErrorReport(ex)
@@ -80,7 +80,7 @@ Namespace Contensive.ImportWizard.Controllers
                     fileList2.Append(cp.Html.div(input, "", "pb-2"))
                     uploadPtr += 1
                 Next
-                Dim Content As String = fileList2.ToString()
+                Dim Content As String = "<div class=""pl-4"">" & fileList2.ToString() & "</div>"
                 Content &= cp.Html.Hidden(rnSrcViewId, viewIdSelectFile.ToString)
                 '
                 Return HtmlController.createLayout(cp, headerCaption, Description, Content, True, True, True, True)

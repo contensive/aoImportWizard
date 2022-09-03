@@ -51,7 +51,8 @@ Namespace Contensive.ImportWizard.Controllers
                         If (importConfig.privateUploadPathFilename <> privateUploadPathFilename) Then
                             '
                             ' -- upload changed, reset map
-                            importConfig.newImportMap(app)
+                            importConfig.importMapPathFilename = ""
+                            'importConfig.newEmptyImportMap(app)
                         End If
                         If Not app.cp.PrivateFiles.SaveUpload(RequestNameImportUpload, privateFilesUploadPath, importConfig.privateUploadPathFilename) Then
                             '
@@ -61,7 +62,7 @@ Namespace Contensive.ImportWizard.Controllers
                         importConfig.privateUploadPathFilename = privateFilesUploadPath & importConfig.privateUploadPathFilename
                         importConfig.save(app)
                         '
-                        Return viewIdSelectTable
+                        Return viewIdSelectContent
                 End Select
                 Return viewIdUpload
             Catch ex As Exception

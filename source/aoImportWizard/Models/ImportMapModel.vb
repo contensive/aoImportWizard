@@ -1,4 +1,6 @@
-﻿Imports Contensive.BaseClasses
+﻿
+Imports Contensive.BaseClasses
+Imports C5BaseModel = Contensive.Models.Db.DbBaseModel
 
 Namespace Contensive.ImportWizard.Models
     Public Class ImportMapModel
@@ -32,6 +34,24 @@ Namespace Contensive.ImportWizard.Models
         Public Property mapPairCnt As Integer
         Public Property mapPairs As ImportMapModel_MapPair()
         '
+        Public Shared Function getMapPath(app As ApplicationModel) As String
+            Return privateFilesMapFolder & "user" & app.cp.User.Id & "\"
+        End Function
+        '
+        Public Shared Function getNewMapFilename(app As ApplicationModel) As String
+            Dim rightNow As DateTime = Now
+            Return getMapPath(app) & "map" & "-" & rightNow.Year & "-" & rightNow.Month & "-" & rightNow.Day & "-" & rightNow.Hour & "-" & rightNow.Minute & "-" & rightNow.Second & ".txt"
+        End Function
+        '
+        Public Shared Function getMapFileList(app As ApplicationModel) As List(Of CPFileSystemBaseClass.FileDetail)
+            Try
+                Return app.cp.PrivateFiles.FileList(getMapPath(app))
+            Catch ex As Exception
+                app.cp.Site.ErrorReport(ex)
+                Throw
+            End Try
+        End Function
+        '
         ''' <summary>
         ''' Load Import Map
         ''' </summary>
@@ -44,11 +64,11 @@ Namespace Contensive.ImportWizard.Models
                 If result IsNot Nothing Then Return result
                 '
                 result = New ImportMapModel() With {
-                .contentName = "People",
-                .groupID = 0,
-                .mapPairCnt = 0,
-                .mapPairs = {},
-                .skipRowCnt = 1
+                    .contentName = "People",
+                    .groupID = 0,
+                    .mapPairCnt = 0,
+                    .mapPairs = {},
+                    .skipRowCnt = 1
                 }
                 Return result
             Catch ex As Exception
@@ -71,6 +91,110 @@ Namespace Contensive.ImportWizard.Models
                 app.cp.Site.ErrorReport(ex)
                 Throw
             End Try
+        End Sub
+        '
+        ''' <summary>
+        ''' Create new import map based on the importconfig.content
+        ''' </summary>
+        ''' <param name="app"></param>
+        ''' <param name="importConfig"></param>
+        Public Shared Sub buildNewImportMapForContent(app As ApplicationModel, importConfig As ImportConfigModel)
+            Dim cp As CPBaseClass = app.cp
+            '
+            ' -- build a new map
+            importConfig.importMapPathFilename = ImportMapModel.getNewMapFilename(app)
+            importConfig.save(app)
+            '
+            Dim ImportMap As ImportMapModel = ImportMapModel.create(cp, importConfig.importMapPathFilename)
+            ImportMap.contentName = cp.Content.GetName(importConfig.dstContentId)
+
+            Dim fieldList As List(Of ContentFieldModel) = C5BaseModel.createList(Of ContentFieldModel)(cp, "(contentId=" & importConfig.dstContentId & ")and(active>0)", "caption")
+
+            Dim dbFieldNames() As String = Split(ContentFieldModel.getDbFieldList(cp, ImportMap.contentName, False), ",")
+            Dim dbFieldNameCnt As Integer = UBound(dbFieldNames) + 1
+            ' todo di-hack
+            app.loadUploadFields(importConfig.privateUploadPathFilename)
+            Dim uploadFields() As String = app.uploadFields
+            ImportMap.mapPairCnt = dbFieldNameCnt
+            ReDim ImportMap.mapPairs(dbFieldNameCnt - 1)
+            Dim rowPtr As Integer = 0
+            For Each dbFieldName In dbFieldNames
+                '
+                ' -- setup mapPair
+                Dim mapRow = New ImportMapModel_MapPair()
+                ImportMap.mapPairs(rowPtr) = mapRow
+                mapRow.dbFieldName = dbFieldName
+                mapRow.setValue = Nothing
+                mapRow.dbFieldType = ContentFieldModel.getFieldType(cp, dbFieldName, importConfig.dstContentId)
+                mapRow.uploadFieldPtr = -1
+                mapRow.uploadFieldName = ""
+                '
+                ' -- search uploadFields for matches to dbFields
+                Dim dBFieldName_lower As String = LCase(dbFieldName)
+                Dim uploadFieldPtr As Integer = 0
+                For Each uploadField As String In uploadFields
+                    Dim uploadField_lower As String = uploadField.ToLowerInvariant()
+                    If uploadField_lower = dBFieldName_lower Then
+                        mapRow.uploadFieldPtr = uploadFieldPtr
+                        mapRow.uploadFieldName = uploadField
+                        Exit For
+                    End If
+                    Select Case dBFieldName_lower
+                        Case "company"
+                            If (uploadField_lower = "companyname") OrElse (uploadField_lower = "company name") Then
+                                mapRow.uploadFieldPtr = uploadFieldPtr
+                                mapRow.uploadFieldName = uploadField
+                                Exit For
+                            End If
+                        Case "zip"
+                            If (uploadField_lower = "zip code") OrElse (uploadField_lower = "zipcode") OrElse (uploadField_lower = "postal code") OrElse (uploadField_lower = "postalcode") OrElse (uploadField_lower = "zip/postalcode") Then
+                                mapRow.uploadFieldPtr = uploadFieldPtr
+                                mapRow.uploadFieldName = uploadField
+                                Exit For
+                            End If
+                        Case "firstname"
+                            If (uploadField_lower = "first") OrElse (uploadField_lower = "first name") Then
+                                mapRow.uploadFieldPtr = uploadFieldPtr
+                                mapRow.uploadFieldName = uploadField
+                                Exit For
+                            End If
+                        Case "lastname"
+                            If (uploadField_lower = "last") OrElse (uploadField_lower = "last name") Then
+                                mapRow.uploadFieldPtr = uploadFieldPtr
+                                mapRow.uploadFieldName = uploadField
+                                Exit For
+                            End If
+                        Case "email"
+                            If (uploadField_lower = "e-mail") OrElse (uploadField_lower = "emailaddress") OrElse (uploadField_lower = "e-mailaddress") Then
+                                mapRow.uploadFieldPtr = uploadFieldPtr
+                                mapRow.uploadFieldName = uploadField
+                                Exit For
+                            End If
+                        Case "address"
+                            If (uploadField_lower = "address1") OrElse (uploadField_lower = "addressline1") Then
+                                mapRow.uploadFieldPtr = uploadFieldPtr
+                                mapRow.uploadFieldName = uploadField
+                                Exit For
+                            End If
+                        Case "address2"
+                            If (uploadField_lower = "addressline2") Then
+                                mapRow.uploadFieldPtr = uploadFieldPtr
+                                mapRow.uploadFieldName = uploadField
+                                Exit For
+                            End If
+                        Case "phone"
+                            If (uploadField_lower = "phone number") OrElse (uploadField_lower = "phonenumber") Then
+                                mapRow.uploadFieldPtr = uploadFieldPtr
+                                mapRow.uploadFieldName = uploadField
+                                Exit For
+                            End If
+                    End Select
+                    uploadFieldPtr += 1
+                Next
+                rowPtr += 1
+            Next
+            ImportMap.save(app, importConfig)
+
         End Sub
     End Class
     '

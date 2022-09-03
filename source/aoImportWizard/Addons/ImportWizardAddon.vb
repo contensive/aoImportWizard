@@ -24,8 +24,6 @@ Namespace Contensive.ImportWizard.Addons
             Try
                 '
                 ' -- initialize application. If authentication needed and not login page, pass true
-                Dim result As String = ""
-                Dim GetForm As String = ""
                 Using app As New ApplicationModel(CP, False)
                     '
                     ' Process incoming form
@@ -47,12 +45,17 @@ Namespace Contensive.ImportWizard.Addons
                             ' Select file
                             '
                             viewId = SelectFileView.processView(app, viewId)
-                        Case viewIdSelectTable
+                        Case viewIdSelectContent
                             '
                             ' Source and ContentName
                             '
-                            viewId = SelectTableView.processView(app, viewId)
-                        Case viewIdNewMapping
+                            viewId = SelectContentView.processView(app, viewId)
+                        Case viewIdSelectMap
+                            '
+                            ' select Mapping
+                            '
+                            viewId = SelectMapView.processView(app, viewId)
+                        Case viewIdMapping
                             '
                             ' Mapping - Save Values to the file pointed to by RequestNameImportMapFile
                             '
@@ -66,7 +69,7 @@ Namespace Contensive.ImportWizard.Addons
                             '
                             ' Add to group
                             '
-                            viewId = SelectgroupView.processView(app, viewId)
+                            viewId = SelectGroupView.processView(app, viewId)
                         Case viewIdFinish
                             '
                             ' Determine next or previous form
@@ -80,9 +83,7 @@ Namespace Contensive.ImportWizard.Addons
                     '
                     ' Get Next Form
                     '
-                    Dim Description As String
                     Dim body As String = ""
-                    'Dim ImportContentName As String
                     Select Case viewId
                         Case viewIdUpload
                             '
@@ -96,13 +97,19 @@ Namespace Contensive.ImportWizard.Addons
                             '
                             body = SelectFileView.getView(app)
                             Return CP.Html.Form(body)
-                        Case viewIdSelectTable
+                        Case viewIdSelectContent
                             '
                             ' Destination
                             '
-                            body = SelectTableView.getView(app)
+                            body = SelectContentView.getView(app)
                             Return CP.Html.Form(body)
-                        Case viewIdNewMapping
+                        Case viewIdSelectMap
+                            '
+                            '
+                            '
+                            body = SelectMapView.getView(app)
+                            Return CP.Html.Form(body)
+                        Case viewIdMapping
                             '
                             '
                             '
@@ -148,69 +155,5 @@ Namespace Contensive.ImportWizard.Addons
                 Throw
             End Try
         End Function
-        ''
-        ''=====================================================================================
-        '''' <summary>
-        '''' Wrap the wizard content in a form
-        '''' </summary>
-        '''' <param name="cp"></param>
-        '''' <param name="wizardContent"></param>
-        '''' <returns></returns>
-        'Private ReadOnly Property getAdminFormBody(cp As CPBaseClass, wizardContent As String) As String
-        '    Get
-        '        Try
-        '            Return cp.Html.Form(cp.Html.div(wizardContent))
-        '        Catch ex As Exception
-        '            cp.Site.ErrorReport(ex)
-        '            Throw
-        '        End Try
-        '    End Get
-        'End Property
-        ''
-        ''=====================================================================================
-        '''' <summary>
-        '''' Get next wizard form
-        '''' </summary>
-        '''' <param name="SubformID"></param>
-        '''' <returns></returns>
-        'Private Function nextSubFormID(app As ApplicationModel, SubformID As Integer) As Integer
-        '    Try
-        '        Dim Ptr As Integer = 0
-        '        Do While Ptr < viewIdMax
-        '            If SubformID = app.wizard.Path(Ptr) Then
-        '                nextSubFormID = app.wizard.Path(Ptr + 1)
-        '                Exit Do
-        '            End If
-        '            Ptr += 1
-        '        Loop
-        '    Catch ex As Exception
-        '        Throw
-        '    End Try
-        'End Function
-        ''
-        ''=====================================================================================
-        '''' <summary>
-        '''' get previous wizard form
-        '''' </summary>
-        '''' <param name="SubformID"></param>
-        '''' <returns></returns>
-        'Private Function previousSubFormID(app As ApplicationModel, SubformID As Integer) As Integer
-        '    Try
-        '        Dim Ptr As Integer
-        '        '
-        '        Ptr = 1
-        '        Do While Ptr < viewIdMax
-        '            If SubformID = app.wizard.Path(Ptr) Then
-        '                previousSubFormID = app.wizard.Path(Ptr - 1)
-        '                Exit Do
-        '            End If
-        '            Ptr += 1
-        '        Loop
-        '    Catch ex As Exception
-        '        Throw
-        '    End Try
-        'End Function
-
-
     End Class
 End Namespace
