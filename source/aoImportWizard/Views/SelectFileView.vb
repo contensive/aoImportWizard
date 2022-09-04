@@ -38,10 +38,10 @@ Namespace Contensive.ImportWizard.Controllers
                         '
                         ' -- continue to select source file
                         Dim importConfig As ImportConfigModel = ImportConfigModel.create(app)
-                        If String.IsNullOrEmpty(importConfig.privateUploadPathFilename) Then
+                        If String.IsNullOrEmpty(app.cp.Doc.GetText("SelectFile")) Then
                             '
                             ' -- no file selected
-                            returnUserError.Add("You must select a file to continue")
+                            returnUserError.Add("You must select a file to continue.")
                             Return srcViewId
                         End If
                         If (importConfig.privateUploadPathFilename <> app.cp.Doc.GetText("SelectFile")) Then

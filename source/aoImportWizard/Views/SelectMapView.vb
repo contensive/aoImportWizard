@@ -72,10 +72,17 @@ Namespace Contensive.ImportWizard.Controllers
                 Dim contentName As String = cp.Content.GetName(importConfig.dstContentId)
                 Dim mapPth As String = ImportMapModel.getMapPath(app, contentName)
                 Dim fileList As New List(Of String)
+                Dim optionList As New List(Of String)
+                optionList.Add("<option value="""">Create New Field Mapping</option>")
+                Dim currentFile As String = ""
+
+
                 For Each file In ImportMapModel.getMapFileList(app, contentName)
+                    optionList.Add("<option value=""" & cp.Utils.EncodeHTML(file.Name) & """ " & If(file.Name = importConfig.importMapPathFilename, " selected ", "") & ">" & file.Name & "</option>")
                     fileList.Add(file.Name)
                 Next
-                Dim content As String = cp.Html5.SelectList("selectMapRow", importConfig.importMapPathFilename, String.Join(",", fileList), "Create New Field Mapping", "form-control")
+                Dim content As String = "<select name=""selectMapRow"" class=""form-control"" id="""">" & String.Join("", optionList) & "</select>"
+                'Dim content As String = cp.Html5.SelectList("selectMapRow", importConfig.importMapPathFilename, String.Join(",", fileList), "Create New Field Mapping", "form-control")
                 content &= cp.Html5.Hidden(rnSrcViewId, viewIdSelectMap)
                 Return HtmlController.createLayout(cp, headerCaption, description, content, True, True, True, True)
             Catch ex As Exception
