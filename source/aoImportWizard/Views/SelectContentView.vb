@@ -35,10 +35,11 @@ Namespace Contensive.ImportWizard.Controllers
                 Dim importConfig As ImportConfigModel = ImportConfigModel.create(app)
                 '
                 If cp.Doc.GetBoolean("useNewContentName") Then
+                    Dim contentName As String = cp.Doc.GetText("newContentName")
                     '
                     ' -- reset import map
-                    importConfig.newEmptyImportMap(app)
-                    importConfig.dstContentId = cp.Doc.GetInteger(RequestNameImportContentID)
+                    importConfig.newEmptyImportMap(app, contentName)
+                    importConfig.dstContentId = 0
                     importConfig.save(app)
                     '
                     ' -- new table. Save table and return

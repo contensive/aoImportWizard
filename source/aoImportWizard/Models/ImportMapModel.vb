@@ -34,18 +34,18 @@ Namespace Contensive.ImportWizard.Models
         Public Property mapPairCnt As Integer
         Public Property mapPairs As ImportMapModel_MapPair()
         '
-        Public Shared Function getMapPath(app As ApplicationModel) As String
-            Return privateFilesMapFolder & "user" & app.cp.User.Id & "\"
+        Public Shared Function getMapPath(app As ApplicationModel, contentName As String) As String
+            Return privateFilesMapFolder & "user" & app.cp.User.Id & "\" & contentName.Replace(" ", "-") & "\"
         End Function
         '
-        Public Shared Function getNewMapFilename(app As ApplicationModel) As String
+        Public Shared Function getNewMapFilename(app As ApplicationModel, contentName As String) As String
             Dim rightNow As DateTime = Now
-            Return getMapPath(app) & "map" & "-" & rightNow.Year & "-" & rightNow.Month & "-" & rightNow.Day & "-" & rightNow.Hour & "-" & rightNow.Minute & "-" & rightNow.Second & ".txt"
+            Return getMapPath(app, contentName) & "map" & "-" & rightNow.Year & "-" & rightNow.Month & "-" & rightNow.Day & "_" & rightNow.Hour & "-" & rightNow.Minute & "-" & rightNow.Second & ".txt"
         End Function
         '
-        Public Shared Function getMapFileList(app As ApplicationModel) As List(Of CPFileSystemBaseClass.FileDetail)
+        Public Shared Function getMapFileList(app As ApplicationModel, contentName As String) As List(Of CPFileSystemBaseClass.FileDetail)
             Try
-                Return app.cp.PrivateFiles.FileList(getMapPath(app))
+                Return app.cp.PrivateFiles.FileList(getMapPath(app, contentName))
             Catch ex As Exception
                 app.cp.Site.ErrorReport(ex)
                 Throw
@@ -94,19 +94,23 @@ Namespace Contensive.ImportWizard.Models
         End Sub
         '
         ''' <summary>
-        ''' Create new import map based on the importconfig.content
+        ''' Create new import map based on contentName. contentName is explicitly requested instead of using importconfig.contentid so this
+        ''' call must explicitly note the content is valid
+        ''' 
         ''' </summary>
         ''' <param name="app"></param>
         ''' <param name="importConfig"></param>
-        Public Shared Sub buildNewImportMapForContent(app As ApplicationModel, importConfig As ImportConfigModel)
+        ''' <param name="contentName"></param>
+        Public Shared Sub buildNewImportMapForContent(app As ApplicationModel, importConfig As ImportConfigModel, contentName As String)
             Dim cp As CPBaseClass = app.cp
             '
             ' -- build a new map
-            importConfig.importMapPathFilename = ImportMapModel.getNewMapFilename(app)
+            importConfig.importMapPathFilename = ImportMapModel.getNewMapFilename(app, contentName)
+            importConfig.dstContentId = cp.Content.GetID(contentName)
             importConfig.save(app)
             '
             Dim ImportMap As ImportMapModel = ImportMapModel.create(cp, importConfig.importMapPathFilename)
-            ImportMap.contentName = cp.Content.GetName(importConfig.dstContentId)
+            ImportMap.contentName = contentName
 
             Dim fieldList As List(Of ContentFieldModel) = C5BaseModel.createList(Of ContentFieldModel)(cp, "(contentId=" & importConfig.dstContentId & ")and(active>0)", "caption")
 

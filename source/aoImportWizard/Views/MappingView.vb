@@ -159,10 +159,10 @@ Namespace Contensive.ImportWizard.Controllers
                                 ' -- lookup from a table
                                 Dim mapContentName As String = cp.Content.GetName(mapField.lookupContentId)
                                 valueEditor = cp.Html5.SelectContent(valueEditorHtmlName, setValueValue, mapContentName, "", "", "form-control js-import-manual-data").Replace("<select ", "<select style=""{{styles}}""")
-                            ElseIf String.IsNullOrEmpty(mapField.lookupList) Then
+                            ElseIf Not String.IsNullOrEmpty(mapField.lookupList) Then
                                 '
                                 ' -- lookup from a list
-                                valueEditor = cp.Html5.SelectList(valueEditorHtmlName, setValueValue, mapField.lookupList, "", "", "form-control js-import-manual-data").Replace("<select ", "<select style=""{{styles}}""")
+                                valueEditor = cp.Html5.SelectList(valueEditorHtmlName, setValueValue, mapField.lookupList, "", "form-control js-import-manual-data").Replace("<select ", "<select style=""{{styles}}""")
                             Else
                                 '
                                 ' -- invalid, just enter integer

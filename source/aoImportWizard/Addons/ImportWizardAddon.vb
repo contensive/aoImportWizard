@@ -27,7 +27,7 @@ Namespace Contensive.ImportWizard.Addons
                 Using app As New ApplicationModel(CP, False)
                     '
                     ' Process incoming form
-                    '
+                    Dim userErrors As New List(Of String)
                     Dim viewId As Integer = CP.Doc.GetInteger(rnSrcViewId)
                     Select Case viewId
                         Case viewIdSelectSource
@@ -44,7 +44,7 @@ Namespace Contensive.ImportWizard.Addons
                             '
                             ' Select file
                             '
-                            viewId = SelectFileView.processView(app, viewId)
+                            viewId = SelectFileView.processView(app, viewId, userErrors)
                         Case viewIdSelectContent
                             '
                             ' Source and ContentName
@@ -54,7 +54,7 @@ Namespace Contensive.ImportWizard.Addons
                             '
                             ' select Mapping
                             '
-                            viewId = SelectMapView.processView(app, viewId)
+                            viewId = SelectMapView.processView(app, viewId, userErrors)
                         Case viewIdMapping
                             '
                             ' Mapping - Save Values to the file pointed to by RequestNameImportMapFile

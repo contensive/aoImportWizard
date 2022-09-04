@@ -11,7 +11,7 @@ Namespace Contensive.ImportWizard.Controllers
         ''' </summary>
         ''' <param name="app"></param>
         ''' <returns></returns>
-        Public Shared Function processView(app As ApplicationModel, srcViewId As Integer) As Integer
+        Public Shared Function processView(app As ApplicationModel, srcViewId As Integer, returnUserError As List(Of String)) As Integer
             Try
                 Dim cp As CPBaseClass = app.cp
                 Dim Button As String = app.cp.Doc.GetText(RequestNameButton)
@@ -38,18 +38,18 @@ Namespace Contensive.ImportWizard.Controllers
                         '
                         ' -- continue to select source file
                         Dim importConfig As ImportConfigModel = ImportConfigModel.create(app)
-                        If (importConfig.privateUploadPathFilename <> app.cp.Doc.GetText("SelectFile")) Then
-                            '
-                            ' -- there was a change in the file, reset the map
-                            importConfig.newEmptyImportMap(app)
-                            importConfig.privateUploadPathFilename = app.cp.Doc.GetText("SelectFile")
-                            importConfig.save(app)
-                        End If
                         If String.IsNullOrEmpty(importConfig.privateUploadPathFilename) Then
                             '
                             ' -- no file selected
-                            app.cp.UserError.Add("You must select a file to continue")
+                            returnUserError.Add("You must select a file to continue")
                             Return srcViewId
+                        End If
+                        If (importConfig.privateUploadPathFilename <> app.cp.Doc.GetText("SelectFile")) Then
+                            '
+                            ' -- there was a change in the file, reset the map
+                            importConfig.importMapPathFilename = ""
+                            importConfig.privateUploadPathFilename = app.cp.Doc.GetText("SelectFile")
+                            importConfig.save(app)
                         End If
                         If Left(importConfig.privateUploadPathFilename, 1) = "\" Then importConfig.privateUploadPathFilename = Mid(importConfig.privateUploadPathFilename, 2)
                         importConfig.save(app)

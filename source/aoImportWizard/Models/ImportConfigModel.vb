@@ -18,8 +18,17 @@ Namespace Contensive.ImportWizard.Models
         ''' <returns></returns>
         Public Property dstContentId As Integer
         '
-        Public Sub newEmptyImportMap(app As ApplicationModel)
-            importMapPathFilename = ImportMapModel.getNewMapFilename(app)
+        ''' <summary>
+        ''' create new empty import map. ContentName requested because it must be valid before map is valid.
+        ''' </summary>
+        ''' <param name="app"></param>
+        ''' <param name="contentName"></param>
+        Public Sub newEmptyImportMap(app As ApplicationModel, contentName As String)
+            If String.IsNullOrEmpty(contentName) Then
+                '
+                ' -- problem, cannot create map until content is established.
+            End If
+            importMapPathFilename = ImportMapModel.getNewMapFilename(app, contentName)
             save(app)
         End Sub
         '

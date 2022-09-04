@@ -6,7 +6,7 @@ Imports Contensive.ImportWizard.Models
 Namespace Contensive.ImportWizard.Controllers
     Public Class SelectMapView
         '
-        Public Shared Function processView(app As ApplicationModel, srcViewId As Integer) As Integer
+        Public Shared Function processView(app As ApplicationModel, srcViewId As Integer, returnUserError As List(Of String)) As Integer
             Try
                 Dim cp As CPBaseClass = app.cp
                 Dim Button As String = app.cp.Doc.GetText(RequestNameButton)
@@ -25,14 +25,18 @@ Namespace Contensive.ImportWizard.Controllers
                 End If
                 '
                 Dim importConfig As ImportConfigModel = ImportConfigModel.create(app)
+                Dim contentName As String = cp.Content.GetName(importConfig.dstContentId)
+                If String.IsNullOrEmpty(contentName) Then
+                    returnUserError.Add("Cannot create the import map without a valid table selection.")
+                End If
                 If String.IsNullOrEmpty(cp.Doc.GetText("selectMapRow")) Then
                     '
                     ' -- create new map for this content
-                    ImportMapModel.buildNewImportMapForContent(app, importConfig)
+                    ImportMapModel.buildNewImportMapForContent(app, importConfig, contentName)
                 Else
                     '
                     ' -- use a previous mapping for this content
-                    importConfig.importMapPathFilename = ImportMapModel.getMapPath(app) & cp.Doc.GetText("selectMapRow")
+                    importConfig.importMapPathFilename = ImportMapModel.getMapPath(app, contentName) & cp.Doc.GetText("selectMapRow")
                 End If
                 importConfig.save(app)
                 '
@@ -64,12 +68,13 @@ Namespace Contensive.ImportWizard.Controllers
                 Dim cp As CPBaseClass = app.cp
                 Dim headerCaption As String = "Import Wizard"
                 Dim description As String = cp.Html.h4("Select how the import maps to the table.") & "<p>To import data into this table, you have to map the input fields to the database fields. You can either create a new map or select one you have previously used.</p>"
-                Dim mapPth As String = ImportMapModel.getMapPath(app)
+                Dim importConfig As ImportConfigModel = ImportConfigModel.create(app)
+                Dim contentName As String = cp.Content.GetName(importConfig.dstContentId)
+                Dim mapPth As String = ImportMapModel.getMapPath(app, contentName)
                 Dim fileList As New List(Of String)
-                For Each file In ImportMapModel.getMapFileList(app)
+                For Each file In ImportMapModel.getMapFileList(app, contentName)
                     fileList.Add(file.Name)
                 Next
-                Dim importConfig As ImportConfigModel = ImportConfigModel.create(app)
                 Dim content As String = cp.Html5.SelectList("selectMapRow", importConfig.importMapPathFilename, String.Join(",", fileList), "Create New Field Mapping", "form-control")
                 content &= cp.Html5.Hidden(rnSrcViewId, viewIdSelectMap)
                 Return HtmlController.createLayout(cp, headerCaption, description, content, True, True, True, True)
