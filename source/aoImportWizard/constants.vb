@@ -219,9 +219,6 @@ Namespace Contensive.ImportWizard
         Public Const ImportSourceUpload As Integer = 1
         Public Const ImportSourceUploadFolder As Integer = 2
         '
-        Public Const KeyMethodInsertAll As Integer = 1
-        Public Const KeyMethodUpdateOnMatch As Integer = 2
-        Public Const KeyMethodUpdateOnMatchInsertOthers As Integer = 3
         '
         Public Const GroupOptionNone As Integer = 1
         Public Const GroupOptionAll As Integer = 2
@@ -239,6 +236,7 @@ Namespace Contensive.ImportWizard
 
         'Public Const RequestNameImportContentName  As String = "ImportContentName"
         Public Const RequestNameImportSkipFirstRow As String = "ImportSkipFirstRow"
+        Public Const requestNameImportMapName As String = "importMapName"
         '
         ' -- errors for resultErrList
         '

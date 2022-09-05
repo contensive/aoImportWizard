@@ -36,9 +36,10 @@ Namespace Contensive.ImportWizard.Controllers
                 '
                 If cp.Doc.GetBoolean("useNewContentName") Then
                     Dim contentName As String = cp.Doc.GetText("newContentName")
+                    Dim mapName As String = "Import " & contentName
                     '
                     ' -- reset import map
-                    importConfig.newEmptyImportMap(app, contentName)
+                    importConfig.importMapPathFilename = ImportMapModel.createMapPathFilename(app, contentName, mapName)
                     importConfig.dstContentId = 0
                     importConfig.save(app)
                     '

@@ -70,19 +70,15 @@ Namespace Contensive.ImportWizard.Controllers
                 Dim description As String = cp.Html.h4("Select how the import maps to the table.") & "<p>To import data into this table, you have to map the input fields to the database fields. You can either create a new map or select one you have previously used.</p>"
                 Dim importConfig As ImportConfigModel = ImportConfigModel.create(app)
                 Dim contentName As String = cp.Content.GetName(importConfig.dstContentId)
-                Dim mapPth As String = ImportMapModel.getMapPath(app, contentName)
-                Dim fileList As New List(Of String)
-                Dim optionList As New List(Of String)
-                optionList.Add("<option value="""">Create New Field Mapping</option>")
-                Dim currentFile As String = ""
-
-
+                Dim optionList As New List(Of String) From {
+                    "<option value="""">Create New Field Mapping</option>"
+                }
+                Dim currentFilename As String = app.cp.PrivateFiles.GetFilename(importConfig.importMapPathFilename)
                 For Each file In ImportMapModel.getMapFileList(app, contentName)
-                    optionList.Add("<option value=""" & cp.Utils.EncodeHTML(file.Name) & """ " & If(file.Name = importConfig.importMapPathFilename, " selected ", "") & ">" & file.Name & "</option>")
-                    fileList.Add(file.Name)
+                    Dim displayName As String = file.mapName & ", " & file.dateCreated.ToString()
+                    optionList.Add("<option value=""" & cp.Utils.EncodeHTML(file.filename) & """ " & If(file.filename = currentFilename, " selected ", "") & ">" & displayName & "</option>")
                 Next
                 Dim content As String = "<select name=""selectMapRow"" class=""form-control"" id="""">" & String.Join("", optionList) & "</select>"
-                'Dim content As String = cp.Html5.SelectList("selectMapRow", importConfig.importMapPathFilename, String.Join(",", fileList), "Create New Field Mapping", "form-control")
                 content &= cp.Html5.Hidden(rnSrcViewId, viewIdSelectMap)
                 Return HtmlController.createLayout(cp, headerCaption, description, content, True, True, True, True)
             Catch ex As Exception

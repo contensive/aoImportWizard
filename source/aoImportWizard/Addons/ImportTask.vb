@@ -175,7 +175,7 @@ Namespace Contensive.ImportWizard.Addons
                     hint = "200"
                     Dim SourceKeyPtr As Integer = cp.Utils.EncodeInteger(importMap.sourceKeyField)
                     If (String.IsNullOrEmpty(importMap.dbKeyField)) Or (SourceKeyPtr < 0) Then
-                        importMap.keyMethodID = KeyMethodInsertAll
+                        importMap.keyMethodID = MapKeyEnum.KeyMethodInsertAll
                     End If
                     '
                     Dim KeyCriteria As String = "(1=0)"
@@ -191,7 +191,7 @@ Namespace Contensive.ImportWizard.Addons
                         End If
                         If True Then
                             hint = "310"
-                            If importMap.keyMethodID = KeyMethodInsertAll Then
+                            If importMap.keyMethodID = MapKeyEnum.KeyMethodInsertAll Then
                                 hint = "320"
                                 insertRecord = True
                             Else
@@ -206,7 +206,7 @@ Namespace Contensive.ImportWizard.Addons
                                     '
                                     ' Source had no data in key field, insert if allowed
                                     '
-                                    If importMap.keyMethodID = KeyMethodUpdateOnMatchInsertOthers Then
+                                    If importMap.keyMethodID = MapKeyEnum.KeyMethodUpdateOnMatchInsertOthers Then
                                         insertRecord = True
                                     End If
                                 Else
@@ -250,7 +250,7 @@ Namespace Contensive.ImportWizard.Addons
                                             ' unknown field type
                                             '
                                             updateRecord = True
-                                            If importMap.keyMethodID = KeyMethodUpdateOnMatchInsertOthers Then
+                                            If importMap.keyMethodID = MapKeyEnum.KeyMethodUpdateOnMatchInsertOthers Then
                                                 insertRecord = True
                                             End If
                                     End Select
@@ -365,7 +365,7 @@ Namespace Contensive.ImportWizard.Addons
                                         '
                                         ' match was found, update all records found
                                         updateRecord = True
-                                    ElseIf (importMap.keyMethodID = KeyMethodUpdateOnMatchInsertOthers) Then
+                                    ElseIf (importMap.keyMethodID = MapKeyEnum.KeyMethodUpdateOnMatchInsertOthers) Then
                                         '
                                         ' no match, convert to insert if that was requested
                                         insertRecord = True

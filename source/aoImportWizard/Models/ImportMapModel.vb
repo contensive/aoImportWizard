@@ -1,5 +1,6 @@
 ﻿
 Imports Contensive.BaseClasses
+Imports Contensive.ImportWizard.Controllers
 Imports C5BaseModel = Contensive.Models.Db.DbBaseModel
 
 Namespace Contensive.ImportWizard.Models
@@ -24,6 +25,10 @@ Namespace Contensive.ImportWizard.Models
         ' - Create a Contensive Addon record with the namespace apCollectionName.ad
         Public Property importToNewContent As Boolean
         Public Property contentName As String
+        ''' <summary>
+        ''' see MapKeyEnum, 1=insert all, 2=update if match, 3=update if match, else insert
+        ''' </summary>
+        ''' <returns></returns>
         Public Property keyMethodID As Integer
         Public Property sourceKeyField As String
         Public Property dbKeyField As String
@@ -38,14 +43,75 @@ Namespace Contensive.ImportWizard.Models
             Return privateFilesMapFolder & "user" & app.cp.User.Id & "\" & contentName.Replace(" ", "-") & "\"
         End Function
         '
-        Public Shared Function getNewMapFilename(app As ApplicationModel, contentName As String) As String
-            Dim rightNow As DateTime = Now
-            Return getMapPath(app, contentName) & "map" & "-" & rightNow.Year & "-" & rightNow.Month & "-" & rightNow.Day & "_" & rightNow.Hour & "-" & rightNow.Minute & "-" & rightNow.Second & ".txt"
+        ''' <summary>
+        ''' create filename
+        ''' YYYY-MM-DD-HH-MM-SS-normalizedFilename
+        ''' </summary>
+        ''' <param name="app"></param>
+        ''' <param name="contentName"></param>
+        ''' <param name="mapName"></param>
+        ''' <returns></returns>
+        Public Shared Function createMapPathFilename(app As ApplicationModel, contentName As String, mapName As String) As String
+            Dim dateCreated As Date = Now
+            Return getMapPath(app, contentName) & dateCreated.Year & "-" & dateCreated.Month.ToString().PadLeft(2, "0"c) & "-" & dateCreated.Day.ToString().PadLeft(2, "0"c) & "_" & dateCreated.Hour.ToString().PadLeft(2, "0"c) & "-" & dateCreated.Minute.ToString().PadLeft(2, "0"c) & "-" & dateCreated.Second.ToString().PadLeft(2, "0"c) & "_" & GenericController.normalizeFilename(mapName) & ".txt"
         End Function
         '
-        Public Shared Function getMapFileList(app As ApplicationModel, contentName As String) As List(Of CPFileSystemBaseClass.FileDetail)
+        Public Shared Function decodeMapFileName(cp As CPBaseClass, mapFilename As String) As MapFilenameDataModel
+            '
+            If mapFilename.Length < 23 Then Return Nothing
+            Dim yearPart As Integer = cp.Utils.EncodeInteger(mapFilename.Substring(0, 4))
+            Dim monthPart As Integer = cp.Utils.EncodeInteger(mapFilename.Substring(5, 2))
+            Dim dayPart As Integer = cp.Utils.EncodeInteger(mapFilename.Substring(8, 2))
+            Dim hourPart As Integer = cp.Utils.EncodeInteger(mapFilename.Substring(11, 2))
+            Dim minutePart As Integer = cp.Utils.EncodeInteger(mapFilename.Substring(14, 2))
+            Dim secondPart As Integer = cp.Utils.EncodeInteger(mapFilename.Substring(17, 2))
+            If yearPart = 0 Or monthPart = 0 Or dayPart = 0 Then Return Nothing
+            '
+            Dim filenamePart As String = mapFilename.Substring(20)
+            If String.IsNullOrEmpty(filenamePart) Then Return Nothing
+            '
+            Return New MapFilenameDataModel With {
+                .filename = mapFilename,
+                .mapName = IO.Path.GetFileNameWithoutExtension(filenamePart),
+                .dateCreated = New Date(yearPart, monthPart, dayPart, hourPart, minutePart, secondPart)
+            }
+        End Function
+
+        '
+        ''' <summary>
+        ''' Return a list of filename plus dateadded
+        ''' </summary>
+        ''' <param name="app"></param>
+        ''' <param name="contentName"></param>
+        ''' <returns></returns>
+        Public Shared Function getMapFileList(app As ApplicationModel, contentName As String) As List(Of MapFilenameDataModel)
             Try
-                Return app.cp.PrivateFiles.FileList(getMapPath(app, contentName))
+                Dim result As New List(Of MapFilenameDataModel)
+                For Each fileDetail In app.cp.PrivateFiles.FileList(getMapPath(app, contentName))
+                    Dim mapField As MapFilenameDataModel = decodeMapFileName(app.cp, fileDetail.Name)
+                    If mapField Is Nothing Then Continue For
+                    result.Add(mapField)
+                    'Dim mapFilename As String = fileDetail.Name
+                    ''
+                    'If mapFilename.Length < 23 Then Continue For
+                    'Dim yearPart As Integer = app.cp.Utils.EncodeInteger(mapFilename.Substring(0, 4))
+                    'Dim monthPart As Integer = app.cp.Utils.EncodeInteger(mapFilename.Substring(5, 2))
+                    'Dim dayPart As Integer = app.cp.Utils.EncodeInteger(mapFilename.Substring(8, 2))
+                    'Dim hourPart As Integer = app.cp.Utils.EncodeInteger(mapFilename.Substring(11, 2))
+                    'Dim minutePart As Integer = app.cp.Utils.EncodeInteger(mapFilename.Substring(14, 2))
+                    'Dim secondPart As Integer = app.cp.Utils.EncodeInteger(mapFilename.Substring(17, 2))
+                    'If yearPart = 0 Or monthPart = 0 Or dayPart = 0 Then Continue For
+                    ''
+                    'Dim filenamePart As String = mapFilename.Substring(20)
+                    'If String.IsNullOrEmpty(filenamePart) Then Continue For
+                    ''
+                    'result.Add(New MapFilenameDataModel With {
+                    '    .filename = mapFilename,
+                    '    .mapName = filenamePart,
+                    '    .dateCreated = New Date(yearPart, monthPart, dayPart, hourPart, minutePart, secondPart)
+                    '})
+                Next
+                Return result
             Catch ex As Exception
                 app.cp.Site.ErrorReport(ex)
                 Throw
@@ -68,7 +134,8 @@ Namespace Contensive.ImportWizard.Models
                     .groupID = 0,
                     .mapPairCnt = 0,
                     .mapPairs = {},
-                    .skipRowCnt = 1
+                    .skipRowCnt = 1,
+                    .keyMethodID = 1
                 }
                 Return result
             Catch ex As Exception
@@ -105,7 +172,8 @@ Namespace Contensive.ImportWizard.Models
             Dim cp As CPBaseClass = app.cp
             '
             ' -- build a new map
-            importConfig.importMapPathFilename = ImportMapModel.getNewMapFilename(app, contentName)
+            Dim mapName As String = "Import " & contentName
+            importConfig.importMapPathFilename = ImportMapModel.createMapPathFilename(app, contentName, mapName)
             importConfig.dstContentId = cp.Content.GetID(contentName)
             importConfig.save(app)
             '
@@ -114,15 +182,18 @@ Namespace Contensive.ImportWizard.Models
 
             Dim fieldList As List(Of ContentFieldModel) = C5BaseModel.createList(Of ContentFieldModel)(cp, "(contentId=" & importConfig.dstContentId & ")and(active>0)", "caption")
 
-            Dim dbFieldNames() As String = Split(ContentFieldModel.getDbFieldList(cp, ImportMap.contentName, False), ",")
-            Dim dbFieldNameCnt As Integer = UBound(dbFieldNames) + 1
+            Dim dbFieldList As List(Of ContentFieldData) = ContentFieldModel.getDbFieldList(cp, ImportMap.contentName, False, False)
+            'Dim dbFieldNames() As String = Split(ContentFieldModel.getDbFieldList(cp, ImportMap.contentName, False, False), ",")
+            'Dim dbFieldNameCnt As Integer = UBound(dbFieldNames) + 1
             ' todo di-hack
             app.loadUploadFields(importConfig.privateUploadPathFilename)
             Dim uploadFields() As String = app.uploadFields
-            ImportMap.mapPairCnt = dbFieldNameCnt
-            ReDim ImportMap.mapPairs(dbFieldNameCnt - 1)
+            ImportMap.mapPairCnt = dbFieldList.Count
+            ReDim ImportMap.mapPairs(dbFieldList.Count - 1)
             Dim rowPtr As Integer = 0
-            For Each dbFieldName In dbFieldNames
+
+            For Each dbField In dbFieldList
+                Dim dbFieldName As String = dbField.name
                 '
                 ' -- setup mapPair
                 Dim mapRow = New ImportMapModel_MapPair()
@@ -186,7 +257,7 @@ Namespace Contensive.ImportWizard.Models
                                 mapRow.uploadFieldName = uploadField
                                 Exit For
                             End If
-                        Case "phone"
+                        Case "phone", "cellphone"
                             If (uploadField_lower = "phone number") OrElse (uploadField_lower = "phonenumber") Then
                                 mapRow.uploadFieldPtr = uploadFieldPtr
                                 mapRow.uploadFieldName = uploadField
@@ -226,5 +297,17 @@ Namespace Contensive.ImportWizard.Models
         ''' <returns></returns>
         Public Property setValue As String
     End Class
+    '
+    Public Class MapFilenameDataModel
+        Public Property filename As String
+        Public Property mapName As String
+        Public Property dateCreated As Date
+    End Class
+    '
+    Public Enum MapKeyEnum
+        KeyMethodInsertAll = 1
+        KeyMethodUpdateOnMatch = 2
+        KeyMethodUpdateOnMatchInsertOthers = 3
+    End Enum
 
 End Namespace

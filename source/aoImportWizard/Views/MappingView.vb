@@ -61,6 +61,24 @@ Namespace Contensive.ImportWizard.Controllers
                         }
                     Next
                 End If
+
+
+
+                Dim mapfilenamedata As MapFilenameDataModel = ImportMapModel.decodeMapFileName(cp, cp.PrivateFiles.GetFilename(importConfig.importMapPathFilename))
+                Dim ImportMapName As String = ""
+                If mapfilenamedata IsNot Nothing Then
+                    ImportMapName = mapfilenamedata.mapName
+                End If
+                Dim mapName As String = cp.Doc.GetText(requestNameImportMapName)
+                If mapName <> ImportMapName Then
+                    importConfig.importMapPathFilename = ImportMapModel.createMapPathFilename(app, ImportMap.contentName, mapName)
+                    importConfig.save(app)
+                End If
+
+
+
+
+
                 ImportMap.save(app, importConfig)
                 '
                 Select Case Button
@@ -84,25 +102,33 @@ Namespace Contensive.ImportWizard.Controllers
             Try
                 Dim cp As CPBaseClass = app.cp
                 Dim headerCaption As String = "Import Wizard"
-                '
                 Dim importConfig As ImportConfigModel = ImportConfigModel.create(app)
                 Dim Description As String = cp.Html.h4("Create a New Mapping") & cp.Html.p("This step lets you select which fields in your database you would like each field in your upload to be assigned.")
                 If String.IsNullOrEmpty(importConfig.privateUploadPathFilename) Then
                     '
                     ' -- no data in upload
                     Return HtmlController.createLayout(cp, headerCaption, Description, "<P>The file you are importing is empty. Please go back and select a different file.</P>", True, True, True, False)
-                    'Return HtmlController.createLayout(cp, headerCaption, ButtonCancel, ButtonBack2, "", Description, "<P>The file you are importing is empty. Please go back and select a different file.</P>")
                 End If
                 Dim ImportMap As ImportMapModel = ImportMapModel.create(cp, importConfig.importMapPathFilename)
                 '
-                ' Skip first Row checkbox
+                ' -- Skip first Row checkbox
                 Dim result As String = ""
                 result &= cp.Html.CheckBox(RequestNameImportSkipFirstRow, (ImportMap.skipRowCnt <> 0)) & "&nbsp;First row contains field names"
-                result &= "<div>&nbsp;</div>"
+                '
+                ' -- name of mapping
+                Dim mapfilenamedata As MapFilenameDataModel = ImportMapModel.decodeMapFileName(cp, cp.PrivateFiles.GetFilename(importConfig.importMapPathFilename))
+                Dim ImportMapName As String = ""
+                If mapfilenamedata IsNot Nothing Then
+                    ImportMapName = mapfilenamedata.mapName
+                End If
+                result &= "<div class=""mt-4 form-group"" style=""max-width:600px;"">"
+                result &= "<label for=""js-import-name"" style="""">Name for this field map</label>"
+                result &= cp.Html5.InputText(requestNameImportMapName, 100, ImportMapName, "form-control", "js-import-name")
+                result &= "</div>"
                 '
                 ' Output the table
                 '
-                result &= "<TABLE border=0 cellpadding=2 cellspacing=0 width=100%>"
+                result &= "<TABLE class=""mt-4"" border=0 cellpadding=2 cellspacing=0 width=100%>"
                 result &= "" _
                     & "<TR>" _
                     & "<TD align=left>Data From</TD>" _
@@ -111,7 +137,7 @@ Namespace Contensive.ImportWizard.Controllers
                     & "<TD align=left width=300>Save Data To</TD>" _
                     & "<TD align=left width=150>Type</TD>" _
                     & "</TR>"
-                Dim uploadFieldSelectTemplate As String = HtmlController.getSourceFieldSelect(app, importConfig.privateUploadPathFilename, "Ignore", importConfig.dstContentId, True)
+                Dim uploadFieldSelectTemplate As String = HtmlController.getSourceFieldSelect(app, importConfig.privateUploadPathFilename, "Ignore", importConfig.dstContentId, True, -99, "{{inputName}}", "js-import-select-{{fieldPtr}}")
                 Dim rowPtr As Integer = 0
                 Dim fieldList As List(Of ContentFieldModel) = C5BaseModel.createList(Of ContentFieldModel)(cp, "contentId=" & importConfig.dstContentId)
                 For Each mapPair As ImportMapModel_MapPair In ImportMap.mapPairs
@@ -120,7 +146,7 @@ Namespace Contensive.ImportWizard.Controllers
                     Dim mapField As ContentFieldModel = fieldList.Find(Function(x) x.name = mapPair.dbFieldName)
                     '
                     ' -- classes for each column
-                    Dim cell0Style As String = ""
+                    Dim cell0Style As String = "min-width:100px;"
                     Dim cell1Style As String = ""
                     Dim cell2Style As String = ""
                     Dim cell3Style As String = ""
@@ -192,17 +218,17 @@ Namespace Contensive.ImportWizard.Controllers
                         Case -5
                             '
                             ' -- for people only. set to lastname of name
-                            uploadFieldSelect = Replace(uploadFieldSelect, "value=""-1"">", "value=""-5"" selected>", , , vbTextCompare)
+                            uploadFieldSelect = Replace(uploadFieldSelect, "value=""-5"">", "value=""-5"" selected>", , , vbTextCompare)
                             valueEditor = valueEditor.Replace("{{styles}}", "display:none;")
                         Case -4
                             '
                             ' -- for people only. set to firstname of name
-                            uploadFieldSelect = Replace(uploadFieldSelect, "value=""-1"">", "value=""-4"" selected>", , , vbTextCompare)
+                            uploadFieldSelect = Replace(uploadFieldSelect, "value=""-4"">", "value=""-4"" selected>", , , vbTextCompare)
                             valueEditor = valueEditor.Replace("{{styles}}", "display:none;")
                         Case -3
                             '
                             ' -- for people only. set to 'firstname lastname'
-                            uploadFieldSelect = Replace(uploadFieldSelect, "value=""-1"">", "value=""-3"" selected>", , , vbTextCompare)
+                            uploadFieldSelect = Replace(uploadFieldSelect, "value=""-3"">", "value=""-3"" selected>", , , vbTextCompare)
                             valueEditor = valueEditor.Replace("{{styles}}", "display:none;")
                         Case -2
                             '

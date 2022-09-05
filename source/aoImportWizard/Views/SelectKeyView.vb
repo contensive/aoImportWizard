@@ -96,7 +96,7 @@ Namespace Contensive.ImportWizard.Controllers
 
                 Dim KeyMethodID As Integer = cp.Utils.EncodeInteger(ImportMap.keyMethodID)
                 If KeyMethodID = 0 Then
-                    KeyMethodID = KeyMethodUpdateOnMatchInsertOthers
+                    KeyMethodID = MapKeyEnum.KeyMethodUpdateOnMatchInsertOthers
                 End If
 
                 Dim SourceKeyFieldPtr As Integer
@@ -107,40 +107,29 @@ Namespace Contensive.ImportWizard.Controllers
                     SourceKeyFieldPtr = -1
                 End If
                 Dim Filename As String = importConfig.privateUploadPathFilename
-                Dim SourceFieldSelect As String = Replace(HtmlController.getSourceFieldSelect(app, Filename, "Select One", importConfig.dstContentId, false), "xxxx", RequestNameImportSourceKeyFieldPtr)
-                SourceFieldSelect = Replace(SourceFieldSelect, "value=" & SourceKeyFieldPtr, "value=" & SourceKeyFieldPtr & " selected", , , vbTextCompare)
+                Dim uploadFieldSelect As String = HtmlController.getSourceFieldSelect(app, Filename, "Select One", importConfig.dstContentId, False, SourceKeyFieldPtr, RequestNameImportSourceKeyFieldPtr, "js-import-select")
                 '
-                'Dim PeopleContentID As Integer = CP.Content.GetID("people")
-                Dim ImportContentID As Integer = importConfig.dstContentId
-                'ImportContentName = cp.Content.GetRecordName("content", ImportContentID)
-                Dim note As String
-
-                Dim DBFieldSelect As String
-                '
-                ' Pick any field for key if developer or not the ccMembers table
-                '
-                Dim DbKeyField As String = ImportMap.dbKeyField
+                ' -- Pick any field for key if developer or not the ccMembers table
                 Dim LookupContentName As String
                 LookupContentName = cp.Content.GetRecordName("content", importConfig.dstContentId)
-                DBFieldSelect = Replace(HtmlController.getDbFieldSelect(cp, LookupContentName, "Select One", True), "xxxx", RequestNameImportDbKeyField)
-                DBFieldSelect = Replace(DBFieldSelect, ">" & DbKeyField & "<", " selected>" & DbKeyField & "<", , , vbTextCompare)
-                note = ""
+                Dim DBFieldSelect As String = HtmlController.getDbFieldSelect(cp, LookupContentName, "Select One", True, ImportMap.dbKeyField)
+                DBFieldSelect = Replace(DBFieldSelect, "xxxx", RequestNameImportDbKeyField)
                 '
                 Dim Description As String = "" '"cp.Html.h4("Update Control") & cp.Html.p("When your data is imported, it can either update your current database, or insert new records into your database. Use this form to control which records will be updated, and which will be inserted.")
                 Dim Content As String = "" _
                     & "<div>" _
                         & "<h4>Update Options</h4>" _
                         & "<p>When the import file is added to the table, should records be insert, updated or both?</p>" _
-                        & HtmlController.getRadio(cp, RequestNameImportKeyMethodID, KeyMethodInsertAll, KeyMethodID, "Insert all imported data.", "js-radio-insert") _
-                        & HtmlController.getRadio(cp, RequestNameImportKeyMethodID, KeyMethodUpdateOnMatchInsertOthers, KeyMethodID, "Update database records from the import data when the key fields match. Insert all other imported data.", "js-radio-update-insert") _
-                        & HtmlController.getRadio(cp, RequestNameImportKeyMethodID, KeyMethodUpdateOnMatch, KeyMethodID, "Update database records from the import data when the key fields match. Ignore imported data that does not match.", "js-radio-update") _
-                        & "<div id=""js-key-fields"">" _
+                        & HtmlController.getRadio(cp, RequestNameImportKeyMethodID, MapKeyEnum.KeyMethodInsertAll, KeyMethodID, "Insert all imported data.", "js-radio-insert") _
+                        & HtmlController.getRadio(cp, RequestNameImportKeyMethodID, MapKeyEnum.KeyMethodUpdateOnMatchInsertOthers, KeyMethodID, "Update database records from the import data when the key fields match. Insert all other imported data.", "js-radio-update-insert") _
+                        & HtmlController.getRadio(cp, RequestNameImportKeyMethodID, MapKeyEnum.KeyMethodUpdateOnMatch, KeyMethodID, "Update database records from the import data when the key fields match. Ignore imported data that does not match.", "js-radio-update") _
+                        & "<div id=""js-key-fields"" style=""display:none"">" _
                             & "<h4>Key Fields</h4>" _
                             & "<p>If records will be updated, select a field in the upload and a field in the table to match.</p>" _
                             & "<TABLE border=0 cellpadding=4 cellspacing=0 width=100%>" _
                             & "<TR><TD width=10>&nbsp;</td><td width=99% align=left>" _
                                 & "<TABLE border=0 cellpadding=2 cellspacing=0 width=100%>" _
-                                & "<tr><td>Imported&nbsp;Key&nbsp;</td><td>" & SourceFieldSelect & "</td></tr>" _
+                                & "<tr><td>Imported&nbsp;Key&nbsp;</td><td>" & uploadFieldSelect & "</td></tr>" _
                                 & "<tr><td>Database&nbsp;Key&nbsp;</td><td>" & DBFieldSelect & "</td></tr>" _
                                 & "</table>" _
                                 & "</td></tr>" _

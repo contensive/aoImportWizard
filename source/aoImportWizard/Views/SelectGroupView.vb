@@ -97,15 +97,15 @@ Namespace Contensive.ImportWizard.Controllers
                 content = "" _
                     & "<div>" _
                     & "<TABLE border=0 cellpadding=4 cellspacing=0 width=100%>" _
-                    & "<TR><TD colspan=2>Add to Existing Group</td></tr>" _
-                    & "<TR><TD width=10>&nbsp;</td><td width=99% align=left>" & cp.Html.SelectContent(RequestNameImportGroupID, ImportMap.groupID.ToString, "Groups", "", "", "form-control") & "</td></tr>" _
-                    & "<TR><TD colspan=2>Create New Group</td></tr>" _
-                    & "<TR><TD width=10>&nbsp;</td><td width=99% align=left>" & cp.Html.InputText(RequestNameImportGroupNew, "", 100, "form-control") & "</td></tr>" _
                     & "<TR><TD colspan=2>Group Options</td></tr>" _
                     & "<TR><TD width=10>" & cp.Html.RadioBox(RequestNameImportGroupOptionID, GroupOptionNone.ToString, GroupOptionID.ToString) & "</td><td width=99% align=left>Do not add to a group.</td></tr>" _
                     & "<TR><TD width=10>" & cp.Html.RadioBox(RequestNameImportGroupOptionID, GroupOptionAll.ToString, GroupOptionID.ToString) & "</td><td width=99% align=left>Add everyone to the the group.</td></tr>" _
                     & "<TR><TD width=10>" & cp.Html.RadioBox(RequestNameImportGroupOptionID, GroupOptionOnMatch.ToString, GroupOptionID.ToString) & "</td><td width=99% align=left>Add to the group if keys match.</td></tr>" _
                     & "<TR><TD width=10>" & cp.Html.RadioBox(RequestNameImportGroupOptionID, GroupOptionOnNoMatch.ToString, GroupOptionID.ToString) & "</td><td width=99% align=left>Add to the group if keys do NOT match.</td></tr>" _
+                    & "<TR><TD colspan=2>Add to Existing Group</td></tr>" _
+                    & "<TR><TD width=10>&nbsp;</td><td width=99% align=left>" & cp.Html.SelectContent(RequestNameImportGroupID, ImportMap.groupID.ToString, "Groups", "", "", "form-control") & "</td></tr>" _
+                    & "<TR><TD colspan=2>Create New Group</td></tr>" _
+                    & "<TR><TD width=10>&nbsp;</td><td width=99% align=left>" & cp.Html.InputText(RequestNameImportGroupNew, "", 100, "form-control") & "</td></tr>" _
                     & "</table>" _
                     & "</div>" _
                     & ""

@@ -7,6 +7,28 @@ Namespace Contensive.ImportWizard.Controllers
         Private Sub New()
         End Sub
         '
+        Public Shared Function normalizeFilename(srcFilename As String) As String
+            Dim ext As String = IO.Path.GetExtension(srcFilename)
+            Dim filenameNoExt As String = IO.Path.GetFileNameWithoutExtension(srcFilename)
+            Dim result As String = ""
+            Dim validCharacters As String = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+            For Each c In filenameNoExt.Trim().Replace(" "c, "_")
+                result &= If(validCharacters.Contains(c), c, "-")
+            Next
+            Return If(String.IsNullOrEmpty(ext), result, result & "." & ext)
+        End Function
+        '
+        Public Shared Function Base64Encode(ByVal plainText As String) As String
+            Dim plainTextBytes = System.Text.Encoding.UTF8.GetBytes(plainText)
+            Return System.Convert.ToBase64String(plainTextBytes)
+        End Function
+        '
+        Public Shared Function Base64Decode(ByVal base64EncodedData As String) As String
+            Dim base64EncodedBytes = System.Convert.FromBase64String(base64EncodedData)
+            Return System.Text.Encoding.UTF8.GetString(base64EncodedBytes)
+        End Function        '
+
+        '
         '====================================================================================================
         ''' <summary>
         ''' if date is invalid, set to minValue

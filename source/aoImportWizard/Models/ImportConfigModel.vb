@@ -28,7 +28,11 @@ Namespace Contensive.ImportWizard.Models
                 '
                 ' -- problem, cannot create map until content is established.
             End If
-            importMapPathFilename = ImportMapModel.getNewMapFilename(app, contentName)
+            'Dim mapFilenameData As New MapFilenameDataModel With {
+            '    .mapName = "Import " & contentName,
+            '    .dateCreated = Now
+            '}
+            importMapPathFilename = ImportMapModel.createMapPathFilename(app, contentName, "Import " & contentName & ".txt")
             save(app)
         End Sub
         '
