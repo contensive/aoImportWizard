@@ -193,6 +193,10 @@ Namespace Contensive.ImportWizard.Models
             Dim rowPtr As Integer = 0
 
             For Each dbField In dbFieldList
+                '
+                ' -- content controlId should be set to table's contentid
+                If dbField.name.ToLowerInvariant() = "contentcontrolid" Then Continue For
+                '
                 Dim dbFieldName As String = dbField.name
                 '
                 ' -- setup mapPair

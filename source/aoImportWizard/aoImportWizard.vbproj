@@ -74,8 +74,8 @@
     <Reference Include="CPBase, Version=4.1.2.0, Culture=neutral, PublicKeyToken=10b3c53389b845fb, processorArchitecture=MSIL">
       <HintPath>packages\Contensive.CPBaseClass.22.8.16.1\lib\net472\CPBase.dll</HintPath>
     </Reference>
-    <Reference Include="PortalFramework, Version=21.11.11.0, Culture=neutral, PublicKeyToken=df99052d01433f97, processorArchitecture=MSIL">
-      <HintPath>packages\Contensive.PortalApi.22.8.21.1\lib\net472\PortalFramework.dll</HintPath>
+    <Reference Include="PortalFramework, Version=22.9.20.6, Culture=neutral, PublicKeyToken=df99052d01433f97, processorArchitecture=MSIL">
+      <HintPath>packages\Contensive.PortalApi.22.9.20.6\lib\net472\PortalFramework.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />

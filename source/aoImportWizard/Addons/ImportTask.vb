@@ -3,7 +3,6 @@ Imports Contensive.ImportWizard.Controllers
 Imports Contensive.BaseClasses
 Imports Contensive.Models.Db
 Imports Contensive.ImportWizard.Models
-Imports ImportMapModel
 
 Namespace Contensive.ImportWizard.Addons
     '

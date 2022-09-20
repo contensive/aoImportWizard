@@ -142,6 +142,9 @@ Namespace Contensive.ImportWizard.Controllers
                 Dim fieldList As List(Of ContentFieldModel) = C5BaseModel.createList(Of ContentFieldModel)(cp, "contentId=" & importConfig.dstContentId)
                 For Each mapPair As ImportMapModel_MapPair In ImportMap.mapPairs
                     '
+                    ' -- this was created as an array, not a list. So when populating when we skip fields (contentcontrolid) it leaves null entries
+                    If mapPair Is Nothing Then Continue For
+                    '
                     ' -- 
                     Dim mapField As ContentFieldModel = fieldList.Find(Function(x) x.name = mapPair.dbFieldName)
                     '

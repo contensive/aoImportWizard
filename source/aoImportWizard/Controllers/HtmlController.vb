@@ -54,21 +54,36 @@ Namespace Contensive.ImportWizard.Controllers
         '
         Public Shared Function createLayout(cp As CPBaseClass, header As String, description As String, body As String, allowCancel As Boolean, allowRestart As Boolean, allowBack As Boolean, allowContinue As Boolean) As String
             Try
-                Dim buttonBar As String = cp.Html.div("" _
-                    & If(allowCancel, cp.Html.Button("button", ButtonCancel, "mr-2"), "") _
-                    & If(allowRestart, cp.Html.Button("button", ButtonRestart, "mr-2"), "") _
-                    & If(allowBack, cp.Html.Button("button", ButtonBack, "mr-2"), "") _
-                    & If(allowContinue, cp.Html.Button("button", ButtonContinue, "mr-2"), ""), "", "p-2 bg-secondary")
-                Return "" _
-                    & "<div class=""bg-white"">" _
-                        & buttonBar _
-                        & "<div class=""p-4"">" _
-                            & cp.Html.h2(header) _
-                            & cp.Html.div(description) _
-                            & cp.Html.div(body, "", "mt-4") _
-                        & "</div>" _
-                        & buttonBar _
-                    & "</div>"
+                Dim layout As New Contensive.Addons.PortalFramework.LayoutBuilderSimple With {
+                    .title = header,
+                    .description = description,
+                    .body = body,
+                    .includeBodyPadding = True,
+                    .includeBodyColor = False,
+                    .isOuterContainer = True
+                    }
+                If allowCancel Then layout.addFormButton(ButtonCancel)
+                If allowRestart Then layout.addFormButton(ButtonRestart)
+                If allowBack Then layout.addFormButton(ButtonBack)
+                If allowContinue Then layout.addFormButton(ButtonContinue)
+                Return layout.getHtml(cp)
+
+
+                'Dim buttonBar As String = cp.Html.div("" _
+                '    & If(allowCancel, cp.Html.Button("button", ButtonCancel, "mr-2"), "") _
+                '    & If(allowRestart, cp.Html.Button("button", ButtonRestart, "mr-2"), "") _
+                '    & If(allowBack, cp.Html.Button("button", ButtonBack, "mr-2"), "") _
+                '    & If(allowContinue, cp.Html.Button("button", ButtonContinue, "mr-2"), ""), "", "p-2 bg-secondary")
+                'Return "" _
+                '    & "<div class=""bg-white"">" _
+                '        & buttonBar _
+                '        & "<div class=""p-4"">" _
+                '            & cp.Html.h2(header) _
+                '            & cp.Html.div(description) _
+                '            & cp.Html.div(body, "", "mt-4") _
+                '        & "</div>" _
+                '        & buttonBar _
+                '    & "</div>"
             Catch ex As Exception
                 cp.Site.ErrorReport(ex)
                 Throw
