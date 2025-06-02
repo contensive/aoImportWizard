@@ -1,31 +1,45 @@
-﻿                  <div id="js-importwizard" class="iWizWrapper">		
-					   <form id="js-importWizardForm">									   
-					  <table border="0" cellpadding="0" cellspacing="0" width="500" align="center"><tbody><tr><td valign="top">
-						<div class="ccWizardHeader">Import Wizard</div>
-						<table border="0" cellpadding="10" cellspacing="0" width="100%"><tbody><tr><td valign="top" class="ccWizardPanel">
-							<div><b>Select the import source</b><br><br>There are several sources you can use for your data...
-							</div>
-							<table border="0" cellpadding="10" cellspacing="0" height="100" width="100%"><tbody><tr><td valign="top">
-								<div>
-									<input type="hidden" name="SubForm" value="1"><div><table border="0" cellpadding="10" cellspacing="0" width="100%"><tbody><tr><td width="1"><input type="Radio" name="ImportWizardSource" value="1" checked=""></td><td width="99%" align="left">Upload a comma delimited text file (up to 5 MBytes).</td></tr><tr><td width="1"><input type="Radio" name="ImportWizardSource" value="2"></td><td width="99%" align="left">Use a file already uploaded into your Upload Folder.</td></tr></tbody></table></div>
-								</div>
-							</td></tr></tbody></table>
-							<div>
-								<table border="0" cellpadding="0" cellspacing="0" width="100%">
-									<tbody><tr>
-										<td align="left" class="ccButtonCon">
-											<table border="0" cellpadding="0" cellspacing="0" width="100%">
-												<tbody><tr>
-													<td width="50%" align="left"><input type="SUBMIT" name="Button" value=" Cancel " onclick="" id=""></td>
-													<td width="50%" align="right"><input type="SUBMIT" name="Button" value=" Continue " onclick="" id=""></td>
-												</tr>
-											</tbody></table>
-										</td>
-									</tr>
-								</tbody></table>
-							</div>
-						</td></tr></tbody></table>
-						<input type="hidden" name="ccFormRefreshBlockSN" value="1702832669"><br><img alt="space" src="/ccLib/images/spacer.gif" width="400" height="1">
-					</td></tr></tbody></table>		
-					</form>
+﻿    <div id="js-importwizard" class="iWizWrapper">		
+		<form id="js-importWizardForm">									   
+		<table border="0" cellpadding="0" cellspacing="0" width="500" align="center"><tbody><tr><td valign="top">
+		<div class="ccWizardHeader">Import Wizard</div>
+		<table border="0" cellpadding="10" cellspacing="0" width="100%"><tbody><tr><td valign="top" class="ccWizardPanel">
+			<div><b>Select the import source</b><br><br>There are several sources you can use for your data...
+			</div>
+			<table border="0" cellpadding="10" cellspacing="0" height="100" width="100%"><tbody><tr><td valign="top">
+				<div>
+					<input type="hidden" name="SubForm" value="1">
+					<div>
+						<table border="0" cellpadding="10" cellspacing="0" width="100%">
+							<tbody>
+								<tr>
+									<td width="1"><input type="Radio" name="ImportWizardSource" value="1" checked="">&nbsp;</td>
+									<td width="99%" align="left">Upload a comma delimited text file (up to 5 MBytes).</td>
+								</tr>
+								<tr>
+									<td width="1"><input type="Radio" name="ImportWizardSource" value="2">&nbsp;</td>
+									<td width="99%" align="left">Use a file already uploaded into your Upload Folder.</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
 				</div>
+			</td></tr></tbody></table>
+			<div>
+				<table border="0" cellpadding="0" cellspacing="0" width="100%">
+					<tbody><tr>
+						<td align="left" class="ccButtonCon">
+							<table border="0" cellpadding="0" cellspacing="0" width="100%">
+								<tbody><tr>
+									<td width="50%" align="left"><input type="SUBMIT" name="Button" value=" Cancel " onclick="" id=""></td>
+									<td width="50%" align="right"><input type="SUBMIT" name="Button" value=" Continue " onclick="" id=""></td>
+								</tr>
+							</tbody></table>
+						</td>
+					</tr>
+				</tbody></table>
+			</div>
+		</td></tr></tbody></table>
+		<input type="hidden" name="ccFormRefreshBlockSN" value="1702832669"><br><img alt="space" src="/ccLib/images/spacer.gif" width="400" height="1">
+	</td></tr></tbody></table>		
+	</form>
+</div>

@@ -16,7 +16,7 @@ set collectionName=aoImportWizard
 set collectionPath=..\collections\aoImportWizard\
 set solutionPathFilename=..\source\aoImportWizard\aoImportWizard.sln
 set binPath=..\source\aoImportWizard\bin\debug\
-set msbuildLocation=C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\MSBuild\15.0\Bin\
+set msbuildLocation=C:\Program Files (x86)\Microsoft Visual Studio\2019\BuildTools\MSBuild\Current\Bin\
 set deploymentFolderRoot=C:\Deployments\aoImportWizard\Dev\
 
 set deploymentNumber=%1
@@ -77,5 +77,6 @@ cd %collectionPath%
 del "%collectionName%.zip" /Q
 "c:\program files\7-zip\7z.exe" a "%collectionName%.zip"
 xcopy "%collectionName%.zip" "%deploymentFolderRoot%%deploymentNumber%" /Y
+xcopy "%collectionName%.zip" "c:\deployments\_current" /Y
 cd ..\..\scripts
 

@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27703.2035
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "aoImportWizard", "aoImportWizard.csproj", "{E80A2F85-01A6-01FA-3D64-242EA22D4250}"
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "aoImportWizard", "aoImportWizard.vbproj", "{5A2EAEEE-CDFE-4E0B-BF3C-EE50C0BA76F0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -11,10 +11,10 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{E80A2F85-01A6-01FA-3D64-242EA22D4250}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E80A2F85-01A6-01FA-3D64-242EA22D4250}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E80A2F85-01A6-01FA-3D64-242EA22D4250}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E80A2F85-01A6-01FA-3D64-242EA22D4250}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5A2EAEEE-CDFE-4E0B-BF3C-EE50C0BA76F0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5A2EAEEE-CDFE-4E0B-BF3C-EE50C0BA76F0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5A2EAEEE-CDFE-4E0B-BF3C-EE50C0BA76F0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5A2EAEEE-CDFE-4E0B-BF3C-EE50C0BA76F0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

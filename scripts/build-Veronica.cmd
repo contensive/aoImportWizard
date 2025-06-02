@@ -3,7 +3,7 @@ rem all paths are relative to the git scripts folder
 
 call build.cmd
 
-set appName=menucrm0210
+set appName=veronica
 
 rem upload to contensive application
 c:

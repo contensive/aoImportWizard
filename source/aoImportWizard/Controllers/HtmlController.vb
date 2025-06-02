@@ -54,6 +54,7 @@ Namespace Contensive.ImportWizard.Controllers
         '
         Public Shared Function createLayout(cp As CPBaseClass, header As String, description As String, body As String, allowCancel As Boolean, allowRestart As Boolean, allowBack As Boolean, allowContinue As Boolean) As String
             Try
+
                 Dim layout As New Contensive.Addons.PortalFramework.LayoutBuilderSimple With {
                     .title = header,
                     .description = description,

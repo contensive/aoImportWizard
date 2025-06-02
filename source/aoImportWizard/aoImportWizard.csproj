@@ -5,49 +5,42 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>8.0.50727</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{5A2EAEEE-CDFE-4E0B-BF3C-EE50C0BA76F0}</ProjectGuid>
+    <ProjectGuid>{E80A2F85-01A6-01FA-3D64-242EA22D4250}</ProjectGuid>
     <OutputType>Library</OutputType>
-    <RootNamespace>
-    </RootNamespace>
+    <RootNamespace></RootNamespace>
     <AssemblyName>aoImportWizard</AssemblyName>
     <MyType>Windows</MyType>
-    <SccProjectName>
-    </SccProjectName>
-    <SccLocalPath>
-    </SccLocalPath>
-    <SccAuxPath>
-    </SccAuxPath>
-    <SccProvider>
-    </SccProvider>
+    <SccProjectName></SccProjectName>
+    <SccLocalPath></SccLocalPath>
+    <SccAuxPath></SccAuxPath>
+    <SccProvider></SccProvider>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
-    <FileUpgradeFlags>
-    </FileUpgradeFlags>
-    <UpgradeBackupLocation>
-    </UpgradeBackupLocation>
+    <FileUpgradeFlags></FileUpgradeFlags>
+    <UpgradeBackupLocation></UpgradeBackupLocation>
     <OldToolsVersion>2.0</OldToolsVersion>
     <TargetFrameworkProfile />
+    <DefaultItemExcludes>$(DefaultItemExcludes);$(ProjectDir)**\*.vb</DefaultItemExcludes>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
-    <DefineDebug>true</DefineDebug>
-    <DefineTrace>true</DefineTrace>
     <OutputPath>bin\Debug\</OutputPath>
-    <DocumentationFile>aoImportWizard.xml</DocumentationFile>
+    <DocumentationFile>bin\Debug\aoImportWizard.xml</DocumentationFile>
     <NoWarn>42353,42354,42355</NoWarn>
     <Prefer32Bit>false</Prefer32Bit>
     <WarningsAsErrors>41999,42016,42017,42018,42019,42020,42021,42022,42032,42036</WarningsAsErrors>
+    <DefineConstants>TRACE;DEBUG</DefineConstants>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
-    <DefineDebug>false</DefineDebug>
-    <DefineTrace>true</DefineTrace>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
-    <DocumentationFile>aoImportWizard.xml</DocumentationFile>
+    <DocumentationFile>bin\Release\aoImportWizard.xml</DocumentationFile>
     <NoWarn>42353,42354,42355</NoWarn>
     <Prefer32Bit>false</Prefer32Bit>
     <WarningsAsErrors>41999,42016,42017,42018,42019,42020,42021,42022,42032,42036</WarningsAsErrors>
+    <DefineConstants>TRACE</DefineConstants>
   </PropertyGroup>
   <PropertyGroup>
     <OptionExplicit>On</OptionExplicit>
@@ -68,6 +61,7 @@
     <AssemblyOriginatorKeyFile>key1.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Microsoft.VisualBasic" />
     <Reference Include="ContensiveDbModels, Version=20.0.0.0, Culture=neutral, PublicKeyToken=c014b235a9c6bb22, processorArchitecture=MSIL">
       <HintPath>packages\Contensive.DbModels.25.5.29.5\lib\net472\ContensiveDbModels.dll</HintPath>
     </Reference>
@@ -97,46 +91,47 @@
     <Import Include="System.Diagnostics" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="constants.vb" />
-    <Compile Include="Models\ApplicationModel.vb" />
-    <Compile Include="Addons\ImportTask.vb" />
-    <Compile Include="Addons\ImportWizardAddon.vb" />
-    <Compile Include="Controllers\HtmlController.vb" />
-    <Compile Include="Models\ImportConfigModel.vb" />
-    <Compile Include="Models\ContentFieldModel.vb" />
-    <Compile Include="Models\ImportMapModel.vb" />
-    <Compile Include="My Project\AssemblyInfo.vb" />
-    <Compile Include="My Project\Application.Designer.vb">
+    <Compile Include="My Project\MyNamespace.Static.1.Designer.cs" />
+    <Compile Include="constants.cs" />
+    <Compile Include="Models\ApplicationModel.cs" />
+    <Compile Include="Addons\ImportTask.cs" />
+    <Compile Include="Addons\ImportWizardAddon.cs" />
+    <Compile Include="Controllers\HtmlController.cs" />
+    <Compile Include="Models\ImportConfigModel.cs" />
+    <Compile Include="Models\ContentFieldModel.cs" />
+    <Compile Include="Models\ImportMapModel.cs" />
+    <Compile Include="My Project\AssemblyInfo.cs" />
+    <Compile Include="My Project\Application.Designer.cs">
       <AutoGen>True</AutoGen>
       <DependentUpon>Application.myapp</DependentUpon>
       <DesignTime>True</DesignTime>
     </Compile>
-    <Compile Include="My Project\Resources.Designer.vb">
+    <Compile Include="Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="My Project\Settings.Designer.vb">
+    <Compile Include="My Project\Settings.Designer.cs">
       <AutoGen>True</AutoGen>
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="Views\SelectSourceView.vb" />
-    <Compile Include="Views\UploadView.vb" />
-    <Compile Include="Views\SelectFileView.vb" />
-    <Compile Include="Views\SelectContentView.vb" />
-    <Compile Include="Views\MappingView.vb" />
-    <Compile Include="Views\SelectKeyView.vb" />
-    <Compile Include="Views\SelectGroupView.vb" />
-    <Compile Include="Views\FinishView.vb" />
-    <Compile Include="Views\DoneView.vb" />
-    <Compile Include="Views\SelectMapView.vb" />
-    <Compile Include="Views\_blankView.vb" />
+    <Compile Include="Views\SelectSourceView.cs" />
+    <Compile Include="Views\UploadView.cs" />
+    <Compile Include="Views\SelectFileView.cs" />
+    <Compile Include="Views\SelectContentView.cs" />
+    <Compile Include="Views\MappingView.cs" />
+    <Compile Include="Views\SelectKeyView.cs" />
+    <Compile Include="Views\SelectGroupView.cs" />
+    <Compile Include="Views\FinishView.cs" />
+    <Compile Include="Views\DoneView.cs" />
+    <Compile Include="Views\SelectMapView.cs" />
+    <Compile Include="Views\_blankView.cs" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="My Project\Resources.resx">
-      <Generator>VbMyResourcesResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.vb</LastGenOutput>
+    <EmbeddedResource Include="Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
       <CustomToolNamespace>My.Resources</CustomToolNamespace>
       <SubType>Designer</SubType>
     </EmbeddedResource>
@@ -146,17 +141,17 @@
     <None Include="key1.snk" />
     <None Include="My Project\Application.myapp">
       <Generator>MyApplicationCodeGenerator</Generator>
-      <LastGenOutput>Application.Designer.vb</LastGenOutput>
+      <LastGenOutput>Application.Designer.cs</LastGenOutput>
     </None>
     <None Include="My Project\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <CustomToolNamespace>My</CustomToolNamespace>
-      <LastGenOutput>Settings.Designer.vb</LastGenOutput>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Controllers\GenericController.vb" />
+    <Compile Include="Controllers\GenericController.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Resources\Importwizard2layout.txt" />
@@ -165,7 +160,7 @@
     <Content Include="Resources\sampleSql.txt" />
   </ItemGroup>
   <ItemGroup />
-  <Import Project="$(MSBuildBinPath)\Microsoft.VisualBasic.targets" />
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
@@ -174,7 +169,6 @@
   </Target>
   -->
   <PropertyGroup>
-    <PostBuildEvent>
-    </PostBuildEvent>
+    <PostBuildEvent></PostBuildEvent>
   </PropertyGroup>
 </Project>
