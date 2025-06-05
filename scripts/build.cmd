@@ -77,6 +77,6 @@ cd %collectionPath%
 del "%collectionName%.zip" /Q
 "c:\program files\7-zip\7z.exe" a "%collectionName%.zip"
 xcopy "%collectionName%.zip" "%deploymentFolderRoot%%deploymentNumber%" /Y
-xcopy "%collectionName%.zip" "c:\deployments\_current" /Y
+xcopy "%collectionName%.zip" "c:\deployments\_current_sprint" /Y
 cd ..\..\scripts
 
