@@ -83,8 +83,18 @@ namespace Contensive.ImportWizard.Controllers {
                 int uploadPtr = 0;
                 foreach (var @file in cp.PrivateFiles.FileList(constants.privateFilesUploadPath)) {
                     string uploadId = "upload" + uploadPtr;
-                    string input = "<label for=\"" + uploadId + "\">" + cp.Html.RadioBox("selectfile", constants.privateFilesUploadPath + @file.Name, "", "mr-2", uploadId) + @file.Name + "</label>";
-                    fileList2.Append(cp.Html.div(input, "", "pb-2"));
+                    fileList2.Append(@$"
+                        <div class=""form-check"">
+                            <input class=""form-check-input"" type=""radio"" name=""selectfile"" value=""{constants.privateFilesUploadPath + @file.Name}"" id=""{uploadId}"">
+                            <label class=""form-check-label"" for=""{uploadId}"">{@file.Name}</label>
+                        </div>");
+                    //string input = @$"
+                    //    <div class=""form-check"">
+                    //        <input class=""form-check-input"" type=""radio"" name=""selectfile"" value=""{constants.privateFilesUploadPath + @file.Name}"" id=""{uploadId}"">
+                    //        <label class=""form-check-label"" for=""{uploadId}"">@file.Name</label>
+                    //    </div>";
+                    //{ cp.Html.RadioBox("selectfile", constants.privateFilesUploadPath + @file.Name, "", "form-check-input", uploadId)}
+                    //fileList2.Append(cp.Html.div(input, "", "pb-2"));
                     uploadPtr += 1;
                 }
                 string Content = "<div class=\"pl-4\">" + fileList2.ToString() + "</div>";
