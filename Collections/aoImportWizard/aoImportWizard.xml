@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="windows-1252"?>
-<Collection name="Import Wizard" guid="{339b9171-5b57-4f42-914c-dcef4f52f388}" system="No" updatable="Yes" blockNavigatorNode="No">
+<Collection name="Import Wizard" guid="{339b9171-5b57-4f42-914c-dcef4f52f388}" system="No" updatable="Yes" blockNavigatorNode="No"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:noNamespaceSchemaLocation="https://contensive.s3.amazonaws.com/xsd/Collection.xsd"
+>
 	<HelpLink>http://support.contensive.com/Import-Wizard</HelpLink>
 	<Help></Help>
 	<Addon name="Import Wizard" guid="{37F66F90-C0E0-4EAF-84B1-53E90A5B3B3F}" type="Tool">
