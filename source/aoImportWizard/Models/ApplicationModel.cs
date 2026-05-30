@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using Contensive.BaseClasses;
 using Contensive.ImportWizard.Controllers;
-using Microsoft.VisualBasic;
 
 namespace Contensive.ImportWizard.Models {
     // 
@@ -88,8 +87,7 @@ namespace Contensive.ImportWizard.Models {
         public static string serializeObject(CPBaseClass CP, object dataObject) {
             try {
                 string result = "";
-                var json_serializer = new System.Web.Script.Serialization.JavaScriptSerializer();
-                result = json_serializer.Serialize(dataObject);
+                result = System.Text.Json.JsonSerializer.Serialize(dataObject);
                 return result;
             } catch (Exception ex) {
                 CP.Site.ErrorReport(ex);
@@ -145,7 +143,7 @@ namespace Contensive.ImportWizard.Models {
                             // ' -- add firstname and lastname from name
                             // sourceFields.Append("First-Name Last-Name")
                             // End If
-                            sourceFieldCnt = Information.UBound(uploadFields) + 1;
+                            sourceFieldCnt = uploadFields.GetUpperBound(0) + 1;
                         }
                     }
                 }

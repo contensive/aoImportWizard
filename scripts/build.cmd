@@ -1,82 +1,18 @@
+@echo off
+setlocal
 
-rem @echo off
+set nopause=0
+if /i "%~1"=="/nopause" set nopause=1
 
-rem 
-rem Must be run from the projects git\project\scripts folder - everything is relative
-rem run >build [deploymentNumber]
-rem deploymentNumber is YYMMDD.build-number, like 190824.5
-rem
-rem Setup deployment folder
-rem
+powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0build.ps1"
+set exitcode=%errorlevel%
 
-
-set majorVersion=5
-set minorVersion=1
-set collectionName=aoImportWizard
-set collectionPath=..\collections\aoImportWizard\
-set solutionPathFilename=..\source\aoImportWizard\aoImportWizard.sln
-set binPath=..\source\aoImportWizard\bin\debug\
-set msbuildLocation=C:\Program Files (x86)\Microsoft Visual Studio\2019\BuildTools\MSBuild\Current\Bin\
-set deploymentFolderRoot=C:\Deployments\aoImportWizard\Dev\
-
-set deploymentNumber=%1
-set year=%date:~12,4%
-set month=%date:~4,2%
-set day=%date:~7,2%
-
-rem
-rem if deployment number not entered, set it to date.1
-rem
-IF [%deploymentNumber%] == [] (
-	echo No deployment folder provided on the command line, use current date
-	set deploymentTimeStamp=%year%%month%%day%
+if not "%exitcode%"=="0" (
+    echo.
+    echo ========================================
+    echo BUILD FAILED
+    echo ========================================
 )
-rem
-rem if deployment folder exists, delete it and make directory
-rem
 
-set suffix=1
-:tryagain
-set deploymentNumber=%deploymentTimeStamp%.%suffix%
-if not exist "%deploymentFolderRoot%%deploymentNumber%" goto :makefolder
-set /a suffix=%suffix%+1
-goto tryagain
-:makefolder
-md "%deploymentFolderRoot%%deploymentNumber%"
-
-rem ==============================================================
-rem
-echo build 
-rem
-cd 
-"%msbuildLocation%msbuild.exe" "%solutionPathFilename%"
-if errorlevel 1 (
-   echo failure building
-   pause
-   exit /b %errorlevel%
-)
-cd ..\scripts
-
-rem pause
-
-rem ==============================================================
-rem
-echo Build addon collection
-rem
-
-rem remove old DLL files from the collection folder
-del "%collectionPath%"\*.DLL
-del "%collectionPath%"\*.config
-
-rem copy bin folder assemblies to collection folder
-copy "%binPath%*.dll" "%collectionPath%"
-
-rem create new collection zip file
-c:
-cd %collectionPath%
-del "%collectionName%.zip" /Q
-"c:\program files\7-zip\7z.exe" a "%collectionName%.zip"
-xcopy "%collectionName%.zip" "%deploymentFolderRoot%%deploymentNumber%" /Y
-xcopy "%collectionName%.zip" "c:\deployments\_current_sprint" /Y
-cd ..\..\scripts
-
+rem if "%nopause%"=="0" pause
+exit /b %exitcode%

@@ -1,7 +1,6 @@
 ﻿using System;
 using Contensive.ImportWizard.Models;
 using C5BaseModel = Contensive.Models.Db.DbBaseModel;
-using Microsoft.VisualBasic.CompilerServices;
 
 namespace Contensive.ImportWizard.Controllers {
     public class FinishView {
@@ -41,7 +40,7 @@ namespace Contensive.ImportWizard.Controllers {
                             var importConfig = ImportConfigModel.create(app);
                             var ImportWizardTasks = C5BaseModel.addDefault<Contensive.Models.Db.ImportWizardTaskModel>(cp);
                             if (ImportWizardTasks is not null) {
-                                ImportWizardTasks.name = Conversions.ToString(DateTime.Now) + " CSV Import";
+                                ImportWizardTasks.name = $"{DateTime.Now} CSV Import";
                                 ImportWizardTasks.uploadFilename = importConfig.privateUploadPathFilename;
                                 ImportWizardTasks.notifyEmail = importConfig.notifyEmail;
                                 ImportWizardTasks.importMapFilename = importConfig.importMapPathFilename;

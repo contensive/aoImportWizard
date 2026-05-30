@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Text;
 using Contensive.ImportWizard.Models;
-using Microsoft.VisualBasic;
 
 namespace Contensive.ImportWizard.Controllers {
     public class SelectFileView {
@@ -54,8 +53,8 @@ namespace Contensive.ImportWizard.Controllers {
                                 importConfig.privateUploadPathFilename = app.cp.Doc.GetText("SelectFile");
                                 importConfig.save(app);
                             }
-                            if (Strings.Left(importConfig.privateUploadPathFilename, 1) == @"\")
-                                importConfig.privateUploadPathFilename = Strings.Mid(importConfig.privateUploadPathFilename, 2);
+                            if (importConfig.privateUploadPathFilename.Length > 0 && importConfig.privateUploadPathFilename[0] == '\\')
+                                importConfig.privateUploadPathFilename = importConfig.privateUploadPathFilename.Substring(1);
                             importConfig.save(app);
                             // 
                             return constants.viewIdSelectContent;

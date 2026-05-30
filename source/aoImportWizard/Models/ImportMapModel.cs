@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using Contensive.BaseClasses;
 using Contensive.ImportWizard.Controllers;
 using C5BaseModel = Contensive.Models.Db.DbBaseModel;
-using Microsoft.VisualBasic;
 
 namespace Contensive.ImportWizard.Models {
     public class ImportMapModel {
@@ -223,7 +222,7 @@ namespace Contensive.ImportWizard.Models {
                     hint = 40;
                     // 
                     // -- search uploadFields for matches to dbFields
-                    string dBFieldName_lower = Strings.LCase(dbFieldName);
+                    string dBFieldName_lower = dbFieldName.ToLowerInvariant();
                     int uploadFieldPtr = 0;
                     foreach (string uploadField in uploadFields) {
                         hint = 41;

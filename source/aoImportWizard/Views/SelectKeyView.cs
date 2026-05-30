@@ -2,7 +2,6 @@
 using System.Linq;
 using Contensive.ImportWizard.Models;
 using C5BaseModel = Contensive.Models.Db.DbBaseModel;
-using Microsoft.VisualBasic;
 
 namespace Contensive.ImportWizard.Controllers {
     public class SelectKeyView {
@@ -118,7 +117,7 @@ namespace Contensive.ImportWizard.Controllers {
                 string LookupContentName;
                 LookupContentName = cp.Content.GetRecordName("content", importConfig.dstContentId);
                 string DBFieldSelect = HtmlController.getDbFieldSelect(cp, LookupContentName, "Select One", true, ImportMap.dbKeyField);
-                DBFieldSelect = Strings.Replace(DBFieldSelect, "xxxx", constants.RequestNameImportDbKeyField);
+                DBFieldSelect = DBFieldSelect.Replace("xxxx", constants.RequestNameImportDbKeyField);
                 // 
                 string Description = ""; // "cp.Html.h4("Update Control") & cp.Html.p("When your data is imported, it can either update your current database, or insert new records into your database. Use this form to control which records will be updated, and which will be inserted.")
                 string Content = "" + "<div>" + "<h4>Update Options</h4>" + "<p>When the import file is added to the table, should records be insert, updated or both?</p>" + HtmlController.getRadio(cp, constants.RequestNameImportKeyMethodID, (int)MapKeyEnum.KeyMethodInsertAll, KeyMethodID, "Insert all imported data.", "js-radio-insert") + HtmlController.getRadio(cp, constants.RequestNameImportKeyMethodID, (int)MapKeyEnum.KeyMethodUpdateOnMatchInsertOthers, KeyMethodID, "Update database records from the import data when the key fields match. Insert all other imported data.", "js-radio-update-insert") + HtmlController.getRadio(cp, constants.RequestNameImportKeyMethodID, (int)MapKeyEnum.KeyMethodUpdateOnMatch, KeyMethodID, "Update database records from the import data when the key fields match. Ignore imported data that does not match.", "js-radio-update") + "<div id=\"js-key-fields\" style=\"display:none\">" + "<h4>Key Fields</h4>" + "<p>If records will be updated, select a field in the upload and a field in the table to match.</p>" + "<TABLE border=0 cellpadding=4 cellspacing=0 width=100%>" + "<TR><TD width=10>&nbsp;</td><td width=99% align=left>" + "<TABLE border=0 cellpadding=2 cellspacing=0 width=100%>" + "<tr><td>Imported&nbsp;Key&nbsp;</td><td>" + uploadFieldSelect + "</td></tr>" + "<tr><td>Database&nbsp;Key&nbsp;</td><td>" + DBFieldSelect + "</td></tr>" + "</table>" + "</td></tr>" + "</table>" + "</div>" + "</div>" + "";
