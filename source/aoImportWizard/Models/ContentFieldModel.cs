@@ -26,6 +26,7 @@ namespace Contensive.ImportWizard.Models {
         /// <param name="cp"></param>
         /// <param name="contentName"></param>
         /// <param name="allowID"></param>
+        /// <param name="orderByNameCaption"></param>
         /// <returns></returns>
         public static List<ContentFieldData> getDbFieldList(CPBaseClass cp, string contentName, bool allowID, bool orderByNameCaption) {
             try {

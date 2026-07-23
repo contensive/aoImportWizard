@@ -233,7 +233,7 @@ namespace Contensive.ImportWizard.Controllers {
                     return_cells[fieldPtr] = Cell;
                     fieldPtr += 1;
                     if (return_ptr == 0) {
-                        return_ptr = return_ptr;
+                        break;
                     }
                 }
             } catch (Exception) {

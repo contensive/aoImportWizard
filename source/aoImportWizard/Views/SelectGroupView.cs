@@ -10,6 +10,7 @@ namespace Contensive.ImportWizard.Controllers {
         /// return the next view. 0 goes to the first form (start over)
         /// </summary>
         /// <param name="app"></param>
+        /// <param name="srcViewId"></param>
         /// <returns></returns>
         public static int processView(ApplicationModel app, int srcViewId) {
             try {
@@ -66,12 +67,11 @@ namespace Contensive.ImportWizard.Controllers {
                         }
 
                     default: {
-                            // 
+                            //
                             // -- continue to finish
                             return constants.viewIdFinish;
                         }
                 }
-                return constants.viewIdUpload;
             } catch (Exception ex) {
                 app.cp.Site.ErrorReport(ex);
                 throw;

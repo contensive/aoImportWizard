@@ -35,7 +35,6 @@ namespace Contensive.ImportWizard.Addons {
                             } else {
                                 notifyBody = $"This email is to notify you that your data import is complete for [{CP.Site.Name}]";
                             }
-                            string notifySubject = "Import Completed";
                             if (string.IsNullOrEmpty(resultMessage)) {
                                 resultMessage = "OK";
                             }
@@ -68,15 +67,12 @@ namespace Contensive.ImportWizard.Addons {
                 if (CSVFilename.Length > 0 && CSVFilename[0] == '\\') {
                     CSVFilename = CSVFilename.Substring(1);
                 }
-                string hint = "010";
                 string importData = cp.PrivateFiles.Read(CSVFilename);
                 if (string.IsNullOrEmpty(importData)) {
                     return string.Empty;
                 }
 
-                hint = "020";
                 var importMap = ImportMapModel.create(cp, ImportMapPathFilename);
-                hint = "040";
                 string[,] importDataCells = GenericController.parseFile(importData);
                 int importDataColumnCnt = importDataCells.GetUpperBound(0) + 1;
                 string ImportTableName = "";
@@ -95,14 +91,11 @@ namespace Contensive.ImportWizard.Addons {
                     ImportTableName = ImportTableName.Replace(" ", "_");
                     ImportTableName = ImportTableName.Replace("-", "_");
                     ImportTableName = ImportTableName.Replace(",", "_");
-                    hint = "060";
                     cp.Content.AddContent(importMap.contentName, ImportTableName);
-                    hint = "070";
                     int colPtr;
                     var loopTo = importDataColumnCnt - 1;
                     for (colPtr = 0; colPtr <= loopTo; colPtr++) {
                         importMap.mapPairs[colPtr] = new ImportMapModel_MapPair();
-                        hint = "080";
                         dBFieldName = importDataCells[colPtr, 0];
                         dBFieldName = encodeFieldName(cp, dBFieldName);
                         if (string.IsNullOrEmpty(dBFieldName)) {
@@ -112,13 +105,12 @@ namespace Contensive.ImportWizard.Addons {
                         importMap.mapPairs[colPtr].dbFieldType = 2;
                         importMap.mapPairs[colPtr].uploadFieldName = dBFieldName;
                         importMap.mapPairs[colPtr].uploadFieldPtr = colPtr;
-                        hint = "090";
                         cp.Content.AddContentField(importMap.contentName, dBFieldName, 2);
                     }
                 }
 
                 if (importMap.mapPairCnt > 0) {
-                    hint = "200";
+
                     int SourceKeyPtr = cp.Utils.EncodeInteger(importMap.sourceKeyField);
                     if (string.IsNullOrEmpty(importMap.dbKeyField) | SourceKeyPtr < 0) {
                         importMap.keyMethodID = (int)MapKeyEnum.KeyMethodInsertAll;
@@ -130,17 +122,17 @@ namespace Contensive.ImportWizard.Addons {
                     var loopTo1 = rowCnt - 1;
                     int LoopCnt = 0;
                     for (rowPtr = importMap.skipRowCnt; rowPtr <= loopTo1; rowPtr++) {
-                        hint = "300";
+
                         bool updateRecord = false;
                         bool insertRecord = false;
                         int rowWidth = 0;
                         if (true) {
-                            hint = "310";
+
                             if (importMap.keyMethodID == (int)MapKeyEnum.KeyMethodInsertAll) {
-                                hint = "320";
+
                                 insertRecord = true;
                             } else {
-                                hint = "330";
+
                                 string sourceKeyData = importDataCells[SourceKeyPtr, rowPtr];
                                 if (sourceKeyData.Length > 2 & sourceKeyData.StartsWith("\"") & sourceKeyData.EndsWith("\"")) {
                                     sourceKeyData = sourceKeyData.Substring(1, sourceKeyData.Length - 2).Trim();
@@ -150,7 +142,7 @@ namespace Contensive.ImportWizard.Addons {
                                         insertRecord = true;
                                     }
                                 } else {
-                                    hint = "340";
+
                                     switch (importMap.dbKeyFieldType) {
                                         case constants.FieldTypeAutoIncrement:
                                         case constants.FieldTypeCurrency:
@@ -200,16 +192,16 @@ namespace Contensive.ImportWizard.Addons {
                             var textFileManualUpdate = new List<textFileModel>();
                             string updateSQLFieldSet = "";
                             if (insertRecord | updateRecord) {
-                                hint = "400";
+
                                 int fieldPtr;
                                 var loopTo2 = importMap.mapPairCnt - 1;
                                 for (fieldPtr = 0; fieldPtr <= loopTo2; fieldPtr++) {
-                                    hint = "500";
+
                                     int uploadFieldPtr = importMap.mapPairs[fieldPtr].uploadFieldPtr;
                                     if (uploadFieldPtr == -1 || uploadFieldPtr < -2 || uploadFieldPtr >= importDataColumnCnt) {
                                         // ignore -1 = ignore, -3 = firstname + lastname, -4 = firstname from name, -5 = lastname from name
                                     } else {
-                                        hint = "600";
+
                                         dBFieldName = importMap.mapPairs[fieldPtr].dbFieldName;
                                         string importDataCellValue = "";
                                         if (uploadFieldPtr == -2) {
@@ -276,7 +268,7 @@ namespace Contensive.ImportWizard.Addons {
                                     }
                                 }
                             }
-                            hint = "700";
+
                             if (rowWidth == 0) {
                                 result += $"\r\nRow {rowPtr + 1} was not imported because it was empty.";
                             } else if (!string.IsNullOrEmpty(updateSQLFieldSet)) {
@@ -307,7 +299,7 @@ namespace Contensive.ImportWizard.Addons {
                                     cs.Close();
                                 }
                                 if (updateRecord) {
-                                    hint = "900";
+
                                     string UpdateSQL = $"update {ImportTableName} set {updateSQLFieldSet.Substring(1)} where {KeyCriteria}";
                                     cs.OpenSQL(UpdateSQL, cp.Content.GetDataSource(importMap.contentName));
                                 }

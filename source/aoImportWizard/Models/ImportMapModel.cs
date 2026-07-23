@@ -157,6 +157,7 @@ namespace Contensive.ImportWizard.Models {
         /// Save the import map data
         /// </summary>
         /// <param name="app"></param>
+        /// <param name="importConfig"></param>
         public void save(ApplicationModel app, ImportConfigModel importConfig) {
             try {
                 app.cp.PrivateFiles.Save(importConfig.importMapPathFilename, app.cp.JSON.Serialize(this));

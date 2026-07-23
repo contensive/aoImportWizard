@@ -107,10 +107,7 @@ namespace Contensive.ImportWizard.Models {
                 string FileData;
                 var ignoreLong = default(int);
                 var ignoreBoolean = default(bool);
-                bool foundFirstName = false;
-                bool foundLastName = false;
-                bool foundName = false;
-                // 
+                //
                 if (!string.IsNullOrEmpty(Filename)) {
                     if (sourceFieldCnt == 0) {
                         FileData = cp.PrivateFiles.Read(Filename);

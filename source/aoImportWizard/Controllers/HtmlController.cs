@@ -14,6 +14,11 @@ namespace Contensive.ImportWizard.Controllers {
         /// <param name="app"></param>
         /// <param name="filename"></param>
         /// <param name="noneCaption"></param>
+        /// <param name="dstContentId"></param>
+        /// <param name="allowControlFields"></param>
+        /// <param name="selectedValue"></param>
+        /// <param name="inputName"></param>
+        /// <param name="htmlId"></param>
         /// <returns></returns>
         public static string getSourceFieldSelect(ApplicationModel app, string filename, string noneCaption, int dstContentId, bool allowControlFields, int selectedValue, string inputName, string htmlId) {
             try {
@@ -100,6 +105,7 @@ namespace Contensive.ImportWizard.Controllers {
         /// <param name="ContentName"></param>
         /// <param name="NoneCaption"></param>
         /// <param name="AllowID"></param>
+        /// <param name="currentValue"></param>
         /// <returns></returns>
         public static string getDbFieldSelect(CPBaseClass cp, string ContentName, string NoneCaption, bool AllowID, string currentValue) {
             try {
