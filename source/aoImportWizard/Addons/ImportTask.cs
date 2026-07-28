@@ -149,7 +149,6 @@ namespace Contensive.ImportWizard.Addons {
                                         case constants.FieldTypeFloat:
                                         case constants.FieldTypeInteger:
                                         case constants.FieldTypeLookup:
-                                        case constants.FieldTypeManyToMany:
                                         case constants.FieldTypeMemberSelect: {
                                                 updateRecord = true;
                                                 KeyCriteria = $"({importMap.dbKeyField}={cp.Db.EncodeSQLNumber(cp.Utils.EncodeNumber(sourceKeyData))})";
@@ -217,7 +216,6 @@ namespace Contensive.ImportWizard.Addons {
                                             case constants.FieldTypeFloat:
                                             case constants.FieldTypeInteger:
                                             case constants.FieldTypeLookup:
-                                            case constants.FieldTypeManyToMany:
                                             case constants.FieldTypeMemberSelect: {
                                                     if (string.IsNullOrEmpty(importDataCellValue)) {
                                                         updateSQLFieldSet += $",{dBFieldName}=null";
@@ -225,6 +223,11 @@ namespace Contensive.ImportWizard.Addons {
                                                         double sourceConverted = cp.Utils.EncodeNumber(importDataCellValue);
                                                         updateSQLFieldSet += $",{dBFieldName}={cp.Db.EncodeSQLNumber(sourceConverted)}";
                                                     }
+                                                    break;
+                                                }
+                                            case constants.FieldTypeManyToMany:
+                                            case constants.FieldTypeRedirect: {
+                                                    // -- these field types have no database column, skip
                                                     break;
                                                 }
                                             case constants.FieldTypeBoolean: {
