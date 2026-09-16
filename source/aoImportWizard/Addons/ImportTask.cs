@@ -190,6 +190,7 @@ namespace Contensive.ImportWizard.Addons {
                             }
                             var textFileManualUpdate = new List<textFileModel>();
                             string updateSQLFieldSet = "";
+                            var processedFields = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
                             if (insertRecord | updateRecord) {
 
                                 int fieldPtr;
@@ -202,6 +203,12 @@ namespace Contensive.ImportWizard.Addons {
                                     } else {
 
                                         dBFieldName = importMap.mapPairs[fieldPtr].dbFieldName;
+
+                                        // skip if this field has already been processed to avoid duplicate column assignments
+                                        if (processedFields.Contains(dBFieldName)) {
+                                            continue;
+                                        }
+                                        processedFields.Add(dBFieldName);
                                         string importDataCellValue = "";
                                         if (uploadFieldPtr == -2) {
                                             importDataCellValue = importMap.mapPairs[fieldPtr].setValue;
