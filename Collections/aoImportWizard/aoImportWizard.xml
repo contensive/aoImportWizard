@@ -101,4 +101,6 @@
 		<DotNetClass><![CDATA[Contensive.ImportWizard.Addons.ImportTask]]></DotNetClass>
 		<ProcessInterval></ProcessInterval>
 	</Addon>
+	<importcollection></importcollection>
+	<Resource Name="layoutFiles.zip" Type="layoutFiles" Path="" />
 </Collection>
